@@ -143,7 +143,10 @@ export default function TerrainSection() {
               src={item.video}
               muted
               playsInline
+              preload="none"
+              loading="lazy"
               className="absolute z-10 inset-0 w-full h-full object-cover"
+              
             />
 
             <div className="relative z-10 bg-black/55 p-8 h-full flex flex-col justify-end">

@@ -35,7 +35,8 @@ export default function CarCards({ title, type, image, video }) {
         ref={videoRef}
         src={video}
         muted
-        
+        preload="none"
+  loading="lazy"
         playsInline
         className="
           absolute inset-0 w-full h-full object-contain

@@ -117,7 +117,9 @@ function Hero() {
         src="/videos/Toyota-Video.mp4"
         muted
         playsInline
-        preload="auto"
+        preload="none"
+  loading="lazy"
+
         className="absolute inset-0 w-full h-full object-cover"
       />
 
