@@ -4,7 +4,7 @@ export default function CarCards({ title, type, image, video }) {
   const videoRef = useRef(null);
   const cardRef = useRef(null);
 
-  // 🖥️ DESKTOP (unchanged)
+  // Desktop hover (unchanged)
   const enter = () => {
     if (!videoRef.current) return;
     videoRef.current.currentTime = 0;
@@ -17,11 +17,10 @@ export default function CarCards({ title, type, image, video }) {
     videoRef.current.currentTime = 0;
   };
 
-  // 📱 MOBILE fallback (NO logic change)
+  // Mobile viewport play
   useEffect(() => {
     const video = videoRef.current;
     const card = cardRef.current;
-
     if (!video || !card) return;
 
     const observer = new IntersectionObserver(
@@ -37,7 +36,6 @@ export default function CarCards({ title, type, image, video }) {
     );
 
     observer.observe(card);
-
     return () => observer.disconnect();
   }, []);
 
@@ -52,8 +50,11 @@ export default function CarCards({ title, type, image, video }) {
       <img
         src={image}
         alt={title}
-        className="absolute inset-0 w-full h-full object-contain
-        transition-opacity duration-500 group-hover:opacity-0"
+        className="
+          absolute inset-0 w-full h-full object-contain
+          transition-opacity duration-500
+          md:group-hover:opacity-0
+        "
       />
 
       {/* VIDEO */}
@@ -63,8 +64,12 @@ export default function CarCards({ title, type, image, video }) {
         muted
         playsInline
         preload="metadata"
-        className="absolute inset-0 w-full h-full object-contain
-        opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+        className="
+          absolute inset-0 w-full h-full object-contain
+          opacity-100 md:opacity-0
+          md:group-hover:opacity-100
+          transition-opacity duration-500
+        "
       />
 
       {/* TEXT */}
@@ -73,8 +78,13 @@ export default function CarCards({ title, type, image, video }) {
         <h3 className="text-xl font-light tracking-wide">{title}</h3>
       </div>
 
-      <span className="absolute -bottom-8 left-0 h-[1px] w-0
-      bg-white/50 transition-all duration-700 group-hover:w-full" />
+      <span
+        className="
+          absolute -bottom-8 left-0 h-[1px] w-0
+          bg-white/50 transition-all duration-700
+          group-hover:w-full
+        "
+      />
     </div>
   );
 }
