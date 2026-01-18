@@ -32,48 +32,47 @@ export default function TerrainSection() {
   const cardsRef = useRef([]);
   const videosRef = useRef([]);
 
-
-  useGSAP(()=>{
-    const firstF = SplitText.create(".first-text" , {
-            type: "chars",
-        })
-        
-        const paraSplit = SplitText.create(".terrain p" , {
-            type: "words , lines",
-            linesClass: "paragraph-line"
+  // GSAP high-level optimization for SplitText animations
+  useGSAP(() => {
+    const firstF = SplitText.create(".first-text", { type: "chars" });
+    const paraSplit = SplitText.create(".terrain p", {
+      type: "words, lines",
+      linesClass: "paragraph-line"
     });
-        gsap.from(firstF.chars , {
-            yPercent: 200 , 
-            stagger: 0.02,
-            ease: "power1.inOut",
-            scrollTrigger:{
-                trigger: ".terrain",
-                start: "top 75%",
-                scrub: true,
-                
-            }
-        })
-        const revealPara = gsap.timeline({
-        scrollTrigger:{
-            trigger:".terrain p",
-            start: "top 10%",
-            scrub:1,
-            
-        }
-    })
-    revealPara.from(paraSplit.words , {
-        yPercent: 300,
-        rotate: 50 , 
-        ease: "power1.inOut",
-        duration: 1,
-        stagger: 0.01,
-    })
-  })
+
+    gsap.from(firstF.chars, {
+      yPercent: 200,
+      stagger: 0.02,
+      ease: "power1.inOut",
+      scrollTrigger: {
+        trigger: ".terrain",
+        start: "top 75%",
+        scrub: true,
+      }
+    });
+
+    const revealPara = gsap.timeline({
+      scrollTrigger: {
+        trigger: ".terrain p",
+        start: "top 10%",
+        scrub: 1,
+      }
+    });
+
+    revealPara.from(paraSplit.words, {
+      yPercent: 300,
+      rotate: 50,
+      ease: "power1.inOut",
+      duration: 1,
+      stagger: 0.01,
+    });
+
+    // Refresh triggers after setup
+    requestAnimationFrame(() => ScrollTrigger.refresh());
+  });
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-
-        
 
       /* ===== PIN + STACK ANIMATION ===== */
       const pinTl = gsap.timeline({
@@ -85,7 +84,6 @@ export default function TerrainSection() {
           pin: true,
         }
       });
-      
 
       pinTl.from(cardsRef.current, {
         yPercent: 150,
@@ -93,18 +91,32 @@ export default function TerrainSection() {
         ease: "power1.out",
       });
 
-      /* ===== VIDEO PLAY / PAUSE (UNCHANGED) ===== */
+      /* ===== VIDEO PLAY / PAUSE (Safe + Lazy Load) ===== */
       cardsRef.current.forEach((card, i) => {
+        const videoEl = videosRef.current[i];
         ScrollTrigger.create({
           trigger: card,
           start: "top 25%",
           end: "bottom -80%",
-          onEnter: () => videosRef.current[i]?.play(),
-          onEnterBack: () => videosRef.current[i]?.play(),
-          onLeave: () => videosRef.current[i]?.pause(),
-          onLeaveBack: () => videosRef.current[i]?.pause(),
+          onEnter: () => videoEl?.play().catch(() => {}),
+          onEnterBack: () => videoEl?.play().catch(() => {}),
+          onLeave: () => {
+            if (videoEl) {
+              videoEl.pause();
+              videoEl.currentTime = 0;
+            }
+          },
+          onLeaveBack: () => {
+            if (videoEl) {
+              videoEl.pause();
+              videoEl.currentTime = 0;
+            }
+          },
         });
       });
+
+      // Force ScrollTrigger refresh for smooth scroll
+      requestAnimationFrame(() => ScrollTrigger.refresh());
 
     }, sectionRef);
 
@@ -114,7 +126,7 @@ export default function TerrainSection() {
   return (
     <section
       ref={sectionRef}
-      className="bg-gradient-to-b terrain from-[#141414] via-[#0d0d0d] to-black  py-12 px-12 overflow-hidden"
+      className="bg-gradient-to-b terrain from-[#141414] via-[#0d0d0d] to-black py-12 px-12 overflow-hidden"
     >
       {/* Header */}
       <div className="text-center mb-14 -mt-5 relative z-10">
@@ -146,22 +158,14 @@ export default function TerrainSection() {
               preload="none"
               loading="lazy"
               className="absolute z-10 inset-0 w-full h-full object-cover"
-              
             />
 
             <div className="relative z-10 bg-black/55 p-8 h-full flex flex-col justify-end">
-              <h3 className="text-4xl font-bold text-white">
-                {item.title}
-              </h3>
-              <p className="text-gray-300 mt-2">
-                {item.subtitle}
-              </p>
-
+              <h3 className="text-4xl font-bold text-white">{item.title}</h3>
+              <p className="text-gray-300 mt-2">{item.subtitle}</p>
               <div className="flex gap-6 mt-6">
                 {item.stats.map((s, idx) => (
-                  <span key={idx} className="text-sm text-gray-300">
-                    {s}
-                  </span>
+                  <span key={idx} className="text-sm text-gray-300">{s}</span>
                 ))}
               </div>
             </div>

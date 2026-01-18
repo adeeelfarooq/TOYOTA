@@ -26,55 +26,39 @@ export default function Cars() {
   const splitTextRef = useRef(null);
   const isFirstRender = useRef(true);
 
-  // Filter cars based on active filter using useMemo
   const filteredCars = useMemo(() => {
     return active === "All" ? carsData : carsData.filter(c => c.type === active);
   }, [active]);
 
   useGSAP(() => {
-    // First cleanup on every dependency change
     if (splitTextRef.current) {
       splitTextRef.current.revert();
       splitTextRef.current = null;
     }
-    
-    // Kill all ScrollTriggers from this component only
-    ScrollTrigger.getAll().forEach(trigger => {
-      if (trigger.trigger?.closest('.carsmodels') || 
-          trigger.trigger?.closest('.cars-section')) {
-        trigger.kill();
-      }
+
+    ScrollTrigger.getAll().forEach(t => {
+      if (t.trigger?.closest(".carsmodels") || t.trigger?.closest(".cars-section")) t.kill();
     });
 
     const wrapper = cardsWrapperRef.current;
     const row = cardsRowRef.current;
-
     if (!wrapper || !row) return;
 
-    // Calculate scroll distance based on current filtered cars
     const totalWidth = row.scrollWidth;
-    const viewport = window.innerWidth;
-    const scrollDistance = Math.max(0, totalWidth - viewport + 434);
+    const scrollDistance = Math.max(0, totalWidth - window.innerWidth + 434);
 
-    // Recreate SplitText
+    // SplitText for header
     splitTextRef.current = new SplitText(".first-message", {
       type: "words",
-      wordsClass: "word-item"
+      wordsClass: "word-item",
     });
 
-    // ---------------------------------------------------------
-    // 🔥 1. HEADER ANIMATION - Word by Word Highlight
-    // ---------------------------------------------------------
     const words = gsap.utils.toArray(".first-message .word-item");
-    
-    gsap.set(words, { 
-      color: "#666",
-      opacity: 0.7
-    });
+    gsap.set(words, { color: "#666", opacity: 0.7 });
 
     words.forEach((word, i) => {
       gsap.to(word, {
-        color: "#ffffff",
+        color: "#fff",
         opacity: 1,
         ease: "power2.out",
         scrollTrigger: {
@@ -82,32 +66,23 @@ export default function Cars() {
           start: `top+=${i * 50} 65%`,
           end: `top+=${i * 50 + 50} 100%`,
           scrub: 1,
-          toggleActions: "play none none reverse",
-          markers: false
-        }
+        },
       });
     });
 
-    // ---------------------------------------------------------
-    // 🔥 2. JOURNEY REVEAL ANIMATION
-    // ---------------------------------------------------------
+    // Journey reveal
     gsap.to(".journey-container", {
-      clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)",
+      clipPath: "polygon(0% 0%,100% 0%,100% 100%,0% 100%)",
       ease: "circ.inOut",
       scrollTrigger: {
         trigger: ".journey-container",
         start: "top 50%",
         end: "top 10%",
         scrub: true,
-        toggleActions: "play none none reverse",
-        markers: false
-      }
+      },
     });
 
-    // ---------------------------------------------------------
-    // 🚙 3. HORIZONTAL SCROLL LOGIC
-    // ---------------------------------------------------------
-    // Only create horizontal scroll animation if there are cars to show
+    // Horizontal scroll
     if (filteredCars.length > 0 && scrollDistance > 0) {
       gsap.to(row, {
         x: -scrollDistance,
@@ -123,19 +98,13 @@ export default function Cars() {
       });
     }
 
-    // Force refresh ScrollTrigger after animations are set up
-    setTimeout(() => {
-      ScrollTrigger.refresh();
-    }, 100);
-  }, [active]); // Only depend on active, not filteredCars
+    requestAnimationFrame(() => ScrollTrigger.refresh());
+  }, [active]);
 
-  // Force ScrollTrigger refresh when filtered cars change
+  // Refresh scrolltrigger on filtered cars update
   useEffect(() => {
     if (!isFirstRender.current) {
-      // Small delay to ensure DOM has updated
-      setTimeout(() => {
-        ScrollTrigger.refresh();
-      }, 150);
+      setTimeout(() => ScrollTrigger.refresh(), 150);
     } else {
       isFirstRender.current = false;
     }
@@ -143,11 +112,8 @@ export default function Cars() {
 
   return (
     <section className="bg-black text-white px-14 py-25 overflow-hidden carsmodels cars-section">
-      {/* ✅ HEADER */}
       <div className="flex items-end justify-between -mb-16 msgs">
-        <h1 
-          className="text-7xl font-sans first-message origin-bottom-left"
-        >
+        <h1 className="text-7xl font-sans first-message origin-bottom-left">
           EXPLORE MODELS
         </h1>
 
@@ -155,21 +121,14 @@ export default function Cars() {
           Crafted For Every
         </h2>
 
-        {/* ✅ Journey text aur logo ko ek container mein wrap kiya */}
         <div 
           className="journey-container flex items-center -translate-y-4 -translate-x-210"
           style={{ clipPath: "polygon(0% 0%, 0% 0%, 0% 100%, 0% 100%)" }}
         >
-          <h2 
-            className="journey font-sans text-gray-950 bg-toyota-red text-2xl flex items-center w-30"
-          >
+          <h2 className="journey font-sans text-gray-950 bg-toyota-red text-2xl flex items-center w-30">
             Journey
           </h2>
-          <img 
-            src="/images/Toyota-logo1.png" 
-            className="-ml-3 w-8" 
-            alt="Toyota Logo" 
-          />
+          <img src="/images/Toyota-logo1.png" className="-ml-3 w-8" alt="Toyota Logo" />
         </div>
 
         <div className="flex gap-6">
@@ -191,7 +150,7 @@ export default function Cars() {
         </div>
       </div>
 
-      {/* ✅ ONLY THIS PART SCROLLS */}
+      {/* Horizontal cards scroll */}
       <div ref={cardsWrapperRef} className="relative h-screen">
         <div
           ref={cardsRowRef}
