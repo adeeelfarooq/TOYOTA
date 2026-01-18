@@ -7,14 +7,14 @@ import { useGSAP } from "@gsap/react";
 gsap.registerPlugin(SplitText, ScrollTrigger);
 
 const carsData = [
-  { id: 1, title: "Supra GR", type: "Sports", image: "/images/Supra.png", video: "/videos/Supra-2020.mp4" },
-  { id: 2, title: "Toyota 4Runner", type: "SUV", image: "/images/4Runner.png", video: "/videos/4Runner.mp4" },
-  { id: 3, title: "Toyota Prius", type: "Sedan", image: "/images/prius-Photoroom.png", video: "/videos/Prius2025.mp4" },
-  { id: 4, title: "Toyota Prado", type: "SUV", image: "/images/Prado.png", video: "/videos/PRADO.mp4" },
-  { id: 5, title: "Toyota Camry", type: "Sedan", image: "/images/Camry.png", video: "/videos/Camry.mp4" },
-  { id: 6, title: "Supra MK", type: "Sports", image: "/images/Supra-old1.png", video: "/videos/Supra-Mk4.mp4" },
-  { id: 7, title: "Toyota 2000", type: "Sports", image: "/images/2000gt-supra.png", video: "/videos/GT2000.mp4" },
-  { id: 8, title: "Toyota V8", type: "SUV", image: "/images/V8.png", video: "/videos/Land-V8.mp4" },
+  { id: 1, title: "Supra GR", type: "Sports", image: "/images/Supra.png", video: "/videos/Supra-2020.webm" },
+  { id: 2, title: "Toyota 4Runner", type: "SUV", image: "/images/4Runner.png", video: "/videos/4Runner.webm" },
+  { id: 3, title: "Toyota Prius", type: "Sedan", image: "/images/prius-Photoroom.png", video: "/videos/Prius2025.webm" },
+  { id: 4, title: "Toyota Prado", type: "SUV", image: "/images/Prado.png", video: "/videos/PRADO.webm" },
+  { id: 5, title: "Toyota Camry", type: "Sedan", image: "/images/Camry.png", video: "/videos/Camry.webm" },
+  { id: 6, title: "Supra MK", type: "Sports", image: "/images/Supra-old1.png", video: "/videos/Supra-Mk4.webm" },
+  { id: 7, title: "Toyota 2000", type: "Sports", image: "/images/2000gt-supra.png", video: "/videos/GT2000.webm" },
+  { id: 8, title: "Toyota V8", type: "SUV", image: "/images/V8.png", video: "/videos/Land-V8.webm" },
 ];
 
 const filters = ["All", "SUV", "Sedan", "Sports"];
