@@ -17,24 +17,16 @@ export default function CarCards({ title, type, image, video }) {
     videoRef.current.currentTime = 0;
   };
 
-  // Mobile viewport play - FIXED
+  // Mobile viewport play
   useEffect(() => {
     const video = videoRef.current;
     const card = cardRef.current;
     if (!video || !card) return;
 
-    // Force video to load
-    video.load();
-
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
-          // Show video on mobile (it's already visible via CSS)
-          // Try to play if possible
-          video.play().catch(() => {
-            // If autoplay fails, that's okay - video will still show
-            console.log("Autoplay blocked on mobile");
-          });
+          video.play().catch(() => {});
         } else {
           video.pause();
           video.currentTime = 0;
@@ -44,14 +36,7 @@ export default function CarCards({ title, type, image, video }) {
     );
 
     observer.observe(card);
-
-    return () => {
-      observer.disconnect();
-      if (video) {
-        video.pause();
-        video.currentTime = 0;
-      }
-    };
+    return () => observer.disconnect();
   }, []);
 
   return (
@@ -61,7 +46,7 @@ export default function CarCards({ title, type, image, video }) {
       onMouseLeave={leave}
       className="car-card relative w-[410px] h-[260px] group cursor-pointer shrink-0"
     >
-      {/* IMAGE - Hidden on mobile when video should show */}
+      {/* IMAGE */}
       <img
         src={image}
         alt={title}
@@ -69,12 +54,10 @@ export default function CarCards({ title, type, image, video }) {
           absolute inset-0 w-full h-full object-contain
           transition-opacity duration-500
           md:group-hover:opacity-0
-          md:opacity-100
-          opacity-0 md:opacity-100
         "
       />
 
-      {/* VIDEO - Always shown on mobile, hidden on desktop until hover */}
+      {/* VIDEO */}
       <video
         ref={videoRef}
         src={video}
@@ -83,9 +66,8 @@ export default function CarCards({ title, type, image, video }) {
         preload="metadata"
         className="
           absolute inset-0 w-full h-full object-contain
-          md:opacity-0
+          opacity-100 md:opacity-0
           md:group-hover:opacity-100
-          opacity-100
           transition-opacity duration-500
         "
       />
