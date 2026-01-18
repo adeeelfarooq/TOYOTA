@@ -17,27 +17,39 @@ export default function CarCards({ title, type, image, video }) {
     videoRef.current.currentTime = 0;
   };
 
-  // Mobile viewport play - FIXED VERSION
+  // Mobile viewport play - SIMPLE FIX
   useEffect(() => {
     const video = videoRef.current;
     const card = cardRef.current;
     if (!video || !card) return;
 
-    // Check if mobile
-    const isMobile = window.innerWidth < 768;
-    if (!isMobile) return; // Only run on mobile
+    // Load video first
+    video.load();
 
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
-          // Play video
-          video.play().catch(() => {
-            // If autoplay fails, try with muted
-            video.muted = true;
-            video.play().catch(() => {});
-          });
+          // Try to play video
+          const playPromise = video.play();
+          
+          // Handle autoplay restrictions
+          if (playPromise !== undefined) {
+            playPromise.catch(error => {
+              // If autoplay fails, try with user gesture simulation
+              console.log("Autoplay prevented:", error);
+              
+              // Add a click handler to allow play on first tap
+              const handleFirstTap = () => {
+                video.play().catch(() => {});
+                card.removeEventListener('click', handleFirstTap);
+                card.removeEventListener('touchstart', handleFirstTap);
+              };
+              
+              card.addEventListener('click', handleFirstTap);
+              card.addEventListener('touchstart', handleFirstTap);
+            });
+          }
         } else {
-          // Pause and reset when not visible
           video.pause();
           video.currentTime = 0;
         }
@@ -46,22 +58,35 @@ export default function CarCards({ title, type, image, video }) {
     );
 
     observer.observe(card);
-    
-    // Also load video for mobile
-    video.load();
-    
+
     return () => {
       observer.disconnect();
-      video.pause();
-      video.currentTime = 0;
+      if (video) {
+        video.pause();
+        video.currentTime = 0;
+      }
     };
   }, []);
+
+  // Add click handler for mobile
+  const handleClick = () => {
+    // On mobile, clicking the card should play/pause video
+    if (window.innerWidth < 768 && videoRef.current) {
+      if (videoRef.current.paused) {
+        videoRef.current.play();
+      } else {
+        videoRef.current.pause();
+        videoRef.current.currentTime = 0;
+      }
+    }
+  };
 
   return (
     <div
       ref={cardRef}
       onMouseEnter={enter}
       onMouseLeave={leave}
+      onClick={handleClick}
       className="car-card relative w-[410px] h-[260px] group cursor-pointer shrink-0"
     >
       {/* IMAGE */}
@@ -73,7 +98,7 @@ export default function CarCards({ title, type, image, video }) {
           transition-opacity duration-500
           md:group-hover:opacity-0
         "
-        loading="lazy" // Added for optimization
+        loading="lazy"
       />
 
       {/* VIDEO */}
