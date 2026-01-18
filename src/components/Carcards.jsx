@@ -17,17 +17,27 @@ export default function CarCards({ title, type, image, video }) {
     videoRef.current.currentTime = 0;
   };
 
-  // Mobile viewport play
+  // Mobile viewport play - FIXED VERSION
   useEffect(() => {
     const video = videoRef.current;
     const card = cardRef.current;
     if (!video || !card) return;
 
+    // Check if mobile
+    const isMobile = window.innerWidth < 768;
+    if (!isMobile) return; // Only run on mobile
+
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
-          video.play().catch(() => {});
+          // Play video
+          video.play().catch(() => {
+            // If autoplay fails, try with muted
+            video.muted = true;
+            video.play().catch(() => {});
+          });
         } else {
+          // Pause and reset when not visible
           video.pause();
           video.currentTime = 0;
         }
@@ -36,7 +46,15 @@ export default function CarCards({ title, type, image, video }) {
     );
 
     observer.observe(card);
-    return () => observer.disconnect();
+    
+    // Also load video for mobile
+    video.load();
+    
+    return () => {
+      observer.disconnect();
+      video.pause();
+      video.currentTime = 0;
+    };
   }, []);
 
   return (
@@ -55,6 +73,7 @@ export default function CarCards({ title, type, image, video }) {
           transition-opacity duration-500
           md:group-hover:opacity-0
         "
+        loading="lazy" // Added for optimization
       />
 
       {/* VIDEO */}
