@@ -7,6 +7,11 @@ import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
 import Cars from './sections/Cars';
 import Marketing from './sections/Marketing';
+import TechnologySection from './sections/Technology';
+
+
+
+
 
 
 
@@ -28,10 +33,12 @@ const App = () => {
          
 <Hero/>
 <Cars/>
+
 <div>
 
 
 <Marketing/>
+<TechnologySection/>
 
 </div>
     
