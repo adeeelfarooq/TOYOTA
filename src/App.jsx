@@ -15,6 +15,8 @@ import TechnologySection from './sections/Technology';
 
 
 
+
+
 gsap.registerPlugin(ScrollTrigger , ScrollToPlugin ,  ScrollSmoother);
 
 const App = () => {
@@ -39,6 +41,7 @@ const App = () => {
 
 <Marketing/>
 <TechnologySection/>
+
 
 </div>
     

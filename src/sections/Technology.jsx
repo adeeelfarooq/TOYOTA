@@ -6,14 +6,16 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import CarModel from "../components/Carmodel";
 
-
 gsap.registerPlugin(ScrollTrigger);
 
 export default function TechnologySection() {
   const sectionRef = useRef();
   const scrollProgress = useRef(0);
   const controlsRef = useRef();
-  
+  const ringAnimRef = useRef(); // NEW ref for ground ring
+
+  const carAnimRef = useRef(); 
+
   const [viewMode, setViewMode] = useState("default");
   const [cameraDistance, setCameraDistance] = useState(6);
 
@@ -25,23 +27,19 @@ export default function TechnologySection() {
   const numberRef = useRef();
   const viewModeRef = useRef();
 
-  /* ---------- FIX: Initialize and Monitor Camera Controls ---------- */
-  // Replaced the two original useEffect hooks with this single, robust hook
-  // to fix the race condition on initial load.
+  /* ---------- FIX 1: Initialize Camera Controls ---------- */
   useEffect(() => {
     let animationFrameId;
-    let initialized = false; // Flag to run initialization logic only once
+    let initialized = false; 
 
     const monitorAndInitialize = () => {
       const controls = controlsRef.current;
 
-      // First, wait for the OrbitControls ref to be available.
       if (!controls) {
         animationFrameId = requestAnimationFrame(monitorAndInitialize);
         return;
       }
 
-      // When controls are available, run the initialization logic ONCE.
       if (!initialized) {
         const distance = controls.getDistance();
         setCameraDistance(distance);
@@ -53,42 +51,106 @@ export default function TechnologySection() {
         initialized = true;
       }
 
-      // After initialization, continue monitoring on every frame.
       const currentDistance = controls.getDistance();
-      setCameraDistance(currentDistance); // Update for UI elements like the zoom bar
+      setCameraDistance(currentDistance);
 
-      // Use the functional update form of setState to get the latest state
-      // and prevent unnecessary re-renders if the mode hasn't changed.
       setViewMode(prevViewMode => {
-        if (currentDistance > 3.5) {
-          return "default";
-        }
-        if (currentDistance <= 3.5 && currentDistance > 1.4) {
-          return "exterior";
-        }
-        if (currentDistance <= 1.4) {
-          return "interior";
-        }
-        return prevViewMode; // Return the same state if no change is needed
+        if (currentDistance > 3.5) return "default";
+        if (currentDistance <= 3.5 && currentDistance > 1.4) return "exterior";
+        if (currentDistance <= 1.4) return "interior";
+        return prevViewMode; 
       });
 
-      // Continue the animation loop
       animationFrameId = requestAnimationFrame(monitorAndInitialize);
     };
 
-    // Start the loop
     animationFrameId = requestAnimationFrame(monitorAndInitialize);
 
-    // Cleanup function to cancel the loop when the component unmounts
     return () => {
       cancelAnimationFrame(animationFrameId);
     };
-  }, []); // Empty dependency array ensures this effect runs only once on mount
+  }, []);
 
-  /* ---------- Scroll-based rotation ---------- */
+  /* ---------- FIX 2: Robust Scroll-based rotation for Car ---------- */
+  // Ye wala useEffect specifically fix kiya gya hai ta ke refresh par bhi animation chale
+  useEffect(() => {
+    let ctx;
+    let rafId;
+
+    const initCarAnimation = () => {
+      // Check agar car ka ref ya section abhi tak load nahi hua
+      if (!carAnimRef.current || !sectionRef.current) {
+        rafId = requestAnimationFrame(initCarAnimation); // Wait for next frame
+        return;
+      }
+
+      // Jab Ref mil jaye, tab animation register karein
+      ctx = gsap.context(() => {
+        
+        // Position Animation
+        gsap.fromTo(
+          carAnimRef.current.position,
+          { y: -4 , opacity: 0  }, // start below the ground
+          {
+            opacity: 1,
+            y: 0,     // final car position
+            duration: 2,
+            ease: "power3.out",
+            scrollTrigger: {
+              trigger: sectionRef.current,
+              start: "top 20%",
+              toggleActions: "play none none reverse",
+            },
+          }
+        );
+        gsap.fromTo(
+        ringAnimRef.current,
+        { y:300,   }, // start below car
+        { y: 0, opacity: 1, duration: 2, ease: "power3.out" , 
+          scrollTrigger: {
+              trigger: sectionRef.current,
+              start: "top 20%",
+              toggleActions: "play none none reverse",
+            },
+         },
+        
+      );
+        // Scale Animation
+        // gsap.fromTo(
+        //   carAnimRef.current.scale,
+        //   { x: 0.8, y: 0.8, z: 0.8 , opacity:0 },
+        //   {
+        //     opacity:1,
+        //     x: 1,
+        //     y: 1,
+        //     z: 1,
+        //     duration: 2,
+        //     ease: "power3.out",
+        //     scrollTrigger: {
+        //       trigger: sectionRef.current,
+        //       start: "top 10%",
+        //       toggleActions: "play none none reverse",
+        //     },
+        //   }
+        // );
+
+      }, sectionRef);
+    };
+
+    // Start checking for ref
+    initCarAnimation();
+
+    // Cleanup
+    return () => {
+      if (ctx) ctx.revert();
+      cancelAnimationFrame(rafId);
+    };
+  }, []); // Run once on mount
+
+  /* ---------- UI Animations ---------- */
   useEffect(() => {
     const ctx = gsap.context(() => {
-      // Main scroll animation for car rotation
+      // Main scroll animation for car rotation logic (progress tracking)
       gsap.to(scrollProgress, {
         current: 1,
         ease: "none",
@@ -103,16 +165,29 @@ export default function TechnologySection() {
         },
       });
 
+      gsap.fromTo(".scroll" , 
+        { opacity: 0, y: 60 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 2,
+          delay: 0.6,
+          ease: "bounce.inOut",
+          scrollTrigger: {
+            trigger: sectionRef.current,
+            start: "top 10%",
+            toggleActions: "play none none reverse"
+          }
+        }
+      )
+
       // Staggered text animations
       gsap.fromTo(discoverRef.current,
-        {
-          opacity: 0,
-          x: -100,
-        },
+        { opacity: 0, x: -100 },
         {
           opacity: 1,
           x: 0,
-          duration: 1.2,
+          duration: 2.2,
           ease: "power3.out",
           scrollTrigger: {
             trigger: sectionRef.current,
@@ -123,14 +198,11 @@ export default function TechnologySection() {
       );
 
       gsap.fromTo(innovationRef.current,
-        {
-          opacity: 0,
-          x: -80,
-        },
+        { opacity: 0, x: -80 },
         {
           opacity: 1,
           x: 0,
-          duration: 1.2,
+          duration: 2.2,
           delay: 0.15,
           ease: "power3.out",
           scrollTrigger: {
@@ -142,10 +214,7 @@ export default function TechnologySection() {
       );
 
       gsap.fromTo(perfectedRef.current,
-        {
-          opacity: 0,
-          x: -60,
-        },
+        { opacity: 0, x: -60 },
         {
           opacity: 1,
           x: 0,
@@ -161,10 +230,7 @@ export default function TechnologySection() {
       );
 
       gsap.fromTo(modelNameRef.current,
-        {
-          opacity: 0,
-          y: 20
-        },
+        { opacity: 0, y: 20 },
         {
           opacity: 1,
           y: 0,
@@ -180,10 +246,7 @@ export default function TechnologySection() {
       );
 
       gsap.fromTo(descriptionRef.current,
-        {
-          opacity: 0,
-          y: 30
-        },
+        { opacity: 0, y: 30 },
         {
           opacity: 1,
           y: 0,
@@ -192,18 +255,16 @@ export default function TechnologySection() {
           ease: "power3.out",
           scrollTrigger: {
             trigger: sectionRef.current,
-            start: "top 75%",
+            start: "top 20%",
             toggleActions: "play none none reverse"
           }
-        }
+        } 
       );
 
       gsap.fromTo(numberRef.current,
+        { opacity: 0, scale: 0.5, color:"red" },
         {
-          opacity: 0,
-          scale: 0.5,
-        },
-        {
+          color:"red",
           opacity: 1,
           scale: 1,
           duration: 1.2,
@@ -211,7 +272,7 @@ export default function TechnologySection() {
           ease: "elastic.out(1, 0.5)",
           scrollTrigger: {
             trigger: sectionRef.current,
-            start: "top 70%",
+            start: "top 13%",
             toggleActions: "play none none reverse"
           }
         }
@@ -229,7 +290,6 @@ export default function TechnologySection() {
     const tl = gsap.timeline();
 
     if (viewMode === "default") {
-      // Show all UI elements
       tl.to(".ui-element", {
         opacity: 1,
         y: 0,
@@ -245,25 +305,11 @@ export default function TechnologySection() {
         ease: "power2.out"
       }, 0);
 
-      // Highlight default in indicator
-      gsap.to(".indicator-default", {
-        backgroundColor: "red",
-        duration: 0.3,
-        ease: "power2.out"
-      });
-      gsap.to(".indicator-exterior", {
-        backgroundColor: "#6b7280",
-        duration: 0.3,
-        ease: "power2.out"
-      });
-      gsap.to(".indicator-interior", {
-        backgroundColor: "#6b7280",
-        duration: 0.3,
-        ease: "power2.out"
-      });
+      gsap.to(".indicator-default", { backgroundColor: "red", duration: 0.3, ease: "power2.out" });
+      gsap.to(".indicator-exterior", { backgroundColor: "#6b7280", duration: 0.3, ease: "power2.out" });
+      gsap.to(".indicator-interior", { backgroundColor: "#6b7280", duration: 0.3, ease: "power2.out" });
 
     } else if (viewMode === "exterior") {
-      // Hide main UI elements
       tl.to(".ui-element", {
         opacity: 0,
         y: -20,
@@ -272,7 +318,6 @@ export default function TechnologySection() {
         stagger: 0.02
       }, 0);
 
-      // Ensure indicator is visible
       tl.to(".view-mode-indicator", {
         opacity: 1,
         x: 0,
@@ -280,25 +325,11 @@ export default function TechnologySection() {
         ease: "power2.out"
       }, 0);
 
-      // Highlight exterior in indicator
-      gsap.to(".indicator-default", {
-        backgroundColor: "#6b7280",
-        duration: 0.3,
-        ease: "power2.out"
-      });
-      gsap.to(".indicator-exterior", {
-        backgroundColor: "red",
-        duration: 0.3,
-        ease: "power2.out"
-      });
-      gsap.to(".indicator-interior", {
-        backgroundColor: "#6b7280",
-        duration: 0.3,
-        ease: "power2.out"
-      });
+      gsap.to(".indicator-default", { backgroundColor: "#6b7280", duration: 0.3, ease: "power2.out" });
+      gsap.to(".indicator-exterior", { backgroundColor: "red", duration: 0.3, ease: "power2.out" });
+      gsap.to(".indicator-interior", { backgroundColor: "#6b7280", duration: 0.3, ease: "power2.out" });
 
     } else if (viewMode === "interior") {
-      // Hide main UI elements
       tl.to(".ui-element", {
         opacity: 0,
         y: -20,
@@ -307,7 +338,6 @@ export default function TechnologySection() {
         stagger: 0.02
       }, 0);
 
-      // Ensure indicator is visible
       tl.to(".view-mode-indicator", {
         opacity: 1,
         x: 0,
@@ -315,25 +345,11 @@ export default function TechnologySection() {
         ease: "power2.out"
       }, 0);
 
-      // Highlight interior in indicator
-      gsap.to(".indicator-default", {
-        backgroundColor: "#6b7280",
-        duration: 0.3,
-        ease: "power2.out"
-      });
-      gsap.to(".indicator-exterior", {
-        backgroundColor: "#6b7280",
-        duration: 0.3,
-        ease: "power2.out"
-      });
-      gsap.to(".indicator-interior", {
-        backgroundColor: "red",
-        duration: 0.3,
-        ease: "power2.out"
-      });
+      gsap.to(".indicator-default", { backgroundColor: "#6b7280", duration: 0.3, ease: "power2.out" });
+      gsap.to(".indicator-exterior", { backgroundColor: "#6b7280", duration: 0.3, ease: "power2.out" });
+      gsap.to(".indicator-interior", { backgroundColor: "red", duration: 0.3, ease: "power2.out" });
     }
 
-    // Animate view mode text
     gsap.to(".view-mode-text", {
       opacity: 1,
       y: 0,
@@ -344,7 +360,6 @@ export default function TechnologySection() {
 
   }, [viewMode]);
 
-  // Debug: Log camera distance (remove in production)
   useEffect(() => {
     console.log("Camera Distance:", cameraDistance, "View Mode:", viewMode);
   }, [cameraDistance, viewMode]);
@@ -352,24 +367,21 @@ export default function TechnologySection() {
   return (
     <section
       ref={sectionRef}
-      className="relative w-full h-screen  overflow-hidden"
+      className="relative w-full h-screen overflow-hidden"
     >
       {/* Background Image */}
-<div
-  className="absolute inset-0 bg-cover bg-center z-0"
-  style={{
-    backgroundImage: "url('/images/bg-1.png')",
-  }}
-></div>
+      <div
+        className="absolute inset-0 bg-cover bg-center z-0"
+        style={{
+          backgroundImage: "url('/images/bg-1.png')",
+        }}
+      ></div>
 
-{/* Dark overlay for readability */}
-<div className="absolute inset-0 bg-black/50 z-0"></div>
-
-      
+      {/* Dark overlay for readability */}
+      <div className="absolute inset-0 bg-black/50 z-0"></div>
 
       {/* Left Content - Top Left */}
       <div className="absolute top-12 left-16 z-20 max-w-md">
-        {/* Main Headings */}
         <div className="mb-6">
           <div className="overflow-hidden mb-1">
             <h1
@@ -399,13 +411,11 @@ export default function TechnologySection() {
           </div>
         </div>
 
-        {/* Model Name */}
         <div className="overflow-hidden mb-8">
           <h4
             ref={modelNameRef}
-            className="ui-element text-xl  font-medium text-gray-400 tracking-wide uppercase opacity-0"
+            className="ui-element text-xl font-medium text-gray-400 tracking-wide uppercase opacity-0"
           >
-            
           </h4>
         </div>
       </div>
@@ -415,7 +425,7 @@ export default function TechnologySection() {
         <div className="overflow-hidden">
           <p
             ref={descriptionRef}
-            className="ui-element text-milk-yellow text-xs leading-relaxed  opacity-0 font-paragraph"
+            className="ui-element text-milk-yellow text-xs leading-relaxed opacity-0 font-paragraph"
           >
             Advanced automotive systems and precision engineering redefine driving excellence.
           </p>
@@ -425,40 +435,32 @@ export default function TechnologySection() {
       {/* Right Bottom Corner - Number 01 */}
       <div className="absolute right-20 bottom-20 z-20">
         <div className="relative">
-          {/* Circle background */}
           <div className="absolute -inset-4 rounded-full border border-red-600/30"></div>
-
-          {/* Number */}
           <div
             ref={numberRef}
             className="ui-element relative text-3xl font-black text-milk-yellow opacity-0 "
           >
             GR
-            
           </div>
-
-          {/* Small text under number */}
           <div className="absolute -bottom-6 left-1/2 -translate-x-1/2">
             <span className="text-milk-yellow text-xl font-medium">TOYOTA</span>
           </div>
         </div>
       </div>
 
-      {/* View Mode Indicator - Top Right Corner */}
+      {/* View Mode Indicator */}
       <div
         ref={viewModeRef}
         className="view-mode-indicator absolute top-10 right-10 z-30 pointer-events-none"
       >
         <div className="bg-black/60 backdrop-blur-lg rounded-xl p-5 border border-white/10 shadow-2xl">
           <div className="flex items-center gap-4">
-            {/* View mode circles */}
             <div className="flex flex-col gap-3">
               <div className="indicator-default w-4 h-4 rounded-full bg-gray-600"></div>
               <div className="indicator-exterior w-4 h-4 rounded-full bg-gray-600"></div>
               <div className="indicator-interior w-4 h-4 rounded-full bg-gray-600"></div>
             </div>
 
-            {/* View mode labels */}
             <div className="flex flex-col gap-2">
               <div className="view-mode-text">
                 <span className={`text-sm font-semibold ${viewMode === "default" ? 'text-white' : 'text-gray-500'}`}>
@@ -478,7 +480,6 @@ export default function TechnologySection() {
             </div>
           </div>
 
-          {/* Distance indicator */}
           <div className="mt-4 pt-4 border-t border-white/10">
             <div className="text-milk-yellow text-xs mb-1">ZOOM LEVEL</div>
             <div className="w-full bg-gray-800 rounded-full h-2">
@@ -498,12 +499,10 @@ export default function TechnologySection() {
 
       {/* 3D Canvas */}
       <Canvas
-        className="absolute inset-0"
+        className="absolute inset-0 z-1 translate-x-10"
         camera={{ position: [0, 1.2, 6], fov: 45 }}
         dpr={[1, 2]}
       >
-        
-
         {/* Lighting */}
         <ambientLight intensity={0.6} />
         <directionalLight position={[5, 5, 5]} intensity={1.2} />
@@ -511,9 +510,9 @@ export default function TechnologySection() {
         <directionalLight position={[0, 10, 0]} intensity={0.4} />
 
         {/* Car Model */}
-        <CarModel scrollProgress={scrollProgress} />
+        <CarModel scrollProgress={scrollProgress} animRef={carAnimRef} />
 
-        {/* OrbitControls with correct distance limits */}
+        {/* OrbitControls */}
         <OrbitControls
           ref={controlsRef}
           enableZoom={true}
@@ -529,21 +528,38 @@ export default function TechnologySection() {
           makeDefault={true}
         />
       </Canvas>
+      
+      <div
+      ref={ringAnimRef} className="absolute bottom-10 left-1/2 -translate-x-1/2 pointer-events-none z-0 ">
+        {/* Rotating Ground Ring */}
+        <img
+          src="/images/ring.png"
+          alt="ground ring"
+          className="
+            w-[440px]
+            opacity-60
+            translate-x-10
+            scale-x-[1.8]
+            scale-y-[0.8]
+            blur-[0.6px]
+            animate-[spin_40s_linear_infinite_reverse]
+            origin-center
+          "
+        />
+      </div>
 
       {/* Shadow under car */}
       <div className="absolute bottom-14 left-1/2 -translate-x-1/2 w-96 h-14 rounded-full bg-black/50 blur-2xl"></div>
 
-      
-
       {/* Scroll indicator */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 z-20">
+      <div className="scroll absolute bottom-5 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 z-20">
         <span className="text-milk-yellow text-xs">SCROLL TO ROTATE</span>
         <div className="w-5 h-8 border border-white/20 rounded-full flex justify-center pt-1">
           <div className="w-1 h-2 bg-red-500 rounded-full animate-bounce"></div>
         </div>
       </div>
 
-      {/* Debug info (can be removed in production) */}
+      {/* Debug info */}
       <div className="absolute bottom-4 left-4 text-xs text-milk-yellow z-30">
         Camera Distance: {cameraDistance.toFixed(2)} | View Mode: {viewMode}
       </div>

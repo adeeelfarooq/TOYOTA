@@ -1,17 +1,22 @@
-
 import { useRef, useMemo } from "react";
 import { useFrame } from "@react-three/fiber";
 import { useGLTF } from "@react-three/drei";
 import { MeshoptDecoder } from "meshoptimizer";
 
-export default function CarModel({ scrollProgress }) {
-  const { scene } = useGLTF("/models/toyota_gr_supra-compressed.glb", true, undefined, loader => {
-  loader.setMeshoptDecoder(MeshoptDecoder);
-});
-  const ref = useRef();
-  
+export default function CarModel({ scrollProgress, animRef }) {
+  const { scene } = useGLTF(
+    "/models/toyota_gr_supra-compressed.glb",
+    true,
+    undefined,
+    (loader) => {
+      loader.setMeshoptDecoder(MeshoptDecoder);
+    }
+  );
 
-  // Optimize scene meshes once
+  const ref = useRef(); // rotation
+  // Wrap everything in group for animation
+  const groupRef = animRef || useRef();
+
   const model = useMemo(() => {
     scene.traverse((obj) => {
       if (obj.isMesh) {
@@ -22,34 +27,29 @@ export default function CarModel({ scrollProgress }) {
     return scene;
   }, [scene]);
 
-  // Track current rotation
+  // Track rotation
   const currentRotation = useRef(0);
 
   useFrame(() => {
     if (!ref.current) return;
 
-    // Continuous automatic rotation
-    currentRotation.current += 0.003; // adjust speed here
-
-    // Scroll-based rotation added
     const scrollRotation = scrollProgress.current * Math.PI * 2;
-
-    // Combine scroll + auto rotation
+    currentRotation.current += 0.003;
     ref.current.rotation.y = currentRotation.current + scrollRotation;
 
-    // Keep rotation within 0-2π for smooth looping
     if (currentRotation.current > Math.PI * 2) currentRotation.current -= Math.PI * 2;
   });
 
   return (
-    <primitive
-      ref={ref}
-      object={model}
-      scale={0.9}               // car size
-      position={[0, -0.6, 0]}   // move car down
-    />
+    <group ref={groupRef} position={[0, 0, 0]} scale={[1, 1, 1]}>
+      <primitive
+        ref={ref}
+        object={model}
+        scale={0.9}              
+        position={[0, -0.6, 0]}  // relative to group
+      />
+    </group>
   );
 }
 
-// Preload model
 useGLTF.preload("/models/toyota_gr_supra-compressed.glb");
