@@ -8,6 +8,7 @@ import { useGSAP } from '@gsap/react';
 import Cars from './sections/Cars';
 import Marketing from './sections/Marketing';
 import TechnologySection from './sections/Technology';
+import ModernTestimonialsSection from './sections/Testimonial';
 
 
 
@@ -41,6 +42,7 @@ const App = () => {
 
 <Marketing/>
 <TechnologySection/>
+<ModernTestimonialsSection/>
 
 
 </div>
