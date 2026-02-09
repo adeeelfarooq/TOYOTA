@@ -371,7 +371,7 @@ export default function TechnologySection() {
     >
       {/* Background Image */}
       <div
-        className="absolute inset-0 bg-cover bg-center z-0"
+        className="absolute inset-0 bg-cover bg-center z-0 rotate-180"
         style={{
           backgroundImage: "url('/images/bg-1.png')",
         }}
