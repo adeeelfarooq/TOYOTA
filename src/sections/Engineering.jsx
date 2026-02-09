@@ -37,7 +37,7 @@ const EngineeringSection = () => {
         splitTextRef.current.revert();
         splitTextRef.current = null;
       }
-
+      
       // SplitText for "ENGINEERED FROM"
       const splitTextTop = new SplitText(textTopRef.current, {
         type: "words",
@@ -167,6 +167,9 @@ const EngineeringSection = () => {
         { opacity: 1, y: 0, duration: 0.5 }, 
         1 // Ye thora der baad start hoga
       );
+      
+
+      
 
     }, containerRef);
 
