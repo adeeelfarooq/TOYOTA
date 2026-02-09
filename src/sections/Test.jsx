@@ -26,7 +26,7 @@ const TestPage = () => {
         trigger: containerRef.current,
         start: "top top",
         end: "+=400%",
-        scrub: 0,
+        scrub: true,
         pin: true,
         markers: true,
       }
@@ -53,7 +53,7 @@ const TestPage = () => {
       opacity: 1,
       transformPerspective: 1000,
       
-    })
+    } , "-=0.3")
     
 
   }, { scope: containerRef });
