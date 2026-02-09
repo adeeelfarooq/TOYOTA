@@ -25,7 +25,7 @@ const TestPage = () => {
       scrollTrigger: {
         trigger: containerRef.current,
         start: "top top",       
-        end: "+=270%",          
+        end: "+=290%",          
         // CHANGE 1: Scrub ko 0 kiya. 
         // Iska matlab hai 'No Wait'. Scroll karte hi animation chalegi.
         scrub: 0,             
