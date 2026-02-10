@@ -23,7 +23,7 @@ const TestPage = () => {
 
     // Videos ko screen ke neeche bhej do initially
     gsap.set(".video-card", {
-        y: window.innerHeight * 1.5,
+        x: window.innerHeight * 1.5,
         opacity: 1
     });
     
@@ -63,10 +63,10 @@ const TestPage = () => {
     // --- STEP 2: Videos Entry ---
     // Text animation k baad ye chalega
     .to(".video-card", {
-        y: 0, // Wapis apni original jagah (CSS positioning) par aayengi
+        x: -1300, // Wapis apni original jagah (CSS positioning) par aayengi
         opacity: 1,
         duration: 3,
-        stagger: 1.8, // Ek k baad ek video aayegi
+        stagger: 0.3, // Ek k baad ek video aayegi
         ease: "power3.out"
     });
 
