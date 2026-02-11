@@ -3,6 +3,10 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import React, { useRef } from 'react';
 import Videos from '../components/Cards';
+import { MotionPathPlugin } from "gsap/MotionPathPlugin";
+
+gsap.registerPlugin(ScrollTrigger, MotionPathPlugin);
+
 
 
 gsap.registerPlugin(ScrollTrigger);
@@ -12,20 +16,29 @@ const TestPage = () => {
   const textContainerRef = useRef(null);
 
   useGSAP(() => {
+    gsap.set(".message", {
+  rotateX: 60,
+  rotateY: 1,
+  opacity: 0.6,
+  transformPerspective: 1000,
+});
     
     // 1. Initial Setups
-    gsap.set(".message", {
-      rotateX: 60,
-      rotateY: 1,
-      opacity: 0.6,
-      transformPerspective: 1000,
+     
+
+    gsap.set(".video-card", {
+        x: window.innerWidth * 0.9,
+        y: window.innerHeight * 0.8,
+        rotation: 45, // Start mein right ki taraf tilt
+        scale: 1,   // Door se aati hui choti lagen
+        opacity: 1,
     });
 
     // Videos ko screen ke neeche bhej do initially
-    gsap.set(".video-card", {
-        x: window.innerHeight * 1.5,
-        opacity: 1
-    });
+    // gsap.set(".video-card", {
+    //     y: window.innerHeight * 1.5,
+    //     opacity: 1
+    // });
     
     // 2. Master Timeline
     const tl = gsap.timeline({
@@ -63,12 +76,29 @@ const TestPage = () => {
     // --- STEP 2: Videos Entry ---
     // Text animation k baad ye chalega
     .to(".video-card", {
-        x: -1300, // Wapis apni original jagah (CSS positioning) par aayengi
-        opacity: 1,
-        duration: 3,
-        stagger: 0.3, // Ek k baad ek video aayegi
-        ease: "power3.out"
-    });
+      motionPath: {
+        path: [
+          // Point 1: Start (Already set via gsap.set, but good to define)
+          { x: window.innerWidth * 0.8, y: window.innerHeight * 0.8 }, 
+          
+          // Point 2: MID POINT (The Peak of the Arc/Golai)
+          // Yahan hum Y ko minus (-) le jayenge taake wo uper uthey
+          { x: 0, y: -80 }, 
+          
+          // Point 3: END POINT (Left Bottom Corner)
+          { x: -window.innerWidth * 1.6, y: window.innerHeight * 0.8 } 
+        ],
+        curviness: 1.5, // 1.5 se smooth golai (circle) banti hai
+        autoRotate: false // Hum manual rotation denge behtar control ke liye
+      },
+      rotation: -45, // End mein left ki taraf tilt ho jaye (45 to -45)
+      scale: 1,      // Center mein aake normal size ho jaye (MotionPath beech mein scale interpolate karega)
+      opacity: 1,    // Visible ho jaye
+      duration: 5,
+      stagger: 1,  // Snake effect (aik ke baad aik)
+      ease: "power1.inOut" // Smooth start and end
+    }, "-=0.5");
+
 
   }, { scope: containerRef });
 
