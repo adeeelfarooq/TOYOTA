@@ -29,7 +29,7 @@ const TestPage = () => {
     gsap.set(".video-card", {
         x: window.innerWidth * 0.9,
         y: window.innerHeight * 0.8,
-        rotation: 40, // Start mein right ki taraf tilt
+        rotation: 27, // Start mein right ki taraf tilt
         scale: 1,   // Door se aati hui choti lagen
         opacity: 1,
     });
@@ -46,7 +46,7 @@ const TestPage = () => {
         trigger: containerRef.current,
         start: "top top",
         end: "+=2000%", // Scroll height barha di taake animation smooth ho
-        scrub: 1,
+        scrub: true,
         pin: true,
         markers: false, // Markers hata diye clean look k liye
       }
@@ -79,19 +79,20 @@ const TestPage = () => {
       motionPath: {
         path: [
           // Point 1: Start (Already set via gsap.set, but good to define)
-          { x: window.innerWidth * 0.8, y: window.innerHeight * 0.8 }, 
+          { x: window.innerWidth * 0.8, y: window.innerHeight * 0.95 }, 
           
           // Point 2: MID POINT (The Peak of the Arc/Golai)
           // Yahan hum Y ko minus (-) le jayenge taake wo uper uthey
-          { x: -10, y: -10 }, 
+          { x: -10, y: 120  }, 
           
           // Point 3: END POINT (Left Bottom Corner)
-          { x: -window.innerWidth * 1.5, y: window.innerHeight * 0.5 } 
+          { x: -window.innerWidth * 1.5, y: window.innerHeight * 0.78 } 
         ],
-        curviness: 1.5, // 1.5 se smooth golai (circle) banti hai
-        autoRotate: false // Hum manual rotation denge behtar control ke liye
+        curviness: 1.7, // 1.5 se smooth golai (circle) banti hai
+        autoRotate: false 
+        // Hum manual rotation denge behtar control ke liye
       },
-      rotation: -40, // End mein left ki taraf tilt ho jaye (45 to -45)
+      rotation: -27, // End mein left ki taraf tilt ho jaye (45 to -45)
       scale: 1,      // Center mein aake normal size ho jaye (MotionPath beech mein scale interpolate karega)
       opacity: 1,    // Visible ho jaye
       duration: 5,
@@ -123,7 +124,7 @@ const TestPage = () => {
       </div>
 
       {/* VIDEO LAYER */}
-      <div className="absolute top-0 right-0 w-full h-full z-20 pointer-events-none">
+      <div className="absolute top-0 right-0 left-10 w-full h-full z-20 pointer-events-none">
         <Videos />
       </div>
     </div>
