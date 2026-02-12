@@ -131,7 +131,7 @@ const TestPage = () => {
     >
       {/* --- NEW: TAGS LAYER (Background) --- */}
       {/* Absolute positioning behind text and videos */}
-      <div className="absolute top-0 left-0 w-full h-full pointer-events-none z-0">
+      <div className=" absolute top-0 left-0 w-full h-full pointer-events-none z-0">
         {tags.map((tag, index) => (
             <h3 
                 key={index}
