@@ -20,6 +20,7 @@ const TestPage = () => {
     { text: "#SUSTAINABILITY", top: "75%", left: "1%" },
     { text: "#SUPRALEGACY", top: "10%", left: "40%" }, 
     { text: "#BEYONDZERO", top: "80%", left: "45%" },
+    { text: "#FUTURE", top: "62%", right: "1%" },
   ];
 
   useGSAP(() => {
