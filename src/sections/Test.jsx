@@ -61,7 +61,7 @@ const TestPage = () => {
         end: "+=2000%", // Reduced from 2000% to 300%
         scrub: 1.5, // Increased scrub for smoother animation
         pin: true,
-        markers: true, // Turn ON to see the timing (remove after testing)
+        
         id: "testPage-scrollTrigger",
         invalidateOnRefresh: true,
       }
