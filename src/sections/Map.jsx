@@ -63,7 +63,7 @@ const GlobalMap = () => {
     { name: "Argentina", top: "73%", left: "28%", branches: 5, cities: ["Buenos Aires", "Córdoba"], info: "Growing Presence" },
     { name: "Colombia", top: "58%", left: "27%", branches: 4, cities: ["Bogotá", "Medellín"], info: "New Market Entry" },
     { name: "Peru", top: "63%", left: "26%", branches: 3, cities: ["Lima"], info: "Emerging Market" },
-    { name: "Chile", top: "70%", left: "25%", branches: 4, cities: ["Santiago"], info: "South American Hub" },
+    { name: "Chile", top: "75%", left: "26%", branches: 4, cities: ["Santiago"], info: "South American Hub" },
     
     // Europe
     { name: "UK", top: "34%", left: "45%", branches: 15, cities: ["London", "Manchester", "Birmingham"], info: "European Headquarters" },
@@ -81,7 +81,7 @@ const GlobalMap = () => {
     { name: "Bulgaria", top: "32%", left: "61%", branches: 3, cities: ["Sofia"], info: "Balkan Presence" },
     { name: "Greece", top: "44%", left: "71%", branches: 5, cities: ["Athens", "Thessaloniki"], info: "Mediterranean Hub" },
     { name: "Georgia", top: "30%", left: "65%", branches: 2, cities: ["Tbilisi"], info: "Caucasus Region" },
-    { name: "Azerbaijan", top: "39%", left: "65%", branches: 2, cities: ["Baku"], info: "Caspian Market" },
+    { name: "Azerbaijan", top: "27%", left: "76%", branches: 2, cities: ["Baku"], info: "Caspian Market" },
     { name: "Armenia", top: "37%", left: "62%", branches: 2, cities: ["Yerevan"], info: "Emerging Market" },
     { name: "Kazakhstan", top: "32%", left: "68%", branches: 5, cities: ["Almaty", "Nur-Sultan"], info: "Central Asian Hub" },
     { name: "Uzbekistan", top: "35%", left: "70%", branches: 3, cities: ["Tashkent"], info: "Growing Presence" },
@@ -105,11 +105,11 @@ const GlobalMap = () => {
     { name: "Saudi Arabia", top: "50%", left: "59%", branches: 5, cities: ["Riyadh", "Jeddah"], info: "Growing Market" },
     { name: "Turkey", top: "38%", left: "57%", branches: 6, cities: ["Istanbul", "Ankara"], info: "Bridge Between Continents" },
     { name: "Iran", top: "41%", left: "64%", branches: 4, cities: ["Tehran"], info: "Regional Presence" },
-    { name: "Iraq", top: "43%", left: "61%", branches: 3, cities: ["Baghdad"], info: "Emerging Market" },
+    { name: "Iraq", top: "42%", left: "60%", branches: 3, cities: ["Baghdad"], info: "Emerging Market" },
     
     
     // Africa
-    { name: "Egypt", top: "45%", left: "57%", branches: 4, cities: ["Cairo", "Alexandria"], info: "North African Hub" },
+    { name: "Egypt", top: "47%", left: "57%", branches: 4, cities: ["Cairo", "Alexandria"], info: "North African Hub" },
     { name: "Nigeria", top: "53%", left: "51%", branches: 3, cities: ["Lagos", "Abuja"], info: "West African Market" },
     { name: "South Africa", top: "73%", left: "56%", branches: 8, cities: ["Johannesburg", "Cape Town"], info: "Southern African HQ" },
     { name: "Morocco", top: "46%", left: "46%", branches: 4, cities: ["Casablanca"], info: "North African Presence" },
@@ -152,10 +152,10 @@ const GlobalMap = () => {
         >
           <img
             src="/images/Pin.png"
-            className="w-8 md:w-10 lg:w-12 mb-1 transition-transform duration-300 hover:scale-125"
+            className="w-8 md:w-10 lg:w-12 mb-1 transition-transform duration-300 hover:scale-125 "
             alt="pin"
           />
-          <span className="text-white text-[10px] md:text-xs font-medium bg-black/60 px-2 py-0.5 rounded-full border border-red-500/50 whitespace-nowrap">
+          <span className="text-white text-[10px] md:text-xs uppercase bg-black/60 px-2 py-0.5 rounded-full border border-red-500/50 whitespace-nowrap">
             {country.name}
           </span>
 
@@ -173,7 +173,7 @@ const GlobalMap = () => {
             >
               {/* Card Header */}
               <div className="flex items-center gap-2 mb-2 pb-2 border-b border-red-500/30">
-                <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
+                <div className="w-2 h-2 bg-red-500 rounded-full "></div>
                 <h3 className="text-red-500 font-bold text-sm">{country.name}</h3>
               </div>
               
