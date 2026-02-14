@@ -24,7 +24,7 @@ const GlobalMap = () => {
     });
 
     // New: Initial setup for headings
-    gsap.set([headingsRef.current, subheadingRef.current], {
+    gsap.set([headingsRef.current], {
       y: 50, // Start slightly below
       opacity: 0,
     });
@@ -70,18 +70,7 @@ const GlobalMap = () => {
             toggleActions: "play none none reverse",
         }
     });
-    gsap.to(subheadingRef.current, {
-        y: 0, // Animate to original position
-        opacity: 1,
-        duration: 1.2,
-        delay: 0.3, // Delay subheading slightly after main heading
-        ease: "power2.out",
-        scrollTrigger: {
-            trigger: sectionRef.current,
-            start: "top 70%", // Trigger slightly before map fade in
-            toggleActions: "play none none reverse",
-        }
-    });
+    
 
 
   }, []);
@@ -163,14 +152,35 @@ const GlobalMap = () => {
     <section ref={sectionRef} className="relative w-full h-dvh bg-black flex items-center justify-center overflow-hidden">
 
       {/* NEW: Headings Section */}
-      <div className="absolute top-[10%] left-1/2 -translate-x-1/2 text-center w-full max-w-4xl px-4 z-20">
-        <h1 ref={headingsRef} className="text-white text-4xl md:text-6xl font-bold mb-4">
-          <span className="text-red-500">Global</span> Presence
-        </h1>
-        <p ref={subheadingRef} className="text-white/80 text-lg md:text-xl max-w-2xl mx-auto">
-          Explore our expansive network across the globe, connecting communities and driving innovation in every corner of the world.
-        </p>
-      </div>
+      {/* 🟥 STACKED HEADING */}
+<div
+  ref={headingsRef}
+  className="stacked-text  absolute top-[10%] left-1/2 -translate-x-1/2 z-20 flex flex-col items-center uppercase font-bold text-[5rem] md:text-[4rem] leading-none text-toyota-red"
+  style={{ fontFamily: "'Google Sans Flex', sans-serif" }}
+>
+
+  <div className="overflow-hidden h-[0.9em] flex items-end">
+    <span className="block whitespace-nowrap">WE ARE EVERYWHERE</span>
+  </div>
+
+  <div className="overflow-hidden h-[0.5em] flex items-end opacity-80 text-milk-yellow">
+    <span className="block whitespace-nowrap">WE ARE EVERYWHERE</span>
+  </div>
+
+  <div className="overflow-hidden h-[0.4em] flex items-end opacity-60 text-milk-yellow">
+    <span className="block whitespace-nowrap">WE ARE EVERYWHERE</span>
+  </div>
+
+  <div className="overflow-hidden h-[0.3em] flex items-end opacity-40 text-milk-yellow">
+    <span className="block whitespace-nowrap">WE ARE EVERYWHERE</span>
+  </div>
+
+  <div className="overflow-hidden h-[0.2em] flex items-end opacity-20 text-milk-yellow">
+    <span className="block whitespace-nowrap">WE ARE EVERYWHERE</span>
+  </div>
+
+</div>
+
 
 
       {/* 🗺️ MAP IMAGE */}
