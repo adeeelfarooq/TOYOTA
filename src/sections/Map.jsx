@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
@@ -10,6 +10,7 @@ const GlobalMap = () => {
   const sectionRef = useRef(null);
   const mapRef = useRef(null);
   const pinsRef = useRef([]);
+  const [hoveredCountry, setHoveredCountry] = useState(null);
 
   useGSAP(() => {
 
@@ -52,60 +53,61 @@ const GlobalMap = () => {
   }, []);
 
   const countries = [
-    // North America - Adjusted for better map fit and spacing
-    { name: "USA", top: "35%", left: "20%" },
-    { name: "Canada", top: "25%", left: "19%" },
-    { name: "Mexico", top: "45%", left: "23%" },
+    // North America
+    { name: "USA", top: "38%", left: "22%", branches: 12, cities: ["New York", "Los Angeles", "Chicago", "Houston"], info: "North American Headquarters" },
+    { name: "Canada", top: "30%", left: "20%", branches: 8, cities: ["Toronto", "Vancouver", "Montreal"], info: "Expanding EV Market" },
+    { name: "Mexico", top: "48%", left: "23%", branches: 6, cities: ["Mexico City", "Monterrey"], info: "Manufacturing Hub" },
     
-    // South America - Significantly adjusted UPWARDS to ensure visibility and prevent overlap
-    { name: "Brazil", top: "58%", left: "30%" },
-    { name: "Argentina", top: "68%", left: "28%" },
-    { name: "Colombia", top: "53%", left: "27%" },
-    { name: "Peru", top: "58%", left: "26%" },
-    { name: "Chile", top: "65%", left: "25%" },
+    // South America
+    { name: "Brazil", top: "65%", left: "30%", branches: 10, cities: ["São Paulo", "Rio de Janeiro", "Brasília"], info: "Largest Market in SA" },
+    { name: "Argentina", top: "73%", left: "28%", branches: 5, cities: ["Buenos Aires", "Córdoba"], info: "Growing Presence" },
+    { name: "Colombia", top: "58%", left: "27%", branches: 4, cities: ["Bogotá", "Medellín"], info: "New Market Entry" },
+    { name: "Peru", top: "63%", left: "26%", branches: 3, cities: ["Lima"], info: "Emerging Market" },
+    { name: "Chile", top: "70%", left: "25%", branches: 4, cities: ["Santiago"], info: "South American Hub" },
     
-    // Europe - Adjusted for better spacing in a dense region
-    { name: "UK", top: "28%", left: "46%" },
-    { name: "Germany", top: "33%", left: "51%" },
-    { name: "France", top: "37%", left: "48%" },
-    { name: "Italy", top: "40%", left: "52%" },
-    { name: "Spain", top: "40%", left: "44%" },
-    { name: "Sweden", top: "22%", left: "54%" },
-    { name: "Norway", top: "20%", left: "51%" },
-    { name: "Poland", top: "35%", left: "55%" },
-    { name: "Ukraine", top: "32%", left: "58%" },
+    // Europe
+    { name: "UK", top: "30%", left: "46%", branches: 15, cities: ["London", "Manchester", "Birmingham"], info: "European Headquarters" },
+    { name: "Germany", top: "35%", left: "51%", branches: 18, cities: ["Berlin", "Munich", "Hamburg", "Frankfurt"], info: "R&D Center" },
+    { name: "France", top: "40%", left: "48%", branches: 9, cities: ["Paris", "Lyon", "Marseille"], info: "Design Studio" },
+    { name: "Italy", top: "43%", left: "52%", branches: 7, cities: ["Rome", "Milan", "Turin"], info: "Luxury Division" },
+    { name: "Spain", top: "42%", left: "44%", branches: 6, cities: ["Madrid", "Barcelona"], info: "Southern Europe Hub" },
+    { name: "Sweden", top: "25%", left: "54%", branches: 5, cities: ["Stockholm"], info: "Scandinavian Hub" },
+    { name: "Norway", top: "22%", left: "52%", branches: 4, cities: ["Oslo"], info: "EV Innovation" },
+    { name: "Poland", top: "36%", left: "55%", branches: 6, cities: ["Warsaw", "Krakow"], info: "Eastern European Hub" },
+    { name: "Ukraine", top: "33%", left: "58%", branches: 3, cities: ["Kyiv"], info: "Growing Market" },
     
-    // Asia - Adjusted for better spacing and map fit
-    { name: "Pakistan", top: "40%", left: "67%" },
-    { name: "India", top: "45%", left: "70%" },
-    { name: "China", top: "35%", left: "78%" },
-    { name: "Japan", top: "30%", left: "85%" }, // Moved left
-    { name: "South Korea", top: "33%", left: "83%" }, // Moved left, slight top adjustment
-    { name: "Thailand", top: "48%", left: "76%" },
-    { name: "Vietnam", top: "46%", left: "79%" },
-    { name: "Malaysia", top: "50%", left: "80%" },
-    { name: "Indonesia", top: "55%", left: "81%" }, // Moved up
-    { name: "Philippines", top: "50%", left: "85%" }, // Moved up
+    // Asia
+    { name: "Pakistan", top: "43%", left: "67%", branches: 25, cities: ["Karachi", "Lahore", "Islamabad", "Faisalabad"], info: "Major Manufacturing Base" },
+    { name: "India", top: "47%", left: "72%", branches: 30, cities: ["Delhi", "Mumbai", "Bangalore", "Chennai"], info: "Largest Market in Region" },
+    { name: "China", top: "38%", left: "78%", branches: 45, cities: ["Beijing", "Shanghai", "Guangzhou", "Shenzhen"], info: "Global Manufacturing Hub" },
+    { name: "Japan", top: "35%", left: "88%", branches: 22, cities: ["Tokyo", "Osaka", "Nagoya"], info: "Technology Center" },
+    { name: "South Korea", top: "38%", left: "84%", branches: 12, cities: ["Seoul", "Busan"], info: "Innovation Hub" },
+    { name: "Thailand", top: "50%", left: "76%", branches: 8, cities: ["Bangkok", "Chiang Mai"], info: "Production Facility" },
+    { name: "Vietnam", top: "48%", left: "79%", branches: 6, cities: ["Hanoi", "Ho Chi Minh City"], info: "Emerging Market" },
+    { name: "Malaysia", top: "53%", left: "80%", branches: 7, cities: ["Kuala Lumpur"], info: "Southeast Asian Hub" },
+    { name: "Indonesia", top: "60%", left: "81%", branches: 8, cities: ["Jakarta", "Surabaya"], info: "Growing Market" },
+    { name: "Philippines", top: "55%", left: "85%", branches: 5, cities: ["Manila"], info: "Expanding Presence" },
     
-    // Middle East - Adjusted for better spacing
-    { name: "UAE", top: "42%", left: "64%" }, // Adjusted left/up
-    { name: "Saudi Arabia", top: "45%", left: "59%" }, // Adjusted left
-    { name: "Turkey", top: "35%", left: "56%" },
-    { name: "Iran", top: "38%", left: "62%" }, // Adjusted left/up
-    { name: "Iraq", top: "40%", left: "59%" }, // Adjusted left/up
+    // Middle East
+    { name: "UAE", top: "45%", left: "62%", branches: 7, cities: ["Dubai", "Abu Dhabi"], info: "Middle East HQ" },
+    { name: "Saudi Arabia", top: "48%", left: "60%", branches: 5, cities: ["Riyadh", "Jeddah"], info: "Growing Market" },
+    { name: "Turkey", top: "38%", left: "57%", branches: 6, cities: ["Istanbul", "Ankara"], info: "Bridge Between Continents" },
+    { name: "Iran", top: "41%", left: "64%", branches: 4, cities: ["Tehran"], info: "Regional Presence" },
+    { name: "Iraq", top: "43%", left: "61%", branches: 3, cities: ["Baghdad"], info: "Emerging Market" },
     
-    // Africa - Adjusted for better map fit and spacing
-    { name: "Egypt", top: "43%", left: "57%" },
-    { name: "Nigeria", top: "50%", left: "50%" },
-    { name: "South Africa", top: "68%", left: "55%" }, // Moved up
-    { name: "Morocco", top: "40%", left: "45%" },
-    { name: "Kenya", top: "57%", left: "54%" }, // Moved up
-    { name: "Ethiopia", top: "53%", left: "55%" }, // Moved up
-    { name: "Ghana", top: "50%", left: "48%" },
     
-    // Australia & Oceania - Significantly adjusted UPWARDS to ensure visibility and prevent overlap
-    { name: "Australia", top: "68%", left: "80%" }, // Moved significantly up and left
-    { name: "New Zealand", top: "75%", left: "88%" }, // Moved up and left
+    // Africa
+    { name: "Egypt", top: "45%", left: "57%", branches: 4, cities: ["Cairo", "Alexandria"], info: "North African Hub" },
+    { name: "Nigeria", top: "53%", left: "51%", branches: 3, cities: ["Lagos", "Abuja"], info: "West African Market" },
+    { name: "South Africa", top: "73%", left: "56%", branches: 8, cities: ["Johannesburg", "Cape Town"], info: "Southern African HQ" },
+    { name: "Morocco", top: "42%", left: "46%", branches: 4, cities: ["Casablanca"], info: "North African Presence" },
+    { name: "Kenya", top: "60%", left: "54%", branches: 3, cities: ["Nairobi"], info: "East African Hub" },
+    { name: "Ethiopia", top: "55%", left: "55%", branches: 2, cities: ["Addis Ababa"], info: "Emerging Market" },
+    { name: "Ghana", top: "52%", left: "48%", branches: 2, cities: ["Accra"], info: "West African Presence" },
+    
+    // Australia
+    { name: "Australia", top: "75%", left: "89%", branches: 11, cities: ["Sydney", "Melbourne", "Brisbane"], info: "Oceania Headquarters" },
+    { name: "New Zealand", top: "80%", left: "92%", branches: 4, cities: ["Auckland", "Wellington"], info: "Growing Presence" },
   ];
 
   return (
@@ -116,7 +118,7 @@ const GlobalMap = () => {
         <img
           ref={mapRef}
           src="/images/Worldmap.png"
-          className="w-full h-auto opacity-90"
+          className="w-full h-auto opacity-90 scale-y-70 bottom-0"
           alt="World Map"
         />
       </div>
@@ -126,21 +128,71 @@ const GlobalMap = () => {
         <div
           key={index}
           ref={el => pinsRef.current[index] = el}
-          className="absolute flex flex-col items-center"
+          className="absolute flex flex-col items-center cursor-pointer"
           style={{
             top: country.top,
             left: country.left,
-            transform: 'translate(-50%, -50%)'
+            transform: 'translate(-50%, -50%)',
+            zIndex: hoveredCountry?.name === country.name ? 50 : 10
           }}
+          onMouseEnter={() => setHoveredCountry(country)}
+          onMouseLeave={() => setHoveredCountry(null)}
         >
           <img
             src="/images/Pin.png"
-            className="w-8 md:w-10 lg:w-12 mb-1"
+            className="w-8 md:w-10 lg:w-12 mb-1 transition-transform duration-300 hover:scale-125"
             alt="pin"
           />
           <span className="text-white text-[10px] md:text-xs font-medium bg-black/60 px-2 py-0.5 rounded-full border border-red-500/50 whitespace-nowrap">
             {country.name}
           </span>
+
+          {/* Hover Info Card */}
+          {hoveredCountry?.name === country.name && (
+            <div 
+              className="absolute bg-black/90 backdrop-blur-md rounded-xl border border-red-500/30 p-4 shadow-2xl z-50"
+              style={{
+                top: 'auto',
+                bottom: '120%',
+                left: '50%',
+                transform: 'translateX(-50%)',
+                minWidth: '220px',
+              }}
+            >
+              {/* Card Header */}
+              <div className="flex items-center gap-2 mb-2 pb-2 border-b border-red-500/30">
+                <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
+                <h3 className="text-red-500 font-bold text-sm">{country.name}</h3>
+              </div>
+              
+              {/* Card Content */}
+              <div className="space-y-2">
+                <div className="flex items-center gap-2 text-xs">
+                  <span className="text-milk-yellow">Branches:</span>
+                  <span className="text-white font-bold">{country.branches}+</span>
+                </div>
+                
+                <div className="text-xs">
+                  <span className="text-milk-yellow block mb-1">Key Cities:</span>
+                  <div className="flex flex-wrap gap-1">
+                    {country.cities.map((city, idx) => (
+                      <span key={idx} className="bg-red-500/20 text-white px-2 py-0.5 rounded-full text-[10px] border border-red-500/30">
+                        {city}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+                
+                <div className="mt-2 pt-2 border-t border-red-500/30">
+                  <span className="text-red-500 text-[10px] font-medium">{country.info}</span>
+                </div>
+              </div>
+              
+              {/* Decorative Elements */}
+              <div className="absolute -top-1 -left-1 w-3 h-3 border-t-2 border-l-2 border-red-500"></div>
+              <div className="absolute -bottom-1 -right-1 w-3 h-3 border-b-2 border-r-2 border-red-500"></div>
+            </div>
+          )}
         </div>
       ))}
 
