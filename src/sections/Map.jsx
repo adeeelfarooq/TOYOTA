@@ -10,6 +10,8 @@ const GlobalMap = () => {
   const sectionRef = useRef(null);
   const mapRef = useRef(null);
   const pinsRef = useRef([]);
+  const headingsRef = useRef(null); // Ref for the new headings container
+  const subheadingRef = useRef(null); // Ref for the subheading
   const [hoveredCountry, setHoveredCountry] = useState(null);
 
   useGSAP(() => {
@@ -19,6 +21,12 @@ const GlobalMap = () => {
       scale: 0,
       opacity: 0,
       transformOrigin: "center center"
+    });
+
+    // New: Initial setup for headings
+    gsap.set([headingsRef.current, subheadingRef.current], {
+      y: 50, // Start slightly below
+      opacity: 0,
     });
 
     // 🗺️ MAP FADE IN
@@ -50,6 +58,32 @@ const GlobalMap = () => {
       }
     });
 
+    // New: Headings animation
+    gsap.to(headingsRef.current, {
+        y: 0, // Animate to original position
+        opacity: 1,
+        duration: 1.2,
+        ease: "power2.out",
+        scrollTrigger: {
+            trigger: sectionRef.current,
+            start: "top 70%", // Trigger slightly before map fade in
+            toggleActions: "play none none reverse",
+        }
+    });
+    gsap.to(subheadingRef.current, {
+        y: 0, // Animate to original position
+        opacity: 1,
+        duration: 1.2,
+        delay: 0.3, // Delay subheading slightly after main heading
+        ease: "power2.out",
+        scrollTrigger: {
+            trigger: sectionRef.current,
+            start: "top 70%", // Trigger slightly before map fade in
+            toggleActions: "play none none reverse",
+        }
+    });
+
+
   }, []);
 
   const countries = [
@@ -57,6 +91,9 @@ const GlobalMap = () => {
     { name: "USA", top: "38%", left: "22%", branches: 12, cities: ["New York", "Los Angeles", "Chicago", "Houston"], info: "North American Headquarters" },
     { name: "Canada", top: "30%", left: "20%", branches: 8, cities: ["Toronto", "Vancouver", "Montreal"], info: "Expanding EV Market" },
     { name: "Mexico", top: "48%", left: "23%", branches: 6, cities: ["Mexico City", "Monterrey"], info: "Manufacturing Hub" },
+    
+
+    
     
     // South America
     { name: "Brazil", top: "65%", left: "30%", branches: 10, cities: ["São Paulo", "Rio de Janeiro", "Brasília"], info: "Largest Market in SA" },
@@ -73,26 +110,26 @@ const GlobalMap = () => {
     { name: "Spain", top: "42%", left: "44%", branches: 6, cities: ["Madrid", "Barcelona"], info: "Southern Europe Hub" },
     { name: "Sweden", top: "25%", left: "54%", branches: 5, cities: ["Stockholm"], info: "Scandinavian Hub" },
     { name: "Norway", top: "30%", left: "52%", branches: 4, cities: ["Oslo"], info: "EV Innovation" },
-    { name: "Poland", top: "36%", left: "55%", branches: 6, cities: ["Warsaw", "Krakow"], info: "Eastern European Hub" },
+    { name: "Poland", top: "36%", left: "54%", branches: 6, cities: ["Warsaw", "Krakow"], info: "Eastern European Hub" },
     { name: "Ukraine", top: "33%", left: "58%", branches: 3, cities: ["Kyiv"], info: "Growing Market" },
     
     // Eastern Europe / Caucasus (New Countries - Ukraine ke right side)
     { name: "Romania", top: "32%", left: "80%", branches: 4, cities: ["Bucharest"], info: "Emerging European Market" },
-    { name: "Bulgaria", top: "32%", left: "61%", branches: 3, cities: ["Sofia"], info: "Balkan Presence" },
+    { name: "Bulgaria", top: "28%", left: "62%", branches: 3, cities: ["Sofia"], info: "Balkan Presence" },
     { name: "Greece", top: "44%", left: "71%", branches: 5, cities: ["Athens", "Thessaloniki"], info: "Mediterranean Hub" },
     { name: "Georgia", top: "30%", left: "65%", branches: 2, cities: ["Tbilisi"], info: "Caucasus Region" },
     { name: "Azerbaijan", top: "27%", left: "76%", branches: 2, cities: ["Baku"], info: "Caspian Market" },
     { name: "Armenia", top: "37%", left: "62%", branches: 2, cities: ["Yerevan"], info: "Emerging Market" },
     { name: "Kazakhstan", top: "32%", left: "68%", branches: 5, cities: ["Almaty", "Nur-Sultan"], info: "Central Asian Hub" },
     { name: "Uzbekistan", top: "35%", left: "70%", branches: 3, cities: ["Tashkent"], info: "Growing Presence" },
-    { name: "Turkmenistan", top: "38%", left: "74%", branches: 2, cities: ["Ashgabat"], info: "Emerging Market" },
-    { name: "Kyrgyzstan", top: "32%", left: "72%", branches: 2, cities: ["Bishkek"], info: "Central Asian Presence" },
+    { name: "Turkmenistan", top: "40%", left: "75%", branches: 2, cities: ["Ashgabat"], info: "Emerging Market" },
+    { name: "Kyrgyzstan", top: "30%", left: "73%", branches: 2, cities: ["Bishkek"], info: "Central Asian Presence" },
     
     // Asia
     { name: "Pakistan", top: "43%", left: "67%", branches: 25, cities: ["Karachi", "Lahore", "Islamabad", "Faisalabad"], info: "Major Manufacturing Base" },
-    { name: "India", top: "47%", left: "72%", branches: 30, cities: ["Delhi", "Mumbai", "Bangalore", "Chennai"], info: "Largest Market in Region" },
+    { name: "India", top: "49%", left: "72%", branches: 30, cities: ["Delhi", "Mumbai", "Bangalore", "Chennai"], info: "Largest Market in Region" },
     { name: "China", top: "38%", left: "78%", branches: 45, cities: ["Beijing", "Shanghai", "Guangzhou", "Shenzhen"], info: "Global Manufacturing Hub" },
-    { name: "Japan", top: "35%", left: "88%", branches: 22, cities: ["Tokyo", "Osaka", "Nagoya"], info: "Technology Center" },
+    { name: "Japan", top: "35%", left: "89%", branches: 22, cities: ["Tokyo", "Osaka", "Nagoya"], info: "Technology Center" },
     { name: "South Korea", top: "38%", left: "84%", branches: 12, cities: ["Seoul", "Busan"], info: "Innovation Hub" },
     { name: "Thailand", top: "50%", left: "76%", branches: 8, cities: ["Bangkok", "Chiang Mai"], info: "Production Facility" },
     { name: "Vietnam", top: "48%", left: "79%", branches: 6, cities: ["Hanoi", "Ho Chi Minh City"], info: "Emerging Market" },
@@ -115,7 +152,7 @@ const GlobalMap = () => {
     { name: "Morocco", top: "46%", left: "46%", branches: 4, cities: ["Casablanca"], info: "North African Presence" },
     { name: "Kenya", top: "59%", left: "54%", branches: 3, cities: ["Nairobi"], info: "East African Hub" },
     { name: "Ethiopia", top: "55%", left: "55%", branches: 2, cities: ["Addis Ababa"], info: "Emerging Market" },
-    { name: "Ghana", top: "52%", left: "48%", branches: 2, cities: ["Accra"], info: "West African Presence" },
+    { name: "Ghana", top: "55%", left: "48%", branches: 2, cities: ["Accra"], info: "West African Presence" },
     
     // Australia
     { name: "Australia", top: "75%", left: "89%", branches: 11, cities: ["Sydney", "Melbourne", "Brisbane"], info: "Oceania Headquarters" },
@@ -125,8 +162,19 @@ const GlobalMap = () => {
   return (
     <section ref={sectionRef} className="relative w-full h-dvh bg-black flex items-center justify-center overflow-hidden">
 
+      {/* NEW: Headings Section */}
+      <div className="absolute top-[10%] left-1/2 -translate-x-1/2 text-center w-full max-w-4xl px-4 z-20">
+        <h1 ref={headingsRef} className="text-white text-4xl md:text-6xl font-bold mb-4">
+          <span className="text-red-500">Global</span> Presence
+        </h1>
+        <p ref={subheadingRef} className="text-white/80 text-lg md:text-xl max-w-2xl mx-auto">
+          Explore our expansive network across the globe, connecting communities and driving innovation in every corner of the world.
+        </p>
+      </div>
+
+
       {/* 🗺️ MAP IMAGE */}
-      <div className="relative w-[95%] md:w-[90%] lg:w-[85%] max-w-7xl mx-auto bottom-[-18%] scale-x-120">
+      <div className="relative w-[95%] md:w-[90%] lg:w-[85%] max-w-7xl mx-auto bottom-[-17%] scale-x-120">
         <img
           ref={mapRef}
           src="/images/Worldmap.png"
@@ -140,7 +188,7 @@ const GlobalMap = () => {
         <div
           key={index}
           ref={el => pinsRef.current[index] = el}
-          className="absolute flex flex-col items-center cursor-pointer mt-25 "
+          className="absolute flex flex-col items-center cursor-pointer mt-25  "
           style={{
             top: country.top,
             left: country.left,
@@ -152,7 +200,7 @@ const GlobalMap = () => {
         >
           <img
             src="/images/Pin.png"
-            className="w-8 md:w-10 lg:w-12 mb-1 transition-transform duration-300 hover:scale-125 "
+            className="w-8 md:w-10 lg:w-12 mb-1 transition-transform duration-300 scale-130 hover:scale-155 "
             alt="pin"
           />
           <span className="text-white text-[10px] md:text-xs uppercase bg-black/60 px-2 py-0.5 rounded-full border border-red-500/50 whitespace-nowrap">
@@ -161,7 +209,7 @@ const GlobalMap = () => {
 
           {/* Hover Info Card */}
           {hoveredCountry?.name === country.name && (
-            <div 
+            <div
               className="absolute bg-black/90 backdrop-blur-md rounded-xl border border-red-500/30 p-4 shadow-2xl z-50"
               style={{
                 top: 'auto',
@@ -174,21 +222,21 @@ const GlobalMap = () => {
               {/* Card Header */}
               <div className="flex items-center gap-2 mb-2 pb-2 border-b border-red-500/30">
                 <div className="w-2 h-2 bg-red-500 rounded-full "></div>
-                <h3 className="text-red-500 font-bold text-sm">{country.name}</h3>
+                <h3 className="text-red-500 uppercase font-bold text-sm">{country.name}</h3>
               </div>
               
               {/* Card Content */}
               <div className="space-y-2">
                 <div className="flex items-center gap-2 text-xs">
-                  <span className="text-milk-yellow">Branches:</span>
-                  <span className="text-white font-bold">{country.branches}+</span>
+                  <span className="text-white">Branches:</span>
+                  <span className="text-milk-yellow font-bold">{country.branches}+</span>
                 </div>
                 
                 <div className="text-xs">
-                  <span className="text-milk-yellow block mb-1">Key Cities:</span>
+                  <span className="text-white block mb-1">Key Cities:</span>
                   <div className="flex flex-wrap gap-1">
                     {country.cities.map((city, idx) => (
-                      <span key={idx} className="bg-red-500/20 text-white px-2 py-0.5 rounded-full text-[10px] border border-red-500/30">
+                      <span key={idx} className="bg-red-500/20 text-milk-yellow px-2 py-0.5 rounded-full text-[10px] border border-red-500/30">
                         {city}
                       </span>
                     ))}
