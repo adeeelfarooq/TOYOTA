@@ -34,8 +34,9 @@ const App = () => {
 <Marketing/>
 <TechnologySection/>
 <EngineeringSection/>
-<TestPage/>
 <GlobalMap/>
+<TestPage/>
+
 
 {/* <ModernTestimonialsSection/> */}
 

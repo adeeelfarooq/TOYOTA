@@ -153,38 +153,78 @@ const GlobalMap = () => {
 
       {/* NEW: Headings Section */}
       {/* 🟥 STACKED HEADING */}
+{/* 🟥 HEADING + GLOBE ROW */}
 <div
   ref={headingsRef}
-  className="stacked-text  absolute top-[10%] left-1/2 -translate-x-1/2 z-20 flex flex-col items-center uppercase font-bold text-[5rem] md:text-[4rem] leading-none text-toyota-red"
-  style={{ fontFamily: "'Google Sans Flex', sans-serif" }}
+  className="absolute top-[5%] left-1/2 -translate-x-1/2 z-20 w-full max-w-7xl flex items-center justify-between "
 >
 
-  <div className="overflow-hidden h-[0.9em] flex items-end">
-    <span className="block whitespace-nowrap">WE ARE EVERYWHERE</span>
+  {/* LEFT SIDE STACKED TEXT */}
+  <div className="stacked-text flex flex-col uppercase font-bold text-[4rem] md:text-[4rem] leading-none text-white ml-70"
+    style={{ fontFamily: "'Google Sans Flex', sans-serif" }}
+  >
+
+    <div className="overflow-hidden  h-[0.9em] flex items-end">
+      <span className="block whitespace-nowrap">WE  <span className="text-toyota-red"> ARE EVERYWHERE</span></span>
+    </div>
+
+    <div className="overflow-hidden h-[0.5em] flex items-end opacity-80 text-white">
+      <span className="block whitespace-nowrap">WE  <span className="text-toyota-red opacity-80"> ARE EVERYWHERE</span></span>
+    </div>
+
+    <div className="overflow-hidden h-[0.4em] flex items-end opacity-60 text-white">
+      <span className="block whitespace-nowrap">WE  <span className="text-toyota-red opacity-60"> ARE EVERYWHERE</span></span>
+    </div>
+
+    <div className="overflow-hidden h-[0.3em] flex items-end opacity-40 text-white">
+      <span className="block whitespace-nowrap">WE  <span className="text-toyota-red opacity-40"> ARE EVERYWHERE</span></span>
+    </div>
+
+    <div className="overflow-hidden h-[0.2em] flex items-end opacity-20 text-white">
+      <span className="block whitespace-nowrap">WE  <span className="text-toyota-red opacity-35"> ARE EVERYWHERE</span></span>
+    </div>
+
   </div>
 
-  <div className="overflow-hidden h-[0.5em] flex items-end opacity-80 text-milk-yellow">
-    <span className="block whitespace-nowrap">WE ARE EVERYWHERE</span>
-  </div>
+  {/* 🌍 RIGHT SIDE GLOBE */}
+  <div className="relative w-[180px] h-[180px] md:w-[220px] md:h-[220px] flex items-center justify-center scale-80 -mt-7 ">
 
-  <div className="overflow-hidden h-[0.4em] flex items-end opacity-60 text-milk-yellow">
-    <span className="block whitespace-nowrap">WE ARE EVERYWHERE</span>
-  </div>
+    {/* ROTATING TEXT */}
+    <svg className="absolute w-full h-full animate-[spin_20s_linear_infinite]" viewBox="0 0 200 200">
+      <defs>
+        <path
+          id="circlePath"
+          d="M 100, 100
+             m -80, 0
+             a 80,80 0 1,1 160,0
+             a 80,80 0 1,1 -160,0"
+        />
+      </defs>
 
-  <div className="overflow-hidden h-[0.3em] flex items-end opacity-40 text-milk-yellow">
-    <span className="block whitespace-nowrap">WE ARE EVERYWHERE</span>
-  </div>
+      <text fill="#eb0a1e" fontSize="10" fontWeight="bold" letterSpacing="2">
+        <textPath href="#circlePath" startOffset="0%">
+          OVER IN 170+ COUNTRIES • OVER IN 170+ COUNTRIES • OVER IN 170+ COUNTRIES •
+        </textPath>
+      </text>
+    </svg>
 
-  <div className="overflow-hidden h-[0.2em] flex items-end opacity-20 text-milk-yellow">
-    <span className="block whitespace-nowrap">WE ARE EVERYWHERE</span>
+    {/* GLOBE IMAGE */}
+    <img
+      src="/images/Globe.png"
+      className="w-[70%] h-[70%] object-contain "
+      alt="globe"
+      
+    />
+
   </div>
 
 </div>
 
 
 
+
       {/* 🗺️ MAP IMAGE */}
-      <div className="relative w-[95%] md:w-[90%] lg:w-[85%] max-w-7xl mx-auto bottom-[-17%] scale-x-120">
+      <div className="relative w-[95%] md:w-[90%] lg:w-[85%] max-w-7xl mx-auto bottom-[-17%] scale-x-120 ">
         <img
           ref={mapRef}
           src="/images/Worldmap.png"
@@ -198,7 +238,7 @@ const GlobalMap = () => {
         <div
           key={index}
           ref={el => pinsRef.current[index] = el}
-          className="absolute flex flex-col items-center cursor-pointer mt-25  "
+          className="absolute flex flex-col items-center cursor-pointer mt-25   "
           style={{
             top: country.top,
             left: country.left,
@@ -210,7 +250,7 @@ const GlobalMap = () => {
         >
           <img
             src="/images/Pin.png"
-            className="w-8 md:w-10 lg:w-12 mb-1 transition-transform duration-300 scale-130 hover:scale-155 "
+            className="w-8 md:w-10 lg:w-12 mb-1 transition-transform duration-300 scale-130 hover:scale-155  "
             alt="pin"
           />
           <span className="text-white text-[10px] md:text-xs uppercase bg-black/60 px-2 py-0.5 rounded-full border border-red-500/50 whitespace-nowrap">
