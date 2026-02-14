@@ -66,15 +66,27 @@ const GlobalMap = () => {
     { name: "Chile", top: "70%", left: "25%", branches: 4, cities: ["Santiago"], info: "South American Hub" },
     
     // Europe
-    { name: "UK", top: "30%", left: "46%", branches: 15, cities: ["London", "Manchester", "Birmingham"], info: "European Headquarters" },
+    { name: "UK", top: "34%", left: "45%", branches: 15, cities: ["London", "Manchester", "Birmingham"], info: "European Headquarters" },
     { name: "Germany", top: "35%", left: "51%", branches: 18, cities: ["Berlin", "Munich", "Hamburg", "Frankfurt"], info: "R&D Center" },
     { name: "France", top: "40%", left: "48%", branches: 9, cities: ["Paris", "Lyon", "Marseille"], info: "Design Studio" },
     { name: "Italy", top: "43%", left: "52%", branches: 7, cities: ["Rome", "Milan", "Turin"], info: "Luxury Division" },
     { name: "Spain", top: "42%", left: "44%", branches: 6, cities: ["Madrid", "Barcelona"], info: "Southern Europe Hub" },
     { name: "Sweden", top: "25%", left: "54%", branches: 5, cities: ["Stockholm"], info: "Scandinavian Hub" },
-    { name: "Norway", top: "22%", left: "52%", branches: 4, cities: ["Oslo"], info: "EV Innovation" },
+    { name: "Norway", top: "30%", left: "52%", branches: 4, cities: ["Oslo"], info: "EV Innovation" },
     { name: "Poland", top: "36%", left: "55%", branches: 6, cities: ["Warsaw", "Krakow"], info: "Eastern European Hub" },
     { name: "Ukraine", top: "33%", left: "58%", branches: 3, cities: ["Kyiv"], info: "Growing Market" },
+    
+    // Eastern Europe / Caucasus (New Countries - Ukraine ke right side)
+    { name: "Romania", top: "32%", left: "80%", branches: 4, cities: ["Bucharest"], info: "Emerging European Market" },
+    { name: "Bulgaria", top: "32%", left: "61%", branches: 3, cities: ["Sofia"], info: "Balkan Presence" },
+    { name: "Greece", top: "44%", left: "71%", branches: 5, cities: ["Athens", "Thessaloniki"], info: "Mediterranean Hub" },
+    { name: "Georgia", top: "30%", left: "65%", branches: 2, cities: ["Tbilisi"], info: "Caucasus Region" },
+    { name: "Azerbaijan", top: "39%", left: "65%", branches: 2, cities: ["Baku"], info: "Caspian Market" },
+    { name: "Armenia", top: "37%", left: "62%", branches: 2, cities: ["Yerevan"], info: "Emerging Market" },
+    { name: "Kazakhstan", top: "32%", left: "68%", branches: 5, cities: ["Almaty", "Nur-Sultan"], info: "Central Asian Hub" },
+    { name: "Uzbekistan", top: "35%", left: "70%", branches: 3, cities: ["Tashkent"], info: "Growing Presence" },
+    { name: "Turkmenistan", top: "38%", left: "74%", branches: 2, cities: ["Ashgabat"], info: "Emerging Market" },
+    { name: "Kyrgyzstan", top: "32%", left: "72%", branches: 2, cities: ["Bishkek"], info: "Central Asian Presence" },
     
     // Asia
     { name: "Pakistan", top: "43%", left: "67%", branches: 25, cities: ["Karachi", "Lahore", "Islamabad", "Faisalabad"], info: "Major Manufacturing Base" },
@@ -85,12 +97,12 @@ const GlobalMap = () => {
     { name: "Thailand", top: "50%", left: "76%", branches: 8, cities: ["Bangkok", "Chiang Mai"], info: "Production Facility" },
     { name: "Vietnam", top: "48%", left: "79%", branches: 6, cities: ["Hanoi", "Ho Chi Minh City"], info: "Emerging Market" },
     { name: "Malaysia", top: "53%", left: "80%", branches: 7, cities: ["Kuala Lumpur"], info: "Southeast Asian Hub" },
-    { name: "Indonesia", top: "60%", left: "81%", branches: 8, cities: ["Jakarta", "Surabaya"], info: "Growing Market" },
-    { name: "Philippines", top: "55%", left: "85%", branches: 5, cities: ["Manila"], info: "Expanding Presence" },
+    { name: "Indonesia", top: "62%", left: "80%", branches: 8, cities: ["Jakarta", "Surabaya"], info: "Growing Market" },
+    { name: "Philippines", top: "55%", left: "83%", branches: 5, cities: ["Manila"], info: "Expanding Presence" },
     
     // Middle East
     { name: "UAE", top: "45%", left: "62%", branches: 7, cities: ["Dubai", "Abu Dhabi"], info: "Middle East HQ" },
-    { name: "Saudi Arabia", top: "48%", left: "60%", branches: 5, cities: ["Riyadh", "Jeddah"], info: "Growing Market" },
+    { name: "Saudi Arabia", top: "50%", left: "59%", branches: 5, cities: ["Riyadh", "Jeddah"], info: "Growing Market" },
     { name: "Turkey", top: "38%", left: "57%", branches: 6, cities: ["Istanbul", "Ankara"], info: "Bridge Between Continents" },
     { name: "Iran", top: "41%", left: "64%", branches: 4, cities: ["Tehran"], info: "Regional Presence" },
     { name: "Iraq", top: "43%", left: "61%", branches: 3, cities: ["Baghdad"], info: "Emerging Market" },
@@ -100,21 +112,21 @@ const GlobalMap = () => {
     { name: "Egypt", top: "45%", left: "57%", branches: 4, cities: ["Cairo", "Alexandria"], info: "North African Hub" },
     { name: "Nigeria", top: "53%", left: "51%", branches: 3, cities: ["Lagos", "Abuja"], info: "West African Market" },
     { name: "South Africa", top: "73%", left: "56%", branches: 8, cities: ["Johannesburg", "Cape Town"], info: "Southern African HQ" },
-    { name: "Morocco", top: "42%", left: "46%", branches: 4, cities: ["Casablanca"], info: "North African Presence" },
-    { name: "Kenya", top: "60%", left: "54%", branches: 3, cities: ["Nairobi"], info: "East African Hub" },
+    { name: "Morocco", top: "46%", left: "46%", branches: 4, cities: ["Casablanca"], info: "North African Presence" },
+    { name: "Kenya", top: "59%", left: "54%", branches: 3, cities: ["Nairobi"], info: "East African Hub" },
     { name: "Ethiopia", top: "55%", left: "55%", branches: 2, cities: ["Addis Ababa"], info: "Emerging Market" },
     { name: "Ghana", top: "52%", left: "48%", branches: 2, cities: ["Accra"], info: "West African Presence" },
     
     // Australia
     { name: "Australia", top: "75%", left: "89%", branches: 11, cities: ["Sydney", "Melbourne", "Brisbane"], info: "Oceania Headquarters" },
-    { name: "New Zealand", top: "80%", left: "92%", branches: 4, cities: ["Auckland", "Wellington"], info: "Growing Presence" },
+    { name: "New Zealand", top: "78%", left: "95%", branches: 4, cities: ["Auckland", "Wellington"], info: "Growing Presence" },
   ];
 
   return (
     <section ref={sectionRef} className="relative w-full h-dvh bg-black flex items-center justify-center overflow-hidden">
 
       {/* 🗺️ MAP IMAGE */}
-      <div className="relative w-[95%] md:w-[90%] lg:w-[85%] max-w-7xl mx-auto">
+      <div className="relative w-[95%] md:w-[90%] lg:w-[85%] max-w-7xl mx-auto bottom-[-18%] scale-x-120">
         <img
           ref={mapRef}
           src="/images/Worldmap.png"
@@ -128,7 +140,7 @@ const GlobalMap = () => {
         <div
           key={index}
           ref={el => pinsRef.current[index] = el}
-          className="absolute flex flex-col items-center cursor-pointer"
+          className="absolute flex flex-col items-center cursor-pointer mt-25 "
           style={{
             top: country.top,
             left: country.left,
