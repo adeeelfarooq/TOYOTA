@@ -9,7 +9,7 @@ import TechnologySection from './sections/Technology';
 import EngineeringSection from './sections/Engineering';
 import TestPage from './sections/Test';
 import GlobalMap from './sections/Map';
-// import ModernTestimonialsSection from './sections/Testimonial';
+import ModernTestimonialsSection from './sections/Testimonial';
 
 gsap.registerPlugin(ScrollTrigger , ScrollToPlugin ,  ScrollSmoother);
 
@@ -38,7 +38,7 @@ const App = () => {
 <TestPage/>
 
 
-{/* <ModernTestimonialsSection/> */}
+<ModernTestimonialsSection/>
 
 </div>
     
