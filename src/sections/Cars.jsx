@@ -14,7 +14,8 @@ const carsData = [
   { id: 5, title: "Toyota Camry", type: "Sedan", image: "/images/Camry.png", video: "/videos/Camry.mp4" },
   { id: 6, title: "Supra MK", type: "Sports", image: "/images/Supra-old1.png", video: "/videos/Supra-Mk4_1.webm" },
   { id: 7, title: "Toyota 2000", type: "Sports", image: "/images/2000gt-supra.png", video: "/videos/GT2000.webm" },
-  { id: 8, title: "Toyota V8", type: "SUV", image: "/images/V8.png", video: "/videos/Land-V8_1.webm" },
+    { id: 8, title: "Toyota C-HR", type: "SUV", image: "/images/V8.png", video: "/videos/Land-V8_1.webm" },
+  { id: 9, title: "Toyota V8", type: "SUV", image: "/images/V8.png", video: "/videos/Land-V8_1.webm" },
 ];
 
 const filters = ["All", "SUV", "Sedan", "Sports"];
