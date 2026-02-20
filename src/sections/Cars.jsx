@@ -4,6 +4,7 @@ import { SplitText, ScrollTrigger } from "gsap/all";
 import CarCards from "../components/Carcards";
 import { useGSAP } from "@gsap/react";
 
+
 gsap.registerPlugin(SplitText, ScrollTrigger);
 
 const carsData = [
@@ -14,7 +15,7 @@ const carsData = [
   { id: 5, title: "Toyota Camry", type: "Sedan", image: "/images/Camry.png", video: "/videos/Camry.mp4" },
   { id: 6, title: "Supra MK", type: "Sports", image: "/images/Supra-old1.png", video: "/videos/Supra-Mk4_1.webm" },
   { id: 7, title: "Toyota 2000", type: "Sports", image: "/images/2000gt-supra.png", video: "/videos/GT2000.webm" },
-  { id: 8, title: "Toyota C-HR", type: "SUV", image: "/images/C-HR.png", video: "/videos/Land-V8_1.webm" },
+  { id: 8, title: "Toyota C-HR", type: "SUV", image: "/images/C-HR.png", video: "/videos/C-HR.mp4" ,  Scale : "scale-110" },
   { id: 9, title: "Toyota V8", type: "SUV", image: "/images/V8.png", video: "/videos/Land-V8_1.webm" },
 ];
 
@@ -139,7 +140,7 @@ export default function Cars() {
               onClick={() => setActive(item)}
               className={`
                 uppercase text-xs tracking-widest pb-1 px-4 -translate-x-45
-                border-b transition-all z-100
+                border-b transition-all z-100 
                 ${active === item
                   ? "border-toyota-red text-white"
                   : "border-transparent text-gray-400 hover:text-white"}
@@ -158,7 +159,7 @@ export default function Cars() {
           className="absolute top-1/2 -translate-y-1/2 flex gap-28 w-max"
         >
           {filteredCars.map(car => (
-            <CarCards key={car.id} {...car} />
+            <CarCards key={car.id} {...car}  />
           ))}
         </div>
       </div>
