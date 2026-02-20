@@ -64,12 +64,12 @@ export default function CarCards({ title, type, image, video , Scale }) {
         muted
         playsInline
         preload="metadata"
-        className="
+        className={` ${Scale}
           absolute inset-0 w-full h-full object-contain
           opacity-100 md:opacity-0
           md:group-hover:opacity-100
           transition-opacity duration-500
-        "
+        `}
       />
 
       {/* TEXT */}
