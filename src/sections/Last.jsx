@@ -32,8 +32,6 @@ const Lastpage = () => {
             
             if (!isNaN(videoDuration)) {
               // FIX: Video ko exact end par jane se rokna (Flicker/Fade Fix)
-              // 0.1 ka matlab hai video 100 milliseconds pehle ruk jayegi. 
-              // Agar phir bhi thora fade out ho to isko 0.2 ya 0.3 kar lena.
               const maxTime = videoDuration - 0.05; 
               
               const targetTime = videoDuration * scrollPos;
@@ -52,16 +50,67 @@ const Lastpage = () => {
   return (
     <div 
       ref={containerRef} 
-      className='h-screen max-w-dvw relative bg-black flex items-center justify-center overflow-hidden'
+      className='h-screen max-w-dvw relative flex items-center justify-center overflow-hidden'
+      style={{
+        // Yahan apni background image ka path dalein
+        backgroundImage: "url('/images/bg-1.png')",
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundColor: "#c5ff00" // Fallback color
+      }}
     >
-      <video 
-        ref={videoRef}
-        src='videos/footer.mp4'
-        muted
-        playsInline
-        preload="auto"
-        className='w-full h-full object-contain scale-100 z-10'
-      />
+      
+      {/* 
+        SVG Mask: 
+        Uper wala bump chota hai (35% se 65%).
+        Neechay wala area wide hai, aur uski height neechay se barha di gayi hai (1.00 tak max kar diya hai).
+      */}
+      <svg className="absolute w-0 h-0">
+        <defs>
+          <clipPath id="lando-shape" clipPathUnits="objectBoundingBox">
+            <path d="
+              M 0.00 0.10 
+              Q 0.00 0.05, 0.02 0.05 
+              L 0.35 0.05 
+              C 0.38 0.05, 0.39 0.00, 0.42 0.00 
+              L 0.58 0.00 
+              C 0.61 0.00, 0.62 0.05, 0.65 0.05 
+              L 0.98 0.05 
+              Q 1.00 0.05, 1.00 0.10 
+              L 1.00 0.93 
+              Q 1.00 0.98, 0.98 0.98 
+              
+              L 0.90 0.98 
+              C 0.88 0.98, 0.87 1.00, 0.85 1.00 
+              L 0.15 1.00 
+              C 0.13 1.00, 0.12 0.98, 0.10 0.98 
+              L 0.02 0.98 
+              
+              Q 0.00 0.98, 0.00 0.93 
+              Z
+            " />
+          </clipPath>
+        </defs>
+      </svg>
+
+      {/* Inner Div: Yahan video chalegi aur shape apply hogi */}
+      <div 
+        className='w-[97%] h-[95%] relative bg-black flex items-center justify-center'
+        style={{
+          // Uper banaya gaya SVG mask idhar apply ho raha hai
+          clipPath: "url(#lando-shape)"
+        }}
+      >
+        <video 
+          ref={videoRef}
+          src='videos/footer.mp4'
+          muted
+          playsInline
+          preload="auto"
+          className='w-full h-full object-contain scale-100 z-10'
+        />
+      </div>
+      
     </div>
   )
 }
