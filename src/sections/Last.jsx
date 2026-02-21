@@ -21,7 +21,7 @@ const Lastpage = () => {
     let ctx = gsap.context(() => {
       ScrollTrigger.create({
         trigger: containerRef.current,
-        start: "top top", 
+        start: "33% top ", 
         end: "+=250%", 
         pin: true, 
         scrub: true, // Smoothness
@@ -50,10 +50,11 @@ const Lastpage = () => {
   return (
     <div 
       ref={containerRef} 
-      className='h-screen max-w-dvw relative flex items-center justify-center overflow-hidden '
+      // Yahan 'h-[150dvh]' kiya gaya hai aur 'items-end pb-6' add kiya hai
+      // taake section lamba ho aur video bilkul neechay ja kar place ho.
+      className='h-[150dvh] max-w-dvw relative flex items-end justify-center pb-5 overflow-hidden'
       style={{
-        // Gradient background for the main container
-        // backgroundImage: "url('/images/bg-7.png')",
+        // Gradient background for the main container (Ye poori 150dvh ko cover karega, no white space)
         background: "linear-gradient(to bottom, #000000 0%, #eb0a1e 100%)"
       }}
     >
@@ -89,11 +90,10 @@ const Lastpage = () => {
 
       {/* 
         Inner Div (SVG Shape): 
-        Yahan color ki jagah backgroundImage laga di gayi hai.
-        'bg-cover' aur 'bg-center' usko perfectly fit rakhenge.
+        Iska height 'h-[95vh]' fix kar diya hai, taake SVG uper ko stretch na ho.
       */}
       <div 
-        className='w-[97%] h-[95%] relative flex items-center justify-center bg-cover bg-center'
+        className='w-[97%] h-[95vh] relative flex items-center justify-center bg-cover bg-center'
         style={{
           // YAHAN APNI MARZI KI PIC KA PATH DALEIN
           backgroundImage: "url('/images/bg-1.png')", 
@@ -101,7 +101,7 @@ const Lastpage = () => {
         }}
         
       >
-        <div className="absolute inset-0 bg-black/20 z-0"></div>
+        <div className="absolute inset-0 bg-black/70 z-0"></div>
         <video 
           ref={videoRef}
           src='videos/footer.webm'
@@ -110,6 +110,7 @@ const Lastpage = () => {
           preload="auto"
           className='w-full h-full object-contain scale-100 z-10'
         />
+        
       </div>
       
     </div>
