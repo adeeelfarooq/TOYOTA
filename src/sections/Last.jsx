@@ -21,7 +21,7 @@ const Lastpage = () => {
     let ctx = gsap.context(() => {
       ScrollTrigger.create({
         trigger: containerRef.current,
-        start: "33% top ", 
+        start: "+=321 top ", 
         end: "+=250%", 
         pin: true, 
         scrub: true, // Smoothness
