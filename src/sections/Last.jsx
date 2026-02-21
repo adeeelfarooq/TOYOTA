@@ -50,21 +50,15 @@ const Lastpage = () => {
   return (
     <div 
       ref={containerRef} 
-      className='h-screen max-w-dvw relative flex items-center justify-center overflow-hidden'
+      className='h-screen max-w-dvw relative flex items-center justify-center overflow-hidden '
       style={{
-        // Yahan apni background image ka path dalein
-        backgroundImage: "url('/images/bg-1.png')",
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-        backgroundColor: "#c5ff00" // Fallback color
+        // Gradient background for the main container
+        // backgroundImage: "url('/images/bg-7.png')",
+        background: "linear-gradient(to bottom, #000000 0%, #eb0a1e 100%)"
       }}
     >
       
-      {/* 
-        SVG Mask: 
-        Uper wala bump chota hai (35% se 65%).
-        Neechay wala area wide hai, aur uski height neechay se barha di gayi hai (1.00 tak max kar diya hai).
-      */}
+      {/* SVG Mask */}
       <svg className="absolute w-0 h-0">
         <defs>
           <clipPath id="lando-shape" clipPathUnits="objectBoundingBox">
@@ -93,17 +87,24 @@ const Lastpage = () => {
         </defs>
       </svg>
 
-      {/* Inner Div: Yahan video chalegi aur shape apply hogi */}
+      {/* 
+        Inner Div (SVG Shape): 
+        Yahan color ki jagah backgroundImage laga di gayi hai.
+        'bg-cover' aur 'bg-center' usko perfectly fit rakhenge.
+      */}
       <div 
-        className='w-[97%] h-[95%] relative bg-black flex items-center justify-center'
+        className='w-[97%] h-[95%] relative flex items-center justify-center bg-cover bg-center'
         style={{
-          // Uper banaya gaya SVG mask idhar apply ho raha hai
+          // YAHAN APNI MARZI KI PIC KA PATH DALEIN
+          backgroundImage: "url('/images/bg-1.png')", 
           clipPath: "url(#lando-shape)"
         }}
+        
       >
+        <div className="absolute inset-0 bg-black/20 z-0"></div>
         <video 
           ref={videoRef}
-          src='videos/footer.mp4'
+          src='videos/footer.webm'
           muted
           playsInline
           preload="auto"
