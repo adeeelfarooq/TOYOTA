@@ -132,7 +132,11 @@ const Lastpage = () => {
           {/* <span className="text-lg md:text-2xl cursor-pointer text-[#c5ff00] mt-3 hover:opacity-80 transition-opacity">Store</span> */}
         </div>
 
-        
+        {/* RIGHT INSIDE TEXT (FOLLOW ON) */}
+        <div className="absolute right-[5%] md:right-[8%] top-[45%] -translate-y-1/2 z-20 flex flex-col items-end text-white font-black uppercase tracking-widest leading-none space-y-1 md:space-y-2 text-right">
+          <span className="text-[10px] text-toyota-red font-bold mb-1">Follow On</span>
+          
+        </div>
         
       </div>
       
