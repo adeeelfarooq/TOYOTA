@@ -140,7 +140,8 @@ const Lastpage = () => {
           muted
           playsInline
           preload="auto"
-          className='w-full h-full object-contain scale-100 z-10'
+          className='w-full h-full object-contain scale-100 z-10 opacity-60'
+          style={{ filter: "brightness(0) invert(16%) sepia(93%) saturate(5831%) hue-rotate(349deg) brightness(97%) contrast(110%)" }}
         />
 
         {/* LEFT INSIDE TEXT (PAGES) */}
@@ -169,14 +170,15 @@ const Lastpage = () => {
           >
             {/* Logo Set 1 */}
             {sponsors.map((src, index) => {
-              // Red-bull, Subaru aur YAMAHA ka scale barha diya gaya hai
               const needsScaling = src.includes('Red-bull') || src.includes('Subaru') || src.includes('Mobil-1') || src.includes('YAMAHA');
               return (
                 <img 
                   key={index} 
                   src={src} 
                   alt="Toyota Sponsor" 
-                  className={`h-5 md:h-8 mx-8 md:mx-14 object-contain opacity-60 hover:opacity-100 transition-opacity ${needsScaling ? 'scale-[2.5]' : ''}`} 
+                  className={`h-5 md:h-8 mx-8 md:mx-14 object-contain opacity-60 hover:opacity-100 transition-opacity ${needsScaling ? 'scale-[3.0]' : ''}`} 
+                  // Yahan CSS filter lga dia gya hai Toyota Red color k liye
+                  style={{ filter: "brightness(0) invert(16%) sepia(93%) saturate(5831%) hue-rotate(349deg) brightness(97%) contrast(110%)" }}
                 />
               );
             })}
@@ -189,7 +191,9 @@ const Lastpage = () => {
                   key={`dup-${index}`} 
                   src={src} 
                   alt="Toyota Sponsor" 
-                  className={`h-5 md:h-8 mx-8 md:mx-14 object-contain opacity-60 hover:opacity-100 transition-opacity ${needsScaling ? 'scale-[2.5]' : ''}`} 
+                  className={`h-5 md:h-8 mx-8 md:mx-14 object-contain opacity-60 hover:opacity-100 transition-opacity ${needsScaling ? 'scale-[3.0]' : ''}`} 
+                  // Yahan bhi same filter apply kiya gaya hai
+                  style={{ filter: "brightness(0) invert(16%) sepia(93%) saturate(5831%) hue-rotate(349deg) brightness(97%) contrast(110%)" }}
                 />
               );
             })}
