@@ -88,15 +88,15 @@ const Lastpage = () => {
         </defs>
       </svg>
 
-      {/* BOTTOM LEFT TEXTS (Outside Video Mask) */}
-      <div className="absolute bottom-2 left-6 md:left-12 z-20 flex gap-4 text-[10px] md:text-xs font-bold text-white uppercase tracking-wider">
-        <span className="cursor-pointer hover:opacity-70 transition-opacity">Privacy Policy</span>
-        <span className="cursor-pointer hover:opacity-70 transition-opacity">Terms</span>
+      {/* BOTTOM LEFT TEXTS (Outside Video Mask) - Ab yahan Copyright aa gaya hai */}
+      <div className="absolute bottom-2 left-6 md:left-5 z-20 text-[10px] md:text-xs font-bold text-black uppercase tracking-wider">
+        © 2026 TOYOTA. <span className='font-paragraph lowercase md:text-[10px] font-extralight   '><span className='uppercase'>A</span>ll rights reserved </span>
       </div>
 
-      {/* BOTTOM RIGHT TEXTS (Outside Video Mask) */}
-      <div className="absolute bottom-2 right-6 md:right-12 z-20 text-[10px] md:text-xs font-bold text-white uppercase tracking-wider">
-        © 2026 TOYOTA. All rights reserved
+      {/* BOTTOM RIGHT TEXTS (Outside Video Mask) - Ab yahan Privacy & Terms aa gaye hain */}
+      <div className="absolute bottom-2 right-6 md:right-12 z-20 flex gap-4 text-[10px] md:text-xs font-bold text-black uppercase tracking-wider">
+        <span className="cursor-pointer hover:opacity-70 transition-opacity">Privacy Policy</span>
+        <span className="cursor-pointer hover:opacity-70 transition-opacity">Terms</span>
       </div>
 
       {/* 
