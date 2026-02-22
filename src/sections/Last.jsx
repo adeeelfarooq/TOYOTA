@@ -171,12 +171,15 @@ const Lastpage = () => {
             {/* Logo Set 1 */}
             {sponsors.map((src, index) => {
               const needsScaling = src.includes('Red-bull') || src.includes('Subaru') || src.includes('Mobil-1') || src.includes('YAMAHA');
+               const reduceScaling = src.includes('DENSO')  ;
+               
+
               return (
                 <img 
                   key={index} 
                   src={src} 
                   alt="Toyota Sponsor" 
-                  className={`h-5 md:h-8 mx-8 md:mx-14 object-contain opacity-60 hover:opacity-100 transition-opacity ${needsScaling ? 'scale-[3.0]' : ''}`} 
+                  className={`h-5 md:h-8 mx-8 md:mx-14 object-contain opacity-60 hover:opacity-100 transition-opacity ${needsScaling ? 'scale-[3.0]' : ''} ${reduceScaling ? 'scale-y-[0.5]' : ''}`} 
                   // Yahan CSS filter lga dia gya hai Toyota Red color k liye
                   style={{ filter: "brightness(0) invert(16%) sepia(93%) saturate(5831%) hue-rotate(349deg) brightness(97%) contrast(110%)" }}
                 />
@@ -186,12 +189,13 @@ const Lastpage = () => {
             {/* Logo Set 2 (For seamless infinite loop) */}
             {sponsors.map((src, index) => {
               const needsScaling = src.includes('Red-bull') || src.includes('Subaru')  || src.includes('Mobil-1') || src.includes('YAMAHA');
+               const reduceScaling = src.includes('DENSO')   ;
               return (
                 <img 
                   key={`dup-${index}`} 
                   src={src} 
                   alt="Toyota Sponsor" 
-                  className={`h-5 md:h-8 mx-8 md:mx-14 object-contain opacity-60 hover:opacity-100 transition-opacity ${needsScaling ? 'scale-[3.0]' : ''}`} 
+                  className={`h-5 md:h-8 mx-8 md:mx-14 object-contain opacity-60 hover:opacity-100 transition-opacity ${needsScaling ? 'scale-[3.0]' : ''} ${reduceScaling ? 'scale-y-[0.5]' : ''}`} 
                   // Yahan bhi same filter apply kiya gaya hai
                   style={{ filter: "brightness(0) invert(16%) sepia(93%) saturate(5831%) hue-rotate(349deg) brightness(97%) contrast(110%)" }}
                 />
