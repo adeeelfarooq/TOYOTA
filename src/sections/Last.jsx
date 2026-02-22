@@ -7,6 +7,19 @@ gsap.registerPlugin(ScrollTrigger);
 const Lastpage = () => {
   const containerRef = useRef(null);
   const videoRef = useRef(null);
+  const marqueeRef = useRef(null); // Sponsors marquee ke liye ref
+
+  // Aapke 8 sponsors ka array
+  const sponsors = [
+    "/images/Red-bull.png",
+    "/images/DENSO.png",
+    "/images/HAAS.png",
+    "/images/JBL.png",
+    "/images/Subaru.png",
+    "/images/YAMAHA.png",
+    "/images/Mobil-1.png",
+    
+  ];
 
   useEffect(() => {
     const video = videoRef.current;
@@ -19,6 +32,7 @@ const Lastpage = () => {
     }
 
     let ctx = gsap.context(() => {
+      // 1. Video Scroll Animation (Pehle wali exactly same)
       ScrollTrigger.create({
         trigger: containerRef.current,
         start: "+=321 top ", 
@@ -31,17 +45,32 @@ const Lastpage = () => {
             const videoDuration = video.duration;
             
             if (!isNaN(videoDuration)) {
-              // FIX: Video ko exact end par jane se rokna (Flicker/Fade Fix)
               const maxTime = videoDuration - 0.05; 
-              
               const targetTime = videoDuration * scrollPos;
-              
-              // Math.min ensure karega ke currentTime maxTime se agay na jaye
               video.currentTime = Math.min(maxTime, targetTime);
             }
           }
         }
       });
+
+      // 2. GSAP Marquee Animation (Left to Right)
+      if (marqueeRef.current) {
+        const marqueeTween = gsap.fromTo(
+          marqueeRef.current,
+          { x: "-50%" }, // Start position (Left shifted)
+          { 
+            x: "0%",     // End position (Original right pos)
+            duration: 25, 
+            ease: "none", 
+            repeat: -1   // Infinite loop
+          }
+        );
+
+        // Hover par pause aur play karne ka logic GSAP ke through
+        marqueeRef.current.addEventListener("mouseenter", () => marqueeTween.pause());
+        marqueeRef.current.addEventListener("mouseleave", () => marqueeTween.play());
+      }
+
     }, containerRef); 
 
     return () => ctx.revert();
@@ -50,15 +79,13 @@ const Lastpage = () => {
   return (
     <div 
       ref={containerRef} 
-      // Yahan 'h-[150dvh]' kiya gaya hai aur 'items-end pb-6' add kiya hai
-      // taake section lamba ho aur video bilkul neechay ja kar place ho.
       className='h-[150dvh] max-w-dvw relative flex items-end justify-center pb-5 overflow-hidden'
       style={{
-        // Gradient background for the main container (Ye poori 150dvh ko cover karega, no white space)
+        // Gradient background for the main container
         background: "linear-gradient(to bottom, #000000 0%, #eb0a1e 100%)"
       }}
     >
-      
+
       {/* SVG Mask */}
       <svg className="absolute w-0 h-0">
         <defs>
@@ -88,29 +115,23 @@ const Lastpage = () => {
         </defs>
       </svg>
 
-      {/* BOTTOM LEFT TEXTS (Outside Video Mask) - Ab yahan Copyright aa gaya hai */}
+      {/* BOTTOM LEFT TEXTS (Outside Video Mask) */}
       <div className="absolute bottom-2 left-6 md:left-5 z-20 text-[10px] md:text-xs font-bold text-black uppercase tracking-wider">
-        © 2026 TOYOTA. <span className='font-paragraph lowercase md:text-[10px] font-extralight   '><span className='uppercase'>A</span>ll rights reserved </span>
+        © 2026 TOYOTA. <span className='font-paragraph lowercase md:text-[10px] font-extralight'><span className='uppercase'>A</span>ll rights reserved </span>
       </div>
 
-      {/* BOTTOM RIGHT TEXTS (Outside Video Mask) - Ab yahan Privacy & Terms aa gaye hain */}
+      {/* BOTTOM RIGHT TEXTS (Outside Video Mask) */}
       <div className="absolute bottom-2 right-6 md:right-12 z-20 flex gap-4 text-[10px] md:text-xs font-bold text-black uppercase tracking-wider">
         <span className="cursor-pointer hover:opacity-70 transition-opacity">Privacy Policy</span>
         <span className="cursor-pointer hover:opacity-70 transition-opacity">Terms</span>
       </div>
 
-      {/* 
-        Inner Div (SVG Shape): 
-        Iska height 'h-[95vh]' fix kar diya hai, taake SVG uper ko stretch na ho.
-      */}
+      {/* Inner Div (SVG Shape) */}
       <div 
         className='w-[97%] h-[95vh] relative flex items-center justify-center bg-cover bg-center bg-black'
         style={{
-          // YAHAN APNI MARZI KI PIC KA PATH DALEIN
-          // backgroundImage: "url('/images/bg-1.png')", 
           clipPath: "url(#lando-shape)"
         }}
-        
       >
         <div className="absolute inset-0 bg-black/70 z-0"></div>
         <video 
@@ -129,7 +150,6 @@ const Lastpage = () => {
           <span className="text-lg md:text-2xl cursor-pointer hover:text-gray-300 transition-colors">On Track</span>
           <span className="text-lg md:text-2xl cursor-pointer hover:text-gray-300 transition-colors">Off Track</span>
           <span className="text-lg md:text-2xl cursor-pointer hover:text-gray-300 transition-colors">Calendar</span>
-          {/* <span className="text-lg md:text-2xl cursor-pointer text-[#c5ff00] mt-3 hover:opacity-80 transition-opacity">Store</span> */}
         </div>
 
         {/* RIGHT INSIDE TEXT (FOLLOW ON) */}
@@ -139,6 +159,34 @@ const Lastpage = () => {
           <span className="text-lg md:text-2xl cursor-pointer hover:text-gray-300 transition-colors">Instagram</span>
           <span className="text-lg md:text-2xl cursor-pointer hover:text-gray-300 transition-colors">YouTube</span>
           <span className="text-lg md:text-2xl cursor-pointer hover:text-gray-300 transition-colors">Twitch</span>
+        </div>
+
+        {/* SCROLLING SPONSORS (GSAP CONTROLLED) */}
+        <div className="absolute bottom-6 md:bottom-10 w-full overflow-hidden z-20 flex">
+          <div 
+            ref={marqueeRef} 
+            className="flex items-center w-max cursor-pointer"
+          >
+            {/* Logo Set 1 */}
+            {sponsors.map((src, index) => (
+              <img 
+                key={index} 
+                src={src} 
+                alt="Toyota Sponsor" 
+                className="h-5 md:h-8 mx-8 md:mx-14 object-contain opacity-60 hover:opacity-100 transition-opacity" 
+              />
+            ))}
+            
+            {/* Logo Set 2 (For seamless infinite loop) */}
+            {sponsors.map((src, index) => (
+              <img 
+                key={`dup-${index}`} 
+                src={src} 
+                alt="Toyota Sponsor" 
+                className="h-5 md:h-8 mx-8 md:mx-14 object-contain opacity-60 hover:opacity-100 transition-opacity" 
+              />
+            ))}
+          </div>
         </div>
         
       </div>
