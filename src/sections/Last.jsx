@@ -88,15 +88,26 @@ const Lastpage = () => {
         </defs>
       </svg>
 
+      {/* BOTTOM LEFT TEXTS (Outside Video Mask) */}
+      <div className="absolute bottom-2 left-6 md:left-12 z-20 flex gap-4 text-[10px] md:text-xs font-bold text-white uppercase tracking-wider">
+        <span className="cursor-pointer hover:opacity-70 transition-opacity">Privacy Policy</span>
+        <span className="cursor-pointer hover:opacity-70 transition-opacity">Terms</span>
+      </div>
+
+      {/* BOTTOM RIGHT TEXTS (Outside Video Mask) */}
+      <div className="absolute bottom-2 right-6 md:right-12 z-20 text-[10px] md:text-xs font-bold text-white uppercase tracking-wider">
+        © 2026 TOYOTA. All rights reserved
+      </div>
+
       {/* 
         Inner Div (SVG Shape): 
         Iska height 'h-[95vh]' fix kar diya hai, taake SVG uper ko stretch na ho.
       */}
       <div 
-        className='w-[97%] h-[95vh] relative flex items-center justify-center bg-cover bg-center'
+        className='w-[97%] h-[95vh] relative flex items-center justify-center bg-cover bg-center bg-black'
         style={{
           // YAHAN APNI MARZI KI PIC KA PATH DALEIN
-          backgroundImage: "url('/images/bg-1.png')", 
+          // backgroundImage: "url('/images/bg-1.png')", 
           clipPath: "url(#lando-shape)"
         }}
         
@@ -110,6 +121,18 @@ const Lastpage = () => {
           preload="auto"
           className='w-full h-full object-contain scale-100 z-10'
         />
+
+        {/* LEFT INSIDE TEXT (PAGES) */}
+        <div className="absolute left-[5%] md:left-[8%] top-[45%] -translate-y-1/2 z-20 flex flex-col items-start text-white font-black uppercase tracking-widest leading-none space-y-1 md:space-y-2">
+          <span className="text-[10px] text-toyota-red font-bold mb-1">Pages</span>
+          <span className="text-lg md:text-2xl cursor-pointer hover:text-gray-300 transition-colors">Home</span>
+          <span className="text-lg md:text-2xl cursor-pointer hover:text-gray-300 transition-colors">On Track</span>
+          <span className="text-lg md:text-2xl cursor-pointer hover:text-gray-300 transition-colors">Off Track</span>
+          <span className="text-lg md:text-2xl cursor-pointer hover:text-gray-300 transition-colors">Calendar</span>
+          {/* <span className="text-lg md:text-2xl cursor-pointer text-[#c5ff00] mt-3 hover:opacity-80 transition-opacity">Store</span> */}
+        </div>
+
+        
         
       </div>
       
