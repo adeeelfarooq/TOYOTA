@@ -168,24 +168,31 @@ const Lastpage = () => {
             className="flex items-center w-max cursor-pointer"
           >
             {/* Logo Set 1 */}
-            {sponsors.map((src, index) => (
-              <img 
-                key={index} 
-                src={src} 
-                alt="Toyota Sponsor" 
-                className="h-5 md:h-8 mx-8 md:mx-14 object-contain opacity-60 hover:opacity-100 transition-opacity" 
-              />
-            ))}
+            {sponsors.map((src, index) => {
+              // Red-bull, Subaru aur YAMAHA ka scale barha diya gaya hai
+              const needsScaling = src.includes('Red-bull') || src.includes('Subaru') || src.includes('YAMAHA');
+              return (
+                <img 
+                  key={index} 
+                  src={src} 
+                  alt="Toyota Sponsor" 
+                  className={`h-5 md:h-8 mx-8 md:mx-14 object-contain opacity-60 hover:opacity-100 transition-opacity ${needsScaling ? 'scale-[1.5]' : ''}`} 
+                />
+              );
+            })}
             
             {/* Logo Set 2 (For seamless infinite loop) */}
-            {sponsors.map((src, index) => (
-              <img 
-                key={`dup-${index}`} 
-                src={src} 
-                alt="Toyota Sponsor" 
-                className="h-5 md:h-8 mx-8 md:mx-14 object-contain opacity-60 hover:opacity-100 transition-opacity" 
-              />
-            ))}
+            {sponsors.map((src, index) => {
+              const needsScaling = src.includes('Red-bull') || src.includes('Subaru') || src.includes('YAMAHA');
+              return (
+                <img 
+                  key={`dup-${index}`} 
+                  src={src} 
+                  alt="Toyota Sponsor" 
+                  className={`h-5 md:h-8 mx-8 md:mx-14 object-contain opacity-60 hover:opacity-100 transition-opacity ${needsScaling ? 'scale-[1.5]' : ''}`} 
+                />
+              );
+            })}
           </div>
         </div>
         
