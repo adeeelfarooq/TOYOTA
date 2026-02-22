@@ -137,7 +137,8 @@ const Lastpage = () => {
           <span className="text-[10px] text-toyota-red font-bold mb-1">Follow On</span>
           <span className="text-lg md:text-2xl cursor-pointer hover:text-gray-300 transition-colors">TikTok</span>
           <span className="text-lg md:text-2xl cursor-pointer hover:text-gray-300 transition-colors">Instagram</span>
-          
+          <span className="text-lg md:text-2xl cursor-pointer hover:text-gray-300 transition-colors">YouTube</span>
+          <span className="text-lg md:text-2xl cursor-pointer hover:text-gray-300 transition-colors">Twitch</span>
         </div>
         
       </div>
