@@ -1,6 +1,6 @@
 import { useRef, useEffect } from "react";
 
-export default function CarCards({ title, type, image, video , Scale }) {
+export default function CarCards({ title, type, image, video , Scale  }) {
   const videoRef = useRef(null);
   const cardRef = useRef(null);
 
@@ -50,7 +50,7 @@ export default function CarCards({ title, type, image, video , Scale }) {
       <img
         src={image}
         alt={title}
-        className={`${Scale}
+        className={` ${Scale}
           absolute inset-0 w-full h-full object-contain
           transition-opacity duration-500
           md:group-hover:opacity-0
@@ -64,7 +64,7 @@ export default function CarCards({ title, type, image, video , Scale }) {
         muted
         playsInline
         preload="metadata"
-        className={` ${Scale}
+        className={` 
           absolute inset-0 w-full h-full object-contain
           opacity-100 md:opacity-0
           md:group-hover:opacity-100

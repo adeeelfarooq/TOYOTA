@@ -145,8 +145,8 @@ const Lastpage = () => {
         />
 
         {/* LEFT INSIDE TEXT (PAGES) */}
-        <div className="absolute left-[5%] md:left-[8%] top-[45%] -translate-y-1/2 z-20 flex flex-col items-start text-white font-black uppercase tracking-widest leading-none space-y-1 md:space-y-2">
-          <span className="text-[10px] text-toyota-red font-bold mb-1">Pages</span>
+        <div className="absolute left-[5%] md:left-[8%] top-[45%] -translate-y-1/2 z-20 flex flex-col items-start text-white font-black uppercase tracking-widest leading-none space-y-1 md:space-y-1">
+          <span className="text-[10px] text-toyota-red font-bold  mb-4">Pages</span>
           <span className="text-lg md:text-2xl cursor-pointer hover:text-gray-300 transition-colors">Home</span>
           <span className="text-lg md:text-2xl cursor-pointer hover:text-gray-300 transition-colors">On Track</span>
           <span className="text-lg md:text-2xl cursor-pointer hover:text-gray-300 transition-colors">Off Track</span>
@@ -154,8 +154,8 @@ const Lastpage = () => {
         </div>
 
         {/* RIGHT INSIDE TEXT (FOLLOW ON) */}
-        <div className="absolute right-[5%] md:right-[8%] top-[45%] -translate-y-1/2 z-20 flex flex-col items-end text-white font-black uppercase tracking-widest leading-none space-y-1 md:space-y-2 text-right">
-          <span className="text-[10px] text-toyota-red font-bold mb-1">Follow On</span>
+        <div className="absolute right-[5%] md:right-[8%] top-[45%] -translate-y-1/2 z-20 flex flex-col items-end text-white font-black uppercase tracking-widest leading-none space-y-1 md:space-y-1 text-right">
+          <span className="text-[10px] text-toyota-red font-bold mb-4">Follow On</span>
           <span className="text-lg md:text-2xl cursor-pointer hover:text-gray-300 transition-colors">TikTok</span>
           <span className="text-lg md:text-2xl cursor-pointer hover:text-gray-300 transition-colors">Instagram</span>
           <span className="text-lg md:text-2xl cursor-pointer hover:text-gray-300 transition-colors">YouTube</span>
