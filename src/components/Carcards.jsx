@@ -64,7 +64,7 @@ export default function CarCards({ title, type, image, video , Scale , Videoscal
         muted
         playsInline
         preload="metadata"
-        className={` 
+        className={` ${Videoscale}
           absolute inset-0 w-full h-full object-contain
           opacity-100 md:opacity-0
           md:group-hover:opacity-100
