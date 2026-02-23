@@ -162,7 +162,7 @@ const Lastpage = () => {
         {/* HELMET PERSON IMAGE FIXED */}
         <img 
           ref={personRef}
-          src="images/4Runner.png" 
+          src="images/footer1.png" 
           alt="Toyota Racing Driver"
           // Yahan se inline style aur Tailwind ka -translate-x-1/2 hata diya gaya hai, sab GSAP control kar raha hai
           className="absolute bottom-0 left-1/2 h-[60%] md:h-[80%] object-contain z-[15] pointer-events-none"
