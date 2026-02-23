@@ -1,6 +1,6 @@
 import { useRef, useEffect } from "react";
 
-export default function CarCards({ title, type, image, video , Scale  }) {
+export default function CarCards({ title, type, image, video , Scale , Videoscale }) {
   const videoRef = useRef(null);
   const cardRef = useRef(null);
 
