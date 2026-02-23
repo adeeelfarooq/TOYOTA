@@ -8,6 +8,7 @@ const Lastpage = () => {
   const containerRef = useRef(null);
   const videoRef = useRef(null);
   const marqueeRef = useRef(null); // Sponsors marquee ke liye ref
+  const personRef = useRef(null);  // Helmet wali image ke liye ref
 
   // Aapke 8 sponsors ka array
   const sponsors = [
@@ -32,7 +33,13 @@ const Lastpage = () => {
     }
 
     let ctx = gsap.context(() => {
-      // 1. Video Scroll Animation (Pehle wali exactly same)
+
+      // INITIAL STATE FIX: Image ko exactly center mein aur neechay chupa diya hai
+      if (personRef.current) {
+        gsap.set(personRef.current, { xPercent: -50, yPercent: 100 });
+      }
+
+      // 1. Video Scroll Animation
       ScrollTrigger.create({
         trigger: containerRef.current,
         start: "+=321 top ", 
@@ -49,6 +56,14 @@ const Lastpage = () => {
               const targetTime = videoDuration * scrollPos;
               video.currentTime = Math.min(maxTime, targetTime);
             }
+          }
+
+          // HELMET PERSON SCROLL LOGIC FIX
+          if (personRef.current) {
+            let yProg = gsap.utils.mapRange(0.75, 1.0, 100, 0, self.progress);
+            yProg = gsap.utils.clamp(0, 100, yProg); 
+            // xPercent: -50 ensure karega ke image hamesha center mein rahe
+            gsap.set(personRef.current, { yPercent: yProg, xPercent: -50 });
           }
         }
       });
@@ -144,6 +159,15 @@ const Lastpage = () => {
           style={{ filter: "brightness(0) invert(16%) sepia(93%) saturate(5831%) hue-rotate(349deg) brightness(97%) contrast(110%)" }}
         />
 
+        {/* HELMET PERSON IMAGE FIXED */}
+        <img 
+          ref={personRef}
+          src="images/4Runner.png" 
+          alt="Toyota Racing Driver"
+          // Yahan se inline style aur Tailwind ka -translate-x-1/2 hata diya gaya hai, sab GSAP control kar raha hai
+          className="absolute bottom-0 left-1/2 h-[60%] md:h-[80%] object-contain z-[15] pointer-events-none"
+        />
+
         {/* LEFT INSIDE TEXT (PAGES) */}
         <div className="absolute left-[5%] md:left-[8%] top-[45%] -translate-y-1/2 z-20 flex flex-col items-start text-white font-black uppercase tracking-widest leading-none space-y-1 md:space-y-1">
           <span className="text-[10px] text-toyota-red font-bold  mb-4">Pages</span>
@@ -180,7 +204,6 @@ const Lastpage = () => {
                   src={src} 
                   alt="Toyota Sponsor" 
                   className={`h-5 md:h-8 mx-8 md:mx-14 object-contain opacity-60 hover:opacity-100 transition-opacity ${needsScaling ? 'scale-[3.0]' : ''} ${reduceScaling ? 'scale-y-[0.5]' : ''}`} 
-                  // Yahan CSS filter lga dia gya hai Toyota Red color k liye
                   style={{ filter: "brightness(0) invert(16%) sepia(93%) saturate(5831%) hue-rotate(349deg) brightness(97%) contrast(110%)" }}
                 />
               );
@@ -196,7 +219,6 @@ const Lastpage = () => {
                   src={src} 
                   alt="Toyota Sponsor" 
                   className={`h-5 md:h-8 mx-8 md:mx-14 object-contain opacity-60 hover:opacity-100 transition-opacity ${needsScaling ? 'scale-[3.0]' : ''} ${reduceScaling ? 'scale-y-[0.5]' : ''}`} 
-                  // Yahan bhi same filter apply kiya gaya hai
                   style={{ filter: "brightness(0) invert(16%) sepia(93%) saturate(5831%) hue-rotate(349deg) brightness(97%) contrast(110%)" }}
                 />
               );
