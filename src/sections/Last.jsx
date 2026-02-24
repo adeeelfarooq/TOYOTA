@@ -155,7 +155,7 @@ const Lastpage = () => {
           muted
           playsInline
           preload="auto"
-          className='w-full h-full object-contain scale-40 z-10 opacity-60 -translate-y-60'
+          className='w-full h-full object-contain scale-100 z-10 opacity-60 -translate-y-30'
           style={{ filter: "brightness(0) invert(16%) sepia(93%) saturate(5831%) hue-rotate(349deg) brightness(97%) contrast(110%)" }}
         />
 
