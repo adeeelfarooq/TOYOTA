@@ -19,6 +19,7 @@ const Lastpage = () => {
     "/images/Subaru.png",
     "/images/YAMAHA.png",
     "/images/Mobil-1.png",
+    "/images/Zent.png",
     
   ];
 
