@@ -1,6 +1,6 @@
 import React from 'react'
 import { ScrollSmoother, ScrollToPlugin , ScrollTrigger } from 'gsap/all';
-import Hero from './sections/Hero'
+// import Hero from './sections/Hero'
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
 import Cars from './sections/Cars';
@@ -28,7 +28,7 @@ const App = () => {
       <div id="smooth-wrapper">   
       <div id="smooth-content">
          
-<Hero/>
+{/* <Hero/> */}
 <Cars/>
 
 <div>

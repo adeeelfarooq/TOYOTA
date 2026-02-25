@@ -156,17 +156,17 @@ const Lastpage = () => {
           muted
           playsInline
           preload="auto"
-          className='w-full h-full object-contain scale-100 z-10 opacity-60 -translate-y-30'
+          className='w-full h-full object-contain  z-10 opacity-60 '
           style={{ filter: "brightness(0) invert(16%) sepia(93%) saturate(5831%) hue-rotate(349deg) brightness(97%) contrast(110%)" }}
         />
 
         {/* HELMET PERSON IMAGE FIXED */}
         <img 
           ref={personRef}
-          src="images/footer1.png" 
+          src="images/Spn.png" 
           alt="Toyota Racing Driver"
           // Yahan se inline style aur Tailwind ka -translate-x-1/2 hata diya gaya hai, sab GSAP control kar raha hai
-          className="absolute bottom-0 left-1/2 h-[60%] md:h-[80%] object-contain z-[100] pointer-events-none"
+          className="absolute bottom-0 left-1/2 h-[60%] md:h-[80%] scale-90 object-contain z-[100] pointer-events-none"
         />
 
         {/* LEFT INSIDE TEXT (PAGES) */}
