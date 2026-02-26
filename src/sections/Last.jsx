@@ -72,7 +72,7 @@ const Lastpage = () => {
           }
           if (personsRef.current) {
             let yyProg = gsap.utils.mapRange(0.75, 1.0, 100, 0, self.progress);
-            yyProg = gsap.utils.clamp(0, 100, yyProg); 
+            yyProg = gsap.utils.clamp(90, 100, yyProg); 
             // xPercent: -50 ensure karega ke image hamesha center mein rahe
             gsap.set(personsRef.current, { yPercent: -yyProg, xPercent: -50 });
           }
