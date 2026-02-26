@@ -9,6 +9,7 @@ const Lastpage = () => {
   const videoRef = useRef(null);
   const marqueeRef = useRef(null); // Sponsors marquee ke liye ref
   const personRef = useRef(null);  // Helmet wali image ke liye ref
+  const personsRef = useRef(null);
 
   // Aapke 8 sponsors ka array
   const sponsors = [
@@ -39,6 +40,9 @@ const Lastpage = () => {
       if (personRef.current) {
         gsap.set(personRef.current, { xPercent: -50, yPercent: 100 });
       }
+      if (personsRef.current) {
+        gsap.set(personsRef.current, { xPercent: -50, yPercent: 100 });
+      }
 
       // 1. Video Scroll Animation
       ScrollTrigger.create({
@@ -64,7 +68,13 @@ const Lastpage = () => {
             let yProg = gsap.utils.mapRange(0.75, 1.0, 100, 0, self.progress);
             yProg = gsap.utils.clamp(0, 100, yProg); 
             // xPercent: -50 ensure karega ke image hamesha center mein rahe
-            gsap.set(personRef.current, { yPercent: -yProg, xPercent: -50 });
+            gsap.set(personRef.current, { yPercent: yProg, xPercent: -50 });
+          }
+          if (personsRef.current) {
+            let yyProg = gsap.utils.mapRange(0.75, 1.0, 100, 0, self.progress);
+            yyProg = gsap.utils.clamp(0, 100, yyProg); 
+            // xPercent: -50 ensure karega ke image hamesha center mein rahe
+            gsap.set(personsRef.current, { yPercent: -yyProg, xPercent: -50 });
           }
         }
       });
@@ -156,17 +166,24 @@ const Lastpage = () => {
           muted
           playsInline
           preload="auto"
-          className='w-full h-full object-contain scale-110  z-10 opacity-60 '
+          className='w-full h-full object-contain scale-100 z-10 opacity-60 -translate-y-30'
           style={{ filter: "brightness(0) invert(16%) sepia(93%) saturate(5831%) hue-rotate(349deg) brightness(97%) contrast(110%)" }}
         />
 
         {/* HELMET PERSON IMAGE FIXED */}
         <img 
           ref={personRef}
-          src="images/Spn.png" 
+          src="images/footer1.png" 
           alt="Toyota Racing Driver"
           // Yahan se inline style aur Tailwind ka -translate-x-1/2 hata diya gaya hai, sab GSAP control kar raha hai
-          className="absolute bottom-0 left-1/2 h-[60%] md:h-[80%] scale-105 object-contain z-[100] pointer-events-none"
+          className="absolute bottom-0 left-1/2 h-[60%] md:h-[80%] object-contain z-[100] pointer-events-none"
+        />
+        <img 
+          ref={personsRef}
+          src="images/Spn.png" 
+          alt="Toyota Driver"
+          // Yahan se inline style aur Tailwind ka -translate-x-1/2 hata diya gaya hai, sab GSAP control kar raha hai
+          className="absolute bottom-0 left-1/2 h-[60%] md:h-[80%] object-contain z-[100] pointer-events-none"
         />
 
         {/* LEFT INSIDE TEXT (PAGES) */}
