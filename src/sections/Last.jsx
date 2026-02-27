@@ -54,16 +54,16 @@ const Lastpage = () => {
         pin: true, 
         scrub: true, // Smoothness
         onUpdate: (self) => {
-          if (video && video.readyState >= 2) {
-            const scrollPos = self.progress; // 0 to 1
-            const videoDuration = video.duration;
+          // if (video && video.readyState >= 2) {
+          //   const scrollPos = self.progress; // 0 to 1
+          //   const videoDuration = video.duration;
             
-            if (!isNaN(videoDuration)) {
-              const maxTime = videoDuration - 0.05; 
-              const targetTime = videoDuration * scrollPos;
-              video.currentTime = Math.min(maxTime, targetTime);
-            }
-          }
+          //   if (!isNaN(videoDuration)) {
+          //     const maxTime = videoDuration - 0.05; 
+          //     const targetTime = videoDuration * scrollPos;
+          //     video.currentTime = Math.min(maxTime, targetTime);
+          //   }
+          // }
 
           // HELMET PERSON SCROLL LOGIC FIX
           if (personRef.current) {
@@ -162,7 +162,7 @@ const Lastpage = () => {
         }}
       >
         <div className="absolute inset-0 bg-black/70 z-0"></div>
-        <video 
+        {/* <video 
           ref={videoRef}
           src='videos/footer.webm'
           muted
@@ -170,7 +170,7 @@ const Lastpage = () => {
           preload="auto"
           className='w-full h-full object-contain scale-120 z-10 opacity-60 -translate-y-20'
           style={{ filter: "brightness(0) invert(16%) sepia(93%) saturate(5831%) hue-rotate(349deg) brightness(97%) contrast(110%)" }}
-        />
+        /> */}
 
         {/* HELMET PERSON IMAGE FIXED */}
         <img 
