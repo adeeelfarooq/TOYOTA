@@ -22,6 +22,8 @@ const Lastpage = () => {
     "/images/Mobil-1.png",
     "/images/Zent.png",
     "/images/Arai.png",
+    "/images/TA.png",
+    
   ];
 
   useEffect(() => {
@@ -72,7 +74,7 @@ const Lastpage = () => {
           }
           if (personsRef.current) {
             let yyProg = gsap.utils.mapRange(0.75, 1.0, 100, 0, self.progress);
-            yyProg = gsap.utils.clamp(90, 100, yyProg); 
+            yyProg = gsap.utils.clamp(90, 125, yyProg); 
             // xPercent: -50 ensure karega ke image hamesha center mein rahe
             gsap.set(personsRef.current, { yPercent: -yyProg, xPercent: -50 });
           }
@@ -166,7 +168,7 @@ const Lastpage = () => {
           muted
           playsInline
           preload="auto"
-          className='w-full h-full object-contain scale-100 z-10 opacity-60 -translate-y-30'
+          className='w-full h-full object-contain scale-120 z-10 opacity-60 -translate-y-20'
           style={{ filter: "brightness(0) invert(16%) sepia(93%) saturate(5831%) hue-rotate(349deg) brightness(97%) contrast(110%)" }}
         />
 
@@ -212,7 +214,7 @@ const Lastpage = () => {
           >
             {/* Logo Set 1 */}
             {sponsors.map((src, index) => {
-              const needsScaling = src.includes('Red-bull') || src.includes('Subaru') || src.includes('Mobil-1') || src.includes('YAMAHA');
+              const needsScaling = src.includes('Red-bull') || src.includes('Subaru') || src.includes('Mobil-1') || src.includes('TA') || src.includes('YAMAHA');
                const reduceScaling = src.includes('DENSO') || src.includes('Zent')  ;
                
 
@@ -229,7 +231,7 @@ const Lastpage = () => {
             
             {/* Logo Set 2 (For seamless infinite loop) */}
             {sponsors.map((src, index) => {
-              const needsScaling = src.includes('Red-bull') || src.includes('Subaru')  || src.includes('Mobil-1') || src.includes('YAMAHA');
+              const needsScaling = src.includes('Red-bull') || src.includes('Subaru') || src.includes('TA')   || src.includes('Mobil-1') || src.includes('YAMAHA');
                const reduceScaling = src.includes('DENSO') || src.includes('Zent')    ;
               return (
                 <img 
