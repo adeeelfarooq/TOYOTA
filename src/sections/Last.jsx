@@ -23,7 +23,7 @@ const Lastpage = () => {
     "/images/Zent.png",
     "/images/Arai.png",
     "/images/TA.png",
-    
+    "/images/CoreStaff.png",
   ];
 
   useEffect(() => {
