@@ -224,7 +224,7 @@ const Lastpage = () => {
                   key={index} 
                   src={src} 
                   alt="Toyota Sponsor" 
-                  className={`h-5 md:h-8 mx-8 md:mx-14 object-contain opacity-60 hover:opacity-100 transition-opacity ${needsScaling ? 'scale-[3.0]' : ''} ${reduceScaling ? 'scale-y-[0.5]' : ''} ${onescaling ? 'scale-130' : ''}`} 
+                  className={`h-5 md:h-8 mx-8 md:mx-14 object-contain opacity-60 hover:opacity-100 transition-opacity ${needsScaling ? 'scale-[3.0]' : ''} ${reduceScaling ? 'scale-y-[0.5]' : ''} ${oneScaling ? 'scale-130' : ''}`} 
                   style={{ filter: "brightness(0) invert(16%) sepia(93%) saturate(5831%) hue-rotate(349deg) brightness(97%) contrast(110%)" }}
                 />
               );
@@ -240,7 +240,7 @@ const Lastpage = () => {
                   key={`dup-${index}`} 
                   src={src} 
                   alt="Toyota Sponsor" 
-                  className={`h-5 md:h-8 mx-8 md:mx-14 object-contain opacity-60 hover:opacity-100 transition-opacity ${needsScaling ? 'scale-[3.0]' : ''} ${reduceScaling ? 'scale-y-[0.5]' : ''} ${onescaling ? 'scale-130' : ''}`} 
+                  className={`h-5 md:h-8 mx-8 md:mx-14 object-contain opacity-60 hover:opacity-100 transition-opacity ${needsScaling ? 'scale-[3.0]' : ''} ${reduceScaling ? 'scale-y-[0.5]' : ''} ${oneScaling ? 'scale-130' : ''}`} 
                   style={{ filter: "brightness(0) invert(16%) sepia(93%) saturate(5831%) hue-rotate(349deg) brightness(97%) contrast(110%)" }}
                 />
               );
