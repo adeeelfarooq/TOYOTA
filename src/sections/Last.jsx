@@ -215,7 +215,7 @@ const Lastpage = () => {
             {/* Logo Set 1 */}
             {sponsors.map((src, index) => {
               const onescaling =  src.includes('CoreStaff');
-              const needsScaling = src.includes('Red-bull') || src.includes('Subaru') || src.includes('CoreStaff') || src.includes('Mobil-1') || src.includes('TA') || src.includes('YAMAHA');
+              const needsScaling = src.includes('Red-bull') || src.includes('Subaru')  || src.includes('Mobil-1') || src.includes('TA') || src.includes('YAMAHA');
                const reduceScaling = src.includes('DENSO') || src.includes('Zent')  ;
                
 
@@ -232,6 +232,7 @@ const Lastpage = () => {
             
             {/* Logo Set 2 (For seamless infinite loop) */}
             {sponsors.map((src, index) => {
+              const onescaling =  src.includes('CoreStaff');
               const needsScaling = src.includes('Red-bull') || src.includes('Subaru') || src.includes('CoreStaff')  || src.includes('TA')   || src.includes('Mobil-1') || src.includes('YAMAHA');
                const reduceScaling = src.includes('DENSO') || src.includes('Zent')    ;
               return (
