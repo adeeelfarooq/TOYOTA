@@ -27,19 +27,44 @@ const videoVariants = [
   }
 ];
 
+// ⚠️ WebP frames setup (Aapke 150 frames yahan handle honge)
+const TOTAL_FRAMES = 150; 
+const getFramePath = (index) => `/frames/Tacoma/frame_${String(index).padStart(4, "0")}.webp`; // Agar path different ho to isko update karein
+
 export default function TerrainSection() {
   const sectionRef = useRef(null);
   const cardsRef = useRef([]);
   const videosRef = useRef([]);
-  const tacoVideoRef = useRef(null);
+  
+  // Video ref ki jagah Canvas ref aur Images store karne ke liye ref
+  const canvasRef = useRef(null);
+  const imagesRef = useRef([]);
+
+  // 🖼️ Frames Preload Logic
+  useEffect(() => {
+    for (let i = 1; i <= TOTAL_FRAMES; i++) {
+      const img = new Image();
+      img.src = getFramePath(i);
+      imagesRef.current.push(img);
+    }
+    
+    // Canvas par pehla frame lagana jab image load ho jaye
+    imagesRef.current[0].onload = () => {
+      const canvas = canvasRef.current;
+      const ctx = canvas?.getContext("2d");
+      if (ctx && canvas) {
+        // Truck video ka resolution (e.g., 1920x1080 ya jo bhi apka frame size ho)
+        canvas.width = imagesRef.current[0].width || 1920; 
+        canvas.height = imagesRef.current[0].height || 1080;
+        ctx.drawImage(imagesRef.current[0], 0, 0);
+      }
+    };
+  }, []);
 
   useGSAP(() => {
     const firstF = SplitText.create(".first-text ", { type: "chars" });
     const thirdF = SplitText.create(".third ", { type: "chars" });
     
-
- 
-
   // 1️⃣ Designed to dominate
   gsap.to(".designed-dominate", {
     clipPath:"polygon(100% 0%, 0% 0%, 0% 100%, 100% 100%)",
@@ -51,7 +76,6 @@ export default function TerrainSection() {
       start: "290% bottom",   
       end: "335% bottom",
       scrub: 1.5,
-    
     }
   });
 
@@ -62,17 +86,13 @@ export default function TerrainSection() {
     duration: 8,
     opacity: 1,
     scrollTrigger: {
-      
       trigger: sectionRef.current,
-      
       start: "295% bottom",   
       end: "340% bottom",
       scrub: 1.5,
-      
     }
   });
     
-
     // Text Animations
     gsap.from(firstF.chars, {
       yPercent: 200,
@@ -96,40 +116,34 @@ export default function TerrainSection() {
       }
     });
 
-    /* ===== FIXED TACO VIDEO LOGIC ===== */
-    const video = tacoVideoRef.current;
-    
-    // Video ko ensure karna ke metadata load ho jaye
-    if (video) {
-      video.pause(); 
-      video.currentTime = 0;
-    }
-
+    /* ===== FIXED TACO CANVAS LOGIC (Exactly same animation & triggers) ===== */
     gsap.from(".taco", {
-      xPercent: -65, // Aapki original requirement ke mutabiq movement
+      xPercent: -65, // Aapki original requirement
       ease: "none",
-      stagger:0.02,
+      stagger: 0.02,
       scrollTrigger: {
         trigger: ".terrain",
         start: "top 75%",
-        
-        scrub: 2, // Smoothness add karne ke liye (stuck nahi hogi)
+        scrub: 1, // Original scrub timing
         onUpdate: (self) => {
-          if (video && video.readyState >= 2) { // Check if video is ready
-            const scrollPos = self.progress;
-            const videoDuration = video.duration;
-            if (!isNaN(videoDuration)) {
-              // Frame-by-frame calculation
-              video.currentTime = videoDuration * scrollPos;
-            }
+          const scrollPos = self.progress;
+          // Frames calculate karne ki logic (scroll based)
+          const frameIndex = Math.min(
+            TOTAL_FRAMES - 1, 
+            Math.floor(scrollPos * TOTAL_FRAMES)
+          );
+          
+          const canvas = canvasRef.current;
+          const ctx = canvas?.getContext("2d");
+          
+          // Naya frame draw karna
+          if (ctx && canvas && imagesRef.current[frameIndex]) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(imagesRef.current[frameIndex], 0, 0);
           }
         }
       }
     });
-
-   
-
-    
 
     requestAnimationFrame(() => ScrollTrigger.refresh());
   }, { scope: sectionRef });
@@ -197,45 +211,36 @@ export default function TerrainSection() {
         </h2>
         <h2 className="third z-1000 uppercase text-8xl font-bold max-w-xl overflow-hidden text-toyota-red rotate-180 translate-y-4 translate-x-88 tracking-[2.15rem] ">Terrain</h2>
         
-        <video 
-          src="/videos/Tacoma-truck.webm"
-          preload="auto"
-          muted
-          loop={false}
-          playsInline
-          ref={tacoVideoRef}
+        {/* <video> ki jagah ab hum <canvas> use kar rahe hain, Classes bilkul same hain */}
+        <canvas 
+          ref={canvasRef}
           className="taco absolute -ml-40 scale-50 -mt-49 rotate-x-180 overflow-hidden mix-blend-difference"
         />
-
        
-<div className="top-[360%] left-[640px] absolute text-sm flex flex-col items-center -translate-y-1">
-  
-  {/* Main Heading - Bilkul wahi jo aapne rakhi thi */}
-  
-  <div 
-  style={{
-    clipPath:"polygon(50% 0, 50% 0, 50% 100%, 50% 100%)"
-  }}
-    className="designed-dominate  text-toyota-red tracking-[1rem] scale-130 bg-white pl-45 -translate-x-90 pr-45 z-20 border-toyota-red uppercase flex items-center justify-center font-bold"
-  >
-    Designedtodominate
-  </div>
+        <div className="top-[360%] left-[640px] absolute text-sm flex flex-col items-center -translate-y-1">
+          <div 
+          style={{
+            clipPath:"polygon(50% 0, 50% 0, 50% 100%, 50% 100%)"
+          }}
+            className="designed-dominate text-toyota-red tracking-[1rem] scale-130 bg-white pl-45 -translate-x-90 pr-45 z-20 border-toyota-red uppercase flex items-center justify-center font-bold"
+          >
+            Designedtodominate
+          </div>
 
-  {/* Modern Clean Sub-bar */}
-  <div
-  style={{
-    clipPath:"polygon(50% 0, 50% 0, 50% 100%, 50% 100%)"
-  }}
-   className="terrain-tags bg-toyota-red -translate-x-94 -translate-y-1 flex items-center justify-center px-10 py-2 border-milk-yellow border-t-0 border-1 w-140">
-    <div className="flex  items-center gap-4 text-milk-yellow uppercase tracking-[0.5rem] font-medium">
-      <span>streets</span>
-      <span className="opacity-40 scale-150 text-white font-light">|</span>
-      <span>forests</span>
-      <span className="opacity-40 scale-150 text-white font-light">|</span>
-      <span>pinnacl</span>
-    </div>
-  </div>
-</div>
+          <div
+          style={{
+            clipPath:"polygon(50% 0, 50% 0, 50% 100%, 50% 100%)"
+          }}
+           className="terrain-tags bg-toyota-red -translate-x-94 -translate-y-1 flex items-center justify-center px-10 py-2 border-milk-yellow border-t-0 border-1 w-140">
+            <div className="flex items-center gap-4 text-milk-yellow uppercase tracking-[0.5rem] font-medium">
+              <span>streets</span>
+              <span className="opacity-40 scale-150 text-white font-light">|</span>
+              <span>forests</span>
+              <span className="opacity-40 scale-150 text-white font-light">|</span>
+              <span>pinnacl</span>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div className="relative h-[520px] max-w-6xl mx-auto -translate-y-10">
