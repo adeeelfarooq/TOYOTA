@@ -215,8 +215,8 @@ const Lastpage = () => {
           >
             {/* Logo Set 1 */}
             {sponsors.map((src, index) => {
-              const oneScaling =  src.includes('CoreStaff') || src.includes('AISIN');
-              const needsScaling = src.includes('Red-bull') || src.includes('Subaru')  || src.includes('Mobil-1') || src.includes('TA') || src.includes('YAMAHA');
+              const oneScaling =  src.includes('CoreStaff') ;
+              const needsScaling = src.includes('Red-bull') || src.includes('Subaru') || src.includes('AISIN')  || src.includes('Mobil-1') || src.includes('TA') || src.includes('YAMAHA');
                const reduceScaling = src.includes('DENSO') || src.includes('Zent')  ;
                
 
@@ -233,8 +233,8 @@ const Lastpage = () => {
             
             {/* Logo Set 2 (For seamless infinite loop) */}
             {sponsors.map((src, index) => {
-              const oneScaling =  src.includes('CoreStaff') || src.includes('AISIN');
-              const needsScaling = src.includes('Red-bull') || src.includes('Subaru')   || src.includes('TA')   || src.includes('Mobil-1') || src.includes('YAMAHA');
+              const oneScaling =  src.includes('CoreStaff') ;
+              const needsScaling = src.includes('Red-bull') || src.includes('Subaru')   || src.includes('TA') || src.includes('AISIN')   || src.includes('Mobil-1') || src.includes('YAMAHA');
                const reduceScaling = src.includes('DENSO') || src.includes('Zent')    ;
               return (
                 <img 
