@@ -1,3 +1,5 @@
 ffmpeg -c:v libvpx-vp9 -i "D:\StudyMaterial\TOYOTA\public\videos\Tacoma-truck.webm" -vf fps=30 -pix_fmt rgba "D:\StudyMaterial\TOYOTA\public\frames\frame_%04d.png"
 
 ffmpeg -i "D:\StudyMaterial\TOYOTA\public\frames\frame_%04d.png" -c:v libwebp -q:v 60 "D:\StudyMaterial\TOYOTA\public\frames\frame_%04d.webp"
+
+ffmpeg -i "D:\StudyMaterial\TOYOTA\public\videos\Parts11.mp4" -vf "colorkey=0x000000:0.15:0.1,fps=30" -c:v libwebp -pix_fmt rgba -q:v 75 "D:\StudyMaterial\TOYOTA\public\frames\frame_%04d.webp"
