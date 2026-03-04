@@ -9,27 +9,71 @@ gsap.registerPlugin(ScrollTrigger, SplitText);
 const EngineeringSection = () => {
   const containerRef = useRef(null);
   const videoRef = useRef(null);
+  const canvasRef = useRef(null); // Canvas Reference Add kiya IDM Bypass k liye
   const imageRef = useRef(null);
   const textTopRef = useRef(null);
   const textBottomRef = useRef(null);
   const paragraphRef = useRef(null);
   const splitTextRef = useRef(null);
   const partRefs = useRef([]);
-    partRefs.current = [];
-  
-    const addToRefs = (el) => {
-      if (el && !partRefs.current.includes(el)) {
-        partRefs.current.push(el);
+  partRefs.current = [];
+
+  const addToRefs = (el) => {
+    if (el && !partRefs.current.includes(el)) {
+      partRefs.current.push(el);
+    }
+  };
+
+  const partsData = [
+    { title: "POWERHOUSE ENGINE", desc: "Dual VVT-i technology for maximum torque and fuel efficiency.", top: "85%", left: "0%" },
+    { title: "HIGH-GRIP TIRES", desc: "Enhanced tread pattern for superior road holding and wet-grip safety.", top: "95%", left: "28%" },
+    { title: "ERGONOMIC SEATING", desc: "Whiplash injury lessening seats with premium lateral support.", top: "88%", left: "55%" },
+    { title: "AERODYNAMIC BODY", desc: "High-tensile steel shell designed for 5-star safety and low drag.", top: "90%", left: "87%" }
+  ];
+
+  // CANVAS DRAWING LOGIC (IDM KO BYPASS KARNE K LIYE)
+  useEffect(() => {
+    const videoEl = videoRef.current;
+    const canvasEl = canvasRef.current;
+    if (!videoEl || !canvasEl) return;
+    
+    let animationFrameId;
+
+    const renderFrame = () => {
+      if (videoEl.paused || videoEl.ended) return;
+
+      const ctx = canvasEl.getContext("2d");
+      
+      // Video ki original quality maintain karna
+      if (videoEl.videoWidth && canvasEl.width !== videoEl.videoWidth) {
+        canvasEl.width = videoEl.videoWidth;
+        canvasEl.height = videoEl.videoHeight;
+      }
+
+      ctx.drawImage(videoEl, 0, 0, canvasEl.width, canvasEl.height);
+      animationFrameId = requestAnimationFrame(renderFrame);
+    };
+
+    const handleLoadedData = () => {
+      const ctx = canvasEl.getContext("2d");
+      if (videoEl.videoWidth) {
+        canvasEl.width = videoEl.videoWidth;
+        canvasEl.height = videoEl.videoHeight;
+        ctx.drawImage(videoEl, 0, 0, canvasEl.width, canvasEl.height);
       }
     };
-  
-    const partsData = [
-      { title: "POWERHOUSE ENGINE", desc: "Dual VVT-i technology for maximum torque and fuel efficiency.", top: "85%", left: "0%" },
-      { title: "HIGH-GRIP TIRES", desc: "Enhanced tread pattern for superior road holding and wet-grip safety.", top: "95%", left: "28%" },
-      { title: "ERGONOMIC SEATING", desc: "Whiplash injury lessening seats with premium lateral support.", top: "88%", left: "55%" },
-      { title: "AERODYNAMIC BODY", desc: "High-tensile steel shell designed for 5-star safety and low drag.", top: "90%", left: "87%" }
-    ];
 
+    videoEl.addEventListener("play", renderFrame);
+    videoEl.addEventListener("loadeddata", handleLoadedData);
+
+    return () => {
+      cancelAnimationFrame(animationFrameId);
+      videoEl.removeEventListener("play", renderFrame);
+      videoEl.removeEventListener("loadeddata", handleLoadedData);
+    };
+  }, []);
+
+  // GSAP ANIMATION LOGIC (UNCHANGED)
   useEffect(() => {
     let ctx = gsap.context(() => {
       // SplitText cleanup and initialization
@@ -67,8 +111,6 @@ const EngineeringSection = () => {
       // Set initial state for bottom text
       gsap.set(wordsBottom, { color: "#666", opacity: 0.7 });
 
-      
-
       // Animate "ENGINEERED FROM" words
       wordsTop.forEach((word, i) => {
         gsap.to(word, {
@@ -104,9 +146,8 @@ const EngineeringSection = () => {
           trigger: containerRef.current,
           start: "top top",
           end: "+=400%", // Scroll length kitni lambi ho
-              // Smooth scroll animation
           toggleActions: "play none none reverse",
-          pin: true,     // Screen ko rok ke rakhay ga jab tak animation poori na ho
+          pin: true,     // Screen ko rok ke rakhay ga
           markers: false
         }
       });
@@ -114,11 +155,8 @@ const EngineeringSection = () => {
         scrollTrigger: {
           trigger: containerRef.current,
           start: "top top",
-          end: "+=400%", // Scroll length kitni lambi ho
-              // Smooth scroll animation
+          end: "+=400%", 
           toggleActions: "play none none reverse",
-               // Screen ko rok ke rakhay ga jab tak animation poori na ho
-          
           scrub: 1,
         }
       });
@@ -131,19 +169,17 @@ const EngineeringSection = () => {
         }, `label-${i}`);
       });
 
-      
-
-      // 1. Image ko fade out karna aur Video ko play karna
+      // 1. Image ko fade out karna aur Canvas/Video ko animate karna
       tl.to(imageRef.current, { opacity: 0, scale: 0.8, duration: 1 }, 0)
-        .to(videoRef.current, { 
+        // Yahan 'videoRef' ki bajaye 'canvasRef' ko animate kar rahy hain kyonk display canvas pe hogi
+        .to(canvasRef.current, { 
           opacity: 1, 
           scale: 1, 
           duration: 1,
-          onStart: () => videoRef.current.play() 
+          onStart: () => videoRef.current.play() // Play real hidden video
         }, 0)
 
       // 2. Texts ko move karna aur "Gap" khatam karna
-      // Top text uper aur left corner ki taraf
       tl.to(textTopRef.current, {
         y: -200,
         x: -230,
@@ -152,10 +188,9 @@ const EngineeringSection = () => {
         color: "#ffffff"
       }, 0)
 
-      // Bottom text (Inside) uper ja kar "Engineered From" ke sath jud jaye ga
       tl.to(textBottomRef.current, {
-        y: -475, // Adjust this value based on your exact layout to remove gap
-        x: 20,  // Move it slightly right to align after the first text
+        y: -475,
+        x: 20, 
         scale: 0.6,
         duration: 1.5,
         color: "#eb0a1e"
@@ -165,16 +200,12 @@ const EngineeringSection = () => {
       tl.fromTo(paragraphRef.current, 
         { opacity: 0, y: 50 }, 
         { opacity: 1, y: 0, duration: 0.5 }, 
-        1 // Ye thora der baad start hoga
+        1 
       );
-      
-
-      
 
     }, containerRef);
 
     return () => {
-      // Cleanup SplitText
       if (splitTextRef.current) {
         if (splitTextRef.current.top) splitTextRef.current.top.revert();
         if (splitTextRef.current.bottom) splitTextRef.current.bottom.revert();
@@ -218,13 +249,19 @@ const EngineeringSection = () => {
           className="main-png scale-110 z-100 "
         />
 
-        {/* 3D Generated Video */}
+        {/* VISIBLE CANVAS: Yeh 3D video ki jagah nazar ayega (IDM bypass ho gaya) */}
+        <canvas 
+          ref={canvasRef}
+          className="main-video"
+          style={{ opacity: 0, pointerEvents: "none" }}
+        />
+
+        {/* HIDDEN ACTUAL VIDEO: Yeh sirf GSAP k background me play hone k liye hai */}
         <video 
           ref={videoRef}
-          className="main-video"
           muted 
           playsInline
-          style={{ opacity: 0 }}
+          style={{ position: "absolute", width: "1px", height: "1px", opacity: 0, pointerEvents: "none" }}
         >
           <source src="/videos/Parts11.mp4" type="video/mp4" />
         </video>
@@ -329,7 +366,6 @@ const EngineeringSection = () => {
           right: -3px;
           top: -2px;
         }
-
 
         .desc-container {
           position: absolute;
