@@ -140,7 +140,7 @@ export default function Cars() {
               onClick={() => setActive(item)}
               className={`
                 uppercase text-xs tracking-widest pb-1 px-4 -translate-x-45
-                border-b transition-all z-100 
+                border-b transition-all z-100 cursor-pointer
                 ${active === item
                   ? "border-toyota-red text-white"
                   : "border-transparent text-gray-400 hover:text-white"}
