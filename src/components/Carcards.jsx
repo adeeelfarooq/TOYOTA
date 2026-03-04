@@ -1,14 +1,15 @@
 import { useRef, useEffect } from "react";
 
-export default function CarCards({ title, type, image, video , Scale , Videoscale }) {
+export default function CarCards({ title, type, image, video, Scale, Videoscale }) {
   const videoRef = useRef(null);
+  const canvasRef = useRef(null); // Canvas Add kiya hai IDM ko bypass karne k liye
   const cardRef = useRef(null);
 
-  // Desktop hover (unchanged)
+  // Desktop hover
   const enter = () => {
     if (!videoRef.current) return;
     videoRef.current.currentTime = 0;
-    videoRef.current.play();
+    videoRef.current.play().catch(() => {});
   };
 
   const leave = () => {
@@ -19,17 +20,17 @@ export default function CarCards({ title, type, image, video , Scale , Videoscal
 
   // Mobile viewport play
   useEffect(() => {
-    const video = videoRef.current;
+    const videoEl = videoRef.current;
     const card = cardRef.current;
-    if (!video || !card) return;
+    if (!videoEl || !card) return;
 
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
-          video.play().catch(() => {});
+          videoEl.play().catch(() => {});
         } else {
-          video.pause();
-          video.currentTime = 0;
+          videoEl.pause();
+          videoEl.currentTime = 0;
         }
       },
       { threshold: 0.6 }
@@ -37,6 +38,48 @@ export default function CarCards({ title, type, image, video , Scale , Videoscal
 
     observer.observe(card);
     return () => observer.disconnect();
+  }, []);
+
+  // Canvas Drawing Logic (IDM ko dhoka deny k liye)
+  useEffect(() => {
+    const videoEl = videoRef.current;
+    const canvasEl = canvasRef.current;
+    let animationFrameId;
+
+    const renderFrame = () => {
+      // Jab video play ho rahi ho tabhi canvas par draw karega (Highly Optimized)
+      if (videoEl.paused || videoEl.ended) return;
+
+      const ctx = canvasEl.getContext("2d");
+      
+      // Video ki original quality maintain rakhne k liye
+      if (videoEl.videoWidth && canvasEl.width !== videoEl.videoWidth) {
+        canvasEl.width = videoEl.videoWidth;
+        canvasEl.height = videoEl.videoHeight;
+      }
+
+      ctx.drawImage(videoEl, 0, 0, canvasEl.width, canvasEl.height);
+      animationFrameId = requestAnimationFrame(renderFrame);
+    };
+
+    // First frame draw karne k liye jab video load ho jaye
+    const handleLoadedData = () => {
+      const ctx = canvasEl.getContext("2d");
+      if (videoEl.videoWidth) {
+        canvasEl.width = videoEl.videoWidth;
+        canvasEl.height = videoEl.videoHeight;
+        ctx.drawImage(videoEl, 0, 0, canvasEl.width, canvasEl.height);
+      }
+    };
+
+    videoEl.addEventListener("play", renderFrame);
+    videoEl.addEventListener("loadeddata", handleLoadedData);
+
+    return () => {
+      cancelAnimationFrame(animationFrameId);
+      videoEl.removeEventListener("play", renderFrame);
+      videoEl.removeEventListener("loadeddata", handleLoadedData);
+    };
   }, []);
 
   return (
@@ -50,26 +93,30 @@ export default function CarCards({ title, type, image, video , Scale , Videoscal
       <img
         src={image}
         alt={title}
-        className={` ${Scale}
+        className={`${Scale} absolute inset-0 w-full h-full object-contain transition-opacity duration-500 md:group-hover:opacity-0`}
+      />
+
+      {/* VISIBLE CANVAS (Yeh Video ki tarah dikhega lekin IDM isay pakar nahi saky ga) */}
+      <canvas
+        ref={canvasRef}
+        className={` ${Videoscale}
           absolute inset-0 w-full h-full object-contain
+          opacity-100 md:opacity-0
+          md:group-hover:opacity-100
           transition-opacity duration-500
-          md:group-hover:opacity-0
+          pointer-events-none
         `}
       />
 
-      {/* VIDEO */}
+      {/* HIDDEN ACTUAL VIDEO (Sirf logic run karne k liye, UI mein bilkul hidden hai) */}
       <video
         ref={videoRef}
         src={video}
         muted
         playsInline
         preload="metadata"
-        className={` ${Videoscale}
-          absolute inset-0 w-full h-full object-contain
-          opacity-100 md:opacity-0
-          md:group-hover:opacity-100
-          transition-opacity duration-500
-        `}
+        // 1px ka size takay IDM isay tracking pixel samajh k ignore kar de
+        style={{ position: "absolute", width: "1px", height: "1px", opacity: 0, pointerEvents: "none" }}
       />
 
       {/* TEXT */}
