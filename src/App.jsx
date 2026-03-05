@@ -8,7 +8,7 @@ import Marketing from './sections/Marketing';
 import TechnologySection from './sections/Technology';
 import EngineeringSection from './sections/Engineering';
 import TestPage from './sections/Test';
-import GlobalMap from './sections/Map';
+// import GlobalMap from './sections/Map';
 import Lastpage from './sections/Last';
 // import ModernTestimonialsSection from './sections/Testimonial';
 
@@ -35,7 +35,7 @@ const App = () => {
 <Marketing/>
 <TechnologySection/>
 <EngineeringSection/>
-<GlobalMap/>
+{/* <GlobalMap/> */}
 <TestPage/>
 <Lastpage/>
 
