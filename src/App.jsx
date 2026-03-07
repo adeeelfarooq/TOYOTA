@@ -35,7 +35,7 @@ const App = () => {
 <Marketing/>
 <TechnologySection/>
 <EngineeringSection/>
-{/* <GlobalMap/> */}
+<GlobalMap/>
 <TestPage/>
 <Lastpage/>
 
