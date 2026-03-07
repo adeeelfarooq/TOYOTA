@@ -5,21 +5,24 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 gsap.registerPlugin(ScrollTrigger);
 
 // Custom Component for Letter-by-Letter Hover Animation (Wave Effect)
-const AnimatedLink = ({ text }) => {
+// Yahan "hoverColor" prop add kiya hai. Jo bhi color class aap yahan pass karoge, hover pe wohi color aayega.
+const AnimatedLink = ({ text, hoverColor = "text-gray-400" }) => {
   return (
     <div className="group flex cursor-pointer overflow-hidden text-lg md:text-2xl">
       {text.split('').map((char, index) => (
         <div key={index} className="relative flex flex-col">
-          {/* Visible Character */}
+          {/* 1. Visible Character (Pehla text jo uper jata hai) */}
           <span 
             className="transition-transform duration-300 ease-in-out group-hover:-translate-y-full"
             style={{ transitionDelay: `${index * 30}ms` }}
           >
             {char === ' ' ? '\u00A0' : char}
           </span>
-          {/* Hidden Character that rolls up */}
+          
+          {/* 2. Hidden Character (Jo neechay se uper aata hai). Isme hoverColor lagega */}
           <span 
-            className="absolute top-full left-0 transition-transform duration-300 ease-in-out group-hover:-translate-y-full text-gray-300"
+            // Yahan hoverColor apply ho raha hai (e.g. text-red-500)
+            className={`absolute top-full left-0 transition-transform duration-300 ease-in-out group-hover:-translate-y-full ${hoverColor}`}
             style={{ transitionDelay: `${index * 30}ms` }}
           >
             {char === ' ' ? '\u00A0' : char}
@@ -85,13 +88,11 @@ const Lastpage = () => {
           if (personRef.current) {
             let yProg = gsap.utils.mapRange(0.75, 1.0, 100, 0, self.progress);
             yProg = gsap.utils.clamp(0, 100, yProg); 
-            // xPercent: -50 ensure karega ke image hamesha center mein rahe
             gsap.set(personRef.current, { yPercent: yProg, xPercent: -50 });
           }
           if (personsRef.current) {
             let yyProg = gsap.utils.mapRange(0.75, 1.0, 100, 0, self.progress);
             yyProg = gsap.utils.clamp(90, 125, yyProg); 
-            // xPercent: -50 ensure karega ke image hamesha center mein rahe
             gsap.set(personsRef.current, { yPercent: -yyProg, xPercent: -50 });
           }
         }
@@ -196,19 +197,21 @@ const Lastpage = () => {
         {/* LEFT INSIDE TEXT (PAGES) */}
         <div className="absolute left-[5%] md:left-[8%] top-[45%] -translate-y-1/2 z-20 flex flex-col items-start text-white font-black uppercase tracking-widest leading-none space-y-1 md:space-y-1">
           <span className="text-[10px] text-toyota-red font-bold mb-4">Pages</span>
-          <AnimatedLink text="Home" />
-          <AnimatedLink text="On Track" />
-          <AnimatedLink text="Off Track" />
-          <AnimatedLink text="Calendar" />
+          {/* Yahan aap hoverColor property use kar k koi bhi tailwind text color laga sakty hain */}
+          <AnimatedLink text="Home" hoverColor="text-gray-400" />
+          <AnimatedLink text="On Track" hoverColor="text-gray-400" />
+          <AnimatedLink text="Off Track" hoverColor="text-gray-400" />
+          <AnimatedLink text="Calendar" hoverColor="text-gray-400" />
         </div>
 
         {/* RIGHT INSIDE TEXT (FOLLOW ON) */}
         <div className="absolute right-[5%] md:right-[8%] top-[45%] -translate-y-1/2 z-20 flex flex-col items-end text-white font-black uppercase tracking-widest leading-none space-y-1 md:space-y-1 text-right">
           <span className="text-[10px] text-toyota-red font-bold mb-4">Follow On</span>
-          <AnimatedLink text="TikTok" />
-          <AnimatedLink text="Instagram" />
-          <AnimatedLink text="YouTube" />
-          <AnimatedLink text="Twitch" />
+          {/* Agar inka color alag chahiye to "text-red-500" ya koi aur de do */}
+          <AnimatedLink text="TikTok" hoverColor="text-gray-400" />
+          <AnimatedLink text="Instagram" hoverColor="text-gray-400" />
+          <AnimatedLink text="YouTube" hoverColor="text-gray-400" />
+          <AnimatedLink text="Twitch" hoverColor="text-gray-400" />
         </div>
 
         {/* SCROLLING SPONSORS (GSAP CONTROLLED) */}
