@@ -4,26 +4,24 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 gsap.registerPlugin(ScrollTrigger);
 
-// Custom Component for Letter-by-Letter Hover Animation (Wave Effect)
-// Yahan "hoverColor" prop add kiya hai. Jo bhi color class aap yahan pass karoge, hover pe wohi color aayega.
-const AnimatedLink = ({ text, hoverColor = "text-gray-400" }) => {
+// Custom Component Fix: Added 'transform-gpu' and 'backface-hidden' to prevent color dimming/blurring during motion
+const AnimatedLink = ({ text, hoverColor = "text-toyota-red" }) => {
   return (
     <div className="group flex cursor-pointer overflow-hidden text-lg md:text-2xl">
       {text.split('').map((char, index) => (
         <div key={index} className="relative flex flex-col">
-          {/* 1. Visible Character (Pehla text jo uper jata hai) */}
+          {/* 1. Visible Character */}
           <span 
-            className="transition-transform duration-300 ease-in-out group-hover:-translate-y-full"
-            style={{ transitionDelay: `${index * 30}ms` }}
+            className="block transform-gpu backface-hidden transition-transform duration-300 ease-in-out group-hover:-translate-y-full will-change-transform"
+            style={{ transitionDelay: `${index * 25}ms` }}
           >
             {char === ' ' ? '\u00A0' : char}
           </span>
           
-          {/* 2. Hidden Character (Jo neechay se uper aata hai). Isme hoverColor lagega */}
+          {/* 2. Hidden Character (Comes up from bottom) */}
           <span 
-            // Yahan hoverColor apply ho raha hai (e.g. text-red-500)
-            className={`absolute top-full left-0 transition-transform duration-300 ease-in-out group-hover:-translate-y-full ${hoverColor}`}
-            style={{ transitionDelay: `${index * 30}ms` }}
+            className={`absolute top-full left-0 block transform-gpu backface-hidden transition-transform duration-300 ease-in-out group-hover:-translate-y-full will-change-transform ${hoverColor}`}
+            style={{ transitionDelay: `${index * 25}ms` }}
           >
             {char === ' ' ? '\u00A0' : char}
           </span>
@@ -197,7 +195,6 @@ const Lastpage = () => {
         {/* LEFT INSIDE TEXT (PAGES) */}
         <div className="absolute left-[5%] md:left-[8%] top-[45%] -translate-y-1/2 z-20 flex flex-col items-start text-white font-black uppercase tracking-widest leading-none space-y-1 md:space-y-1">
           <span className="text-[10px] text-toyota-red font-bold mb-4">Pages</span>
-          {/* Yahan aap hoverColor property use kar k koi bhi tailwind text color laga sakty hain */}
           <AnimatedLink text="Home" hoverColor="text-toyota-red" />
           <AnimatedLink text="On Track" hoverColor="text-toyota-red" />
           <AnimatedLink text="Off Track" hoverColor="text-toyota-red" />
@@ -207,7 +204,6 @@ const Lastpage = () => {
         {/* RIGHT INSIDE TEXT (FOLLOW ON) */}
         <div className="absolute right-[5%] md:right-[8%] top-[45%] -translate-y-1/2 z-20 flex flex-col items-end text-white font-black uppercase tracking-widest leading-none space-y-1 md:space-y-1 text-right">
           <span className="text-[10px] text-toyota-red font-bold mb-4">Follow On</span>
-          {/* Agar inka color alag chahiye to "text-red-500" ya koi aur de do */}
           <AnimatedLink text="TikTok" hoverColor="text-toyota-red" />
           <AnimatedLink text="Instagram" hoverColor="text-toyota-red" />
           <AnimatedLink text="YouTube" hoverColor="text-toyota-red" />
