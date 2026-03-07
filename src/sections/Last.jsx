@@ -198,8 +198,8 @@ const Lastpage = () => {
         <div className="absolute left-[5%] md:left-[8%] top-[45%] -translate-y-1/2 z-20 flex flex-col items-start text-white font-black uppercase tracking-widest leading-none space-y-1 md:space-y-1">
           <span className="text-[10px] text-toyota-red font-bold mb-4">Pages</span>
           {/* Yahan aap hoverColor property use kar k koi bhi tailwind text color laga sakty hain */}
-          <AnimatedLink text="Home" hoverColor="text-gray-400" />
-          <AnimatedLink text="On Track" hoverColor="text-gray-400" />
+          <AnimatedLink text="Home" hoverColor="text-toyota-red" />
+          <AnimatedLink text="On Track" hoverColor="text-toyota-red-soft" />
           <AnimatedLink text="Off Track" hoverColor="text-gray-400" />
           <AnimatedLink text="Calendar" hoverColor="text-gray-400" />
         </div>
