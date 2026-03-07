@@ -4,6 +4,32 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 gsap.registerPlugin(ScrollTrigger);
 
+// Custom Component for Letter-by-Letter Hover Animation (Wave Effect)
+const AnimatedLink = ({ text }) => {
+  return (
+    <div className="group flex cursor-pointer overflow-hidden text-lg md:text-2xl">
+      {text.split('').map((char, index) => (
+        <div key={index} className="relative flex flex-col">
+          {/* Visible Character */}
+          <span 
+            className="transition-transform duration-300 ease-in-out group-hover:-translate-y-full"
+            style={{ transitionDelay: `${index * 30}ms` }}
+          >
+            {char === ' ' ? '\u00A0' : char}
+          </span>
+          {/* Hidden Character that rolls up */}
+          <span 
+            className="absolute top-full left-0 transition-transform duration-300 ease-in-out group-hover:-translate-y-full text-gray-300"
+            style={{ transitionDelay: `${index * 30}ms` }}
+          >
+            {char === ' ' ? '\u00A0' : char}
+          </span>
+        </div>
+      ))}
+    </div>
+  );
+};
+
 const Lastpage = () => {
   const containerRef = useRef(null);
   const videoRef = useRef(null);
@@ -55,17 +81,6 @@ const Lastpage = () => {
         pin: true, 
         scrub: true, // Smoothness
         onUpdate: (self) => {
-          // if (video && video.readyState >= 2) {
-          //   const scrollPos = self.progress; // 0 to 1
-          //   const videoDuration = video.duration;
-            
-          //   if (!isNaN(videoDuration)) {
-          //     const maxTime = videoDuration - 0.05; 
-          //     const targetTime = videoDuration * scrollPos;
-          //     video.currentTime = Math.min(maxTime, targetTime);
-          //   }
-          // }
-
           // HELMET PERSON SCROLL LOGIC FIX
           if (personRef.current) {
             let yProg = gsap.utils.mapRange(0.75, 1.0, 100, 0, self.progress);
@@ -163,80 +178,37 @@ const Lastpage = () => {
         }}
       >
         <div className="absolute inset-0 bg-black/70 z-0"></div>
-        {/* <video 
-          ref={videoRef}
-          src='videos/footer.webm'
-          muted
-          playsInline
-          preload="auto"
-          className='w-full h-full object-contain scale-120 z-10 opacity-60 -translate-y-20'
-          style={{ filter: "brightness(0) invert(16%) sepia(93%) saturate(5831%) hue-rotate(349deg) brightness(97%) contrast(110%)" }}
-        /> */}
 
         {/* HELMET PERSON IMAGE FIXED */}
         <img 
           ref={personRef}
           src="images/footer1.png" 
           alt="Toyota Racing Driver"
-          // Yahan se inline style aur Tailwind ka -translate-x-1/2 hata diya gaya hai, sab GSAP control kar raha hai
           className="absolute bottom-0 left-1/2 h-[60%] md:h-[80%] object-contain z-[100] pointer-events-none"
         />
         <img 
           ref={personsRef}
           src="images/Spn.png" 
           alt="Toyota Driver"
-          // Yahan se inline style aur Tailwind ka -translate-x-1/2 hata diya gaya hai, sab GSAP control kar raha hai
           className="absolute bottom-0 left-1/2 h-[60%] md:h-[80%] object-contain z-[100] pointer-events-none"
         />
 
         {/* LEFT INSIDE TEXT (PAGES) */}
         <div className="absolute left-[5%] md:left-[8%] top-[45%] -translate-y-1/2 z-20 flex flex-col items-start text-white font-black uppercase tracking-widest leading-none space-y-1 md:space-y-1">
           <span className="text-[10px] text-toyota-red font-bold mb-4">Pages</span>
-          
-          <div className="group relative overflow-hidden cursor-pointer text-lg md:text-2xl">
-            <span className="block transition-transform duration-300 ease-in-out group-hover:-translate-y-full">Home</span>
-            <span className="absolute left-0 top-0 block transition-transform duration-300 ease-in-out translate-y-full group-hover:translate-y-0 text-gray-300">Home</span>
-          </div>
-
-          <div className="group relative overflow-hidden cursor-pointer text-lg md:text-2xl">
-            <span className="block transition-transform duration-300 ease-in-out group-hover:-translate-y-full">On Track</span>
-            <span className="absolute left-0 top-0 block transition-transform duration-300 ease-in-out translate-y-full group-hover:translate-y-0 text-gray-300">On Track</span>
-          </div>
-
-          <div className="group relative overflow-hidden cursor-pointer text-lg md:text-2xl">
-            <span className="block transition-transform duration-300 ease-in-out group-hover:-translate-y-full">Off Track</span>
-            <span className="absolute left-0 top-0 block transition-transform duration-300 ease-in-out translate-y-full group-hover:translate-y-0 text-gray-300">Off Track</span>
-          </div>
-
-          <div className="group relative overflow-hidden cursor-pointer text-lg md:text-2xl">
-            <span className="block transition-transform duration-300 ease-in-out group-hover:-translate-y-full">Calendar</span>
-            <span className="absolute left-0 top-0 block transition-transform duration-300 ease-in-out translate-y-full group-hover:translate-y-0 text-gray-300">Calendar</span>
-          </div>
+          <AnimatedLink text="Home" />
+          <AnimatedLink text="On Track" />
+          <AnimatedLink text="Off Track" />
+          <AnimatedLink text="Calendar" />
         </div>
 
         {/* RIGHT INSIDE TEXT (FOLLOW ON) */}
         <div className="absolute right-[5%] md:right-[8%] top-[45%] -translate-y-1/2 z-20 flex flex-col items-end text-white font-black uppercase tracking-widest leading-none space-y-1 md:space-y-1 text-right">
           <span className="text-[10px] text-toyota-red font-bold mb-4">Follow On</span>
-          
-          <div className="group relative overflow-hidden cursor-pointer text-lg md:text-2xl">
-            <span className="block transition-transform duration-300 ease-in-out group-hover:-translate-y-full">TikTok</span>
-            <span className="absolute right-0 top-0 block transition-transform duration-300 ease-in-out translate-y-full group-hover:translate-y-0 text-gray-300">TikTok</span>
-          </div>
-
-          <div className="group relative overflow-hidden cursor-pointer text-lg md:text-2xl">
-            <span className="block transition-transform duration-300 ease-in-out group-hover:-translate-y-full">Instagram</span>
-            <span className="absolute right-0 top-0 block transition-transform duration-300 ease-in-out translate-y-full group-hover:translate-y-0 text-gray-300">Instagram</span>
-          </div>
-
-          <div className="group relative overflow-hidden cursor-pointer text-lg md:text-2xl">
-            <span className="block transition-transform duration-300 ease-in-out group-hover:-translate-y-full">YouTube</span>
-            <span className="absolute right-0 top-0 block transition-transform duration-300 ease-in-out translate-y-full group-hover:translate-y-0 text-gray-300">YouTube</span>
-          </div>
-
-          <div className="group relative overflow-hidden cursor-pointer text-lg md:text-2xl">
-            <span className="block transition-transform duration-300 ease-in-out group-hover:-translate-y-full">Twitch</span>
-            <span className="absolute right-0 top-0 block transition-transform duration-300 ease-in-out translate-y-full group-hover:translate-y-0 text-gray-300">Twitch</span>
-          </div>
+          <AnimatedLink text="TikTok" />
+          <AnimatedLink text="Instagram" />
+          <AnimatedLink text="YouTube" />
+          <AnimatedLink text="Twitch" />
         </div>
 
         {/* SCROLLING SPONSORS (GSAP CONTROLLED) */}
@@ -249,9 +221,8 @@ const Lastpage = () => {
             {sponsors.map((src, index) => {
               const oneScaling =  src.includes('CoreStaff') ;
               const needsScaling = src.includes('Red-bull') || src.includes('Subaru') || src.includes('AISIN')  || src.includes('Mobil-1') || src.includes('TA') || src.includes('YAMAHA');
-               const reduceScaling = src.includes('DENSO') || src.includes('Zent')  ;
+              const reduceScaling = src.includes('DENSO') || src.includes('Zent')  ;
                
-
               return (
                 <img 
                   key={index} 
@@ -267,7 +238,7 @@ const Lastpage = () => {
             {sponsors.map((src, index) => {
               const oneScaling =  src.includes('CoreStaff') ;
               const needsScaling = src.includes('Red-bull') || src.includes('Subaru')   || src.includes('TA') || src.includes('AISIN')   || src.includes('Mobil-1') || src.includes('YAMAHA');
-               const reduceScaling = src.includes('DENSO') || src.includes('Zent')    ;
+              const reduceScaling = src.includes('DENSO') || src.includes('Zent')    ;
               return (
                 <img 
                   key={`dup-${index}`} 
