@@ -208,7 +208,7 @@ const Lastpage = () => {
         <div className="absolute right-[5%] md:right-[8%] top-[45%] -translate-y-1/2 z-20 flex flex-col items-end text-white font-black uppercase tracking-widest leading-none space-y-1 md:space-y-1 text-right">
           <span className="text-[10px] text-toyota-red font-bold mb-4">Follow On</span>
           {/* Agar inka color alag chahiye to "text-red-500" ya koi aur de do */}
-          <AnimatedLink text="TikTok" hoverColor="text-gray-400" />
+          <AnimatedLink text="TikTok" hoverColor="text-toyota-red" />
           <AnimatedLink text="Instagram" hoverColor="text-gray-400" />
           <AnimatedLink text="YouTube" hoverColor="text-gray-400" />
           <AnimatedLink text="Twitch" hoverColor="text-gray-400" />
