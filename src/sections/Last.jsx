@@ -191,20 +191,52 @@ const Lastpage = () => {
 
         {/* LEFT INSIDE TEXT (PAGES) */}
         <div className="absolute left-[5%] md:left-[8%] top-[45%] -translate-y-1/2 z-20 flex flex-col items-start text-white font-black uppercase tracking-widest leading-none space-y-1 md:space-y-1">
-          <span className="text-[10px] text-toyota-red font-bold  mb-4">Pages</span>
-          <span className="text-lg md:text-2xl cursor-pointer hover:text-gray-300 transition-colors">Home</span>
-          <span className="text-lg md:text-2xl cursor-pointer hover:text-gray-300 transition-colors">On Track</span>
-          <span className="text-lg md:text-2xl cursor-pointer hover:text-gray-300 transition-colors">Off Track</span>
-          <span className="text-lg md:text-2xl cursor-pointer hover:text-gray-300 transition-colors">Calendar</span>
+          <span className="text-[10px] text-toyota-red font-bold mb-4">Pages</span>
+          
+          <div className="group relative overflow-hidden cursor-pointer text-lg md:text-2xl">
+            <span className="block transition-transform duration-300 ease-in-out group-hover:-translate-y-full">Home</span>
+            <span className="absolute left-0 top-0 block transition-transform duration-300 ease-in-out translate-y-full group-hover:translate-y-0 text-gray-300">Home</span>
+          </div>
+
+          <div className="group relative overflow-hidden cursor-pointer text-lg md:text-2xl">
+            <span className="block transition-transform duration-300 ease-in-out group-hover:-translate-y-full">On Track</span>
+            <span className="absolute left-0 top-0 block transition-transform duration-300 ease-in-out translate-y-full group-hover:translate-y-0 text-gray-300">On Track</span>
+          </div>
+
+          <div className="group relative overflow-hidden cursor-pointer text-lg md:text-2xl">
+            <span className="block transition-transform duration-300 ease-in-out group-hover:-translate-y-full">Off Track</span>
+            <span className="absolute left-0 top-0 block transition-transform duration-300 ease-in-out translate-y-full group-hover:translate-y-0 text-gray-300">Off Track</span>
+          </div>
+
+          <div className="group relative overflow-hidden cursor-pointer text-lg md:text-2xl">
+            <span className="block transition-transform duration-300 ease-in-out group-hover:-translate-y-full">Calendar</span>
+            <span className="absolute left-0 top-0 block transition-transform duration-300 ease-in-out translate-y-full group-hover:translate-y-0 text-gray-300">Calendar</span>
+          </div>
         </div>
 
         {/* RIGHT INSIDE TEXT (FOLLOW ON) */}
         <div className="absolute right-[5%] md:right-[8%] top-[45%] -translate-y-1/2 z-20 flex flex-col items-end text-white font-black uppercase tracking-widest leading-none space-y-1 md:space-y-1 text-right">
           <span className="text-[10px] text-toyota-red font-bold mb-4">Follow On</span>
-          <span className="text-lg md:text-2xl cursor-pointer hover:text-gray-300 transition-colors">TikTok</span>
-          <span className="text-lg md:text-2xl cursor-pointer hover:text-gray-300 transition-colors">Instagram</span>
-          <span className="text-lg md:text-2xl cursor-pointer hover:text-gray-300 transition-colors">YouTube</span>
-          <span className="text-lg md:text-2xl cursor-pointer hover:text-gray-300 transition-colors">Twitch</span>
+          
+          <div className="group relative overflow-hidden cursor-pointer text-lg md:text-2xl">
+            <span className="block transition-transform duration-300 ease-in-out group-hover:-translate-y-full">TikTok</span>
+            <span className="absolute right-0 top-0 block transition-transform duration-300 ease-in-out translate-y-full group-hover:translate-y-0 text-gray-300">TikTok</span>
+          </div>
+
+          <div className="group relative overflow-hidden cursor-pointer text-lg md:text-2xl">
+            <span className="block transition-transform duration-300 ease-in-out group-hover:-translate-y-full">Instagram</span>
+            <span className="absolute right-0 top-0 block transition-transform duration-300 ease-in-out translate-y-full group-hover:translate-y-0 text-gray-300">Instagram</span>
+          </div>
+
+          <div className="group relative overflow-hidden cursor-pointer text-lg md:text-2xl">
+            <span className="block transition-transform duration-300 ease-in-out group-hover:-translate-y-full">YouTube</span>
+            <span className="absolute right-0 top-0 block transition-transform duration-300 ease-in-out translate-y-full group-hover:translate-y-0 text-gray-300">YouTube</span>
+          </div>
+
+          <div className="group relative overflow-hidden cursor-pointer text-lg md:text-2xl">
+            <span className="block transition-transform duration-300 ease-in-out group-hover:-translate-y-full">Twitch</span>
+            <span className="absolute right-0 top-0 block transition-transform duration-300 ease-in-out translate-y-full group-hover:translate-y-0 text-gray-300">Twitch</span>
+          </div>
         </div>
 
         {/* SCROLLING SPONSORS (GSAP CONTROLLED) */}
