@@ -211,7 +211,7 @@ const Lastpage = () => {
           <AnimatedLink text="TikTok" hoverColor="text-toyota-red" />
           <AnimatedLink text="Instagram" hoverColor="text-toyota-red" />
           <AnimatedLink text="YouTube" hoverColor="text-toyota-red" />
-          <AnimatedLink text="Twitch" hoverColor="text-gray-400" />
+          <AnimatedLink text="Twitch" hoverColor="text-toyota-red" />
         </div>
 
         {/* SCROLLING SPONSORS (GSAP CONTROLLED) */}
