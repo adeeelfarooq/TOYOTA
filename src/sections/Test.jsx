@@ -2,7 +2,7 @@ import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import React, { useRef } from 'react';
-import Videos from '../components/Cards';
+import Videos from '../components/Cards'; // Apni path check kr lena
 import { MotionPathPlugin } from "gsap/MotionPathPlugin";
 
 gsap.registerPlugin(ScrollTrigger, MotionPathPlugin);
@@ -24,20 +24,13 @@ const TestPage = () => {
   ];
 
   useGSAP(() => {
-    // Clean up only our container's triggers
-    ScrollTrigger.getAll().forEach(st => {
-      if (st.trigger === containerRef.current || 
-          st.vars.trigger === containerRef.current) {
-        st.kill();
-      }
-    });
-
-    // Initial states
+    // Initial states optimized for GPU
     gsap.set(".message", {
       rotateX: 60,
       rotateY: 1,
       opacity: 0.6,
       transformPerspective: 1000,
+      willChange: "transform, opacity"
     });
     
     gsap.set(".video-card", {
@@ -46,22 +39,23 @@ const TestPage = () => {
       rotation: 27, 
       scale: 1,   
       opacity: 1,
+      willChange: "transform, opacity"
     });
 
     gsap.set(".tag-item", {
       opacity: 0,
       scale: 0.9,
+      willChange: "transform, opacity"
     });
     
-    // Master Timeline with reduced end value
+    // Master Timeline
     const tl = gsap.timeline({
       scrollTrigger: {
         trigger: containerRef.current,
         start: "top top",
-        end: "+=2000%", // Reduced from 2000% to 300%
-        scrub: 1.5, // Increased scrub for smoother animation
+        end: "+=2000%", 
+        scrub: 1.5, 
         pin: true,
-        
         id: "testPage-scrollTrigger",
         invalidateOnRefresh: true,
       }
@@ -77,7 +71,8 @@ const TestPage = () => {
         scale: 1,
         opacity: 1,
         ease: "power4.out",
-        duration: 2, 
+        duration: 2,
+        force3D: true, // Hardware acceleration
       }
     )
     .to(".message", {
@@ -85,10 +80,11 @@ const TestPage = () => {
       rotateY: 0,
       opacity: 1,
       transformPerspective: 1000,
-      duration: 1
+      duration: 1,
+      force3D: true, // Hardware acceleration
     }, "-=1")
 
-    // STEP 2: Videos Entry
+    // STEP 2: Videos Entry (Motion Path)
     .to(".video-card", {
       motionPath: {
         path: [
@@ -104,16 +100,18 @@ const TestPage = () => {
       opacity: 1,    
       duration: 5,
       stagger: 0.5,  
-      ease: "power1.inOut" 
+      ease: "power1.inOut",
+      force3D: true, // Crucial for heavy motion path
     }, "-=0.5")
 
-    // STEP 3: Text Fade Out (Simplified timing)
+    // STEP 3: Text Fade Out
     .to(textContainerRef.current, {
       opacity: 0,
       scale: 0.7,
       duration: 2.5,
-      ease: "power2.out"
-    }, "<+=2.75") // Start 1.5 seconds after video starts
+      ease: "power2.out",
+      force3D: true,
+    }, "<+=2.75") 
 
     // STEP 4: Tags Fade In
     .to(".tag-item", {
@@ -123,23 +121,11 @@ const TestPage = () => {
         amount: 1.5,
         from: "random"
       },
-      duration: 2
-    }, "<+=1.2"); // Overlap with text fade out
+      duration: 2,
+      force3D: true,
+    }, "<+=1.2");
 
-    // Force refresh
-    ScrollTrigger.refresh();
-
-    // Cleanup
-    return () => {
-      ScrollTrigger.getAll().forEach(st => {
-        if (st.trigger === containerRef.current || 
-            st.vars.trigger === containerRef.current) {
-          st.kill();
-        }
-      });
-    };
-
-  }, { scope: containerRef });
+  }, { scope: containerRef }); // useGSAP handles proper cleanup with scope
 
   return (
     <div 
@@ -148,11 +134,11 @@ const TestPage = () => {
       className="h-screen w-full bg-black relative flex flex-col items-center justify-center overflow-hidden"
     >
       {/* TAGS LAYER */}
-      <div className="absolute top-0 left-0 w-full h-full pointer-events-none z-0">
+      <div className="absolute top-0 left-0 w-full h-full pointer-events-none z-0 transform-gpu">
         {tags.map((tag, index) => (
           <h3 
             key={index}
-            className="tag-item absolute font-bold text-toyota-red select-none"
+            className="tag-item absolute font-bold text-toyota-red select-none transform-gpu will-change-transform"
             style={{
               top: tag.top,
               left: tag.left,
@@ -169,18 +155,18 @@ const TestPage = () => {
       {/* TEXT LAYER */}
       <div 
         ref={textContainerRef} 
-        className="fixed top-0 left-0 w-full h-screen flex flex-col items-center justify-center pointer-events-none z-10"
+        className="fixed top-0 left-0 w-full h-screen flex flex-col items-center justify-center pointer-events-none z-10 transform-gpu will-change-transform"
       >
-        <h1 className="uppercase message text-white text-6xl md:text-8xl lg:text-[16rem] font-bold tracking-tight leading-none">
+        <h1 className="uppercase message transform-gpu will-change-transform text-white text-6xl md:text-8xl lg:text-[16rem] font-bold tracking-tight leading-none">
           Voices Of
         </h1>
-        <h2 className="uppercase message-two ml-14 text-toyota-red text-6xl md:text-[10rem] lg:text-[16rem] font-bold tracking-[1rem] md:tracking-[2.3rem] -mt-2 md:mt-4">
+        <h2 className="uppercase message-two transform-gpu will-change-transform ml-14 text-toyota-red text-6xl md:text-[10rem] lg:text-[16rem] font-bold tracking-[1rem] md:tracking-[2.3rem] -mt-2 md:mt-4">
           Toyota
         </h2>
       </div>
 
       {/* VIDEO LAYER */}
-      <div className="absolute top-0 right-0 left-10 w-full h-full z-20 pointer-events-none">
+      <div className="absolute top-0 right-0 left-10 w-full h-full z-20 pointer-events-none transform-gpu">
         <Videos />
       </div>
     </div>

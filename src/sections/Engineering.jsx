@@ -9,7 +9,7 @@ gsap.registerPlugin(ScrollTrigger, SplitText);
 const EngineeringSection = () => {
   const containerRef = useRef(null);
   const videoRef = useRef(null);
-  const canvasRef = useRef(null); // Canvas Reference Add kiya IDM Bypass k liye
+  const canvasRef = useRef(null); 
   const imageRef = useRef(null);
   const textTopRef = useRef(null);
   const textBottomRef = useRef(null);
@@ -31,20 +31,29 @@ const EngineeringSection = () => {
     { title: "AERODYNAMIC BODY", desc: "High-tensile steel shell designed for 5-star safety and low drag.", top: "90%", left: "87%" }
   ];
 
-  // CANVAS DRAWING LOGIC (IDM KO BYPASS KARNE K LIYE)
+  // CANVAS DRAWING LOGIC (Optimized for performance)
   useEffect(() => {
     const videoEl = videoRef.current;
     const canvasEl = canvasRef.current;
     if (!videoEl || !canvasEl) return;
     
     let animationFrameId;
+    let isVisible = false;
+
+    // Performance: Only draw when section is visible
+    const observer = new IntersectionObserver(([entry]) => {
+      isVisible = entry.isIntersecting;
+    });
+    if (containerRef.current) observer.observe(containerRef.current);
 
     const renderFrame = () => {
-      if (videoEl.paused || videoEl.ended) return;
+      if (!isVisible || videoEl.paused || videoEl.ended) {
+        animationFrameId = requestAnimationFrame(renderFrame);
+        return;
+      }
 
-      const ctx = canvasEl.getContext("2d");
+      const ctx = canvasEl.getContext("2d", { alpha: false }); // alpha: false improves performance for opaque videos
       
-      // Video ki original quality maintain karna
       if (videoEl.videoWidth && canvasEl.width !== videoEl.videoWidth) {
         canvasEl.width = videoEl.videoWidth;
         canvasEl.height = videoEl.videoHeight;
@@ -55,7 +64,7 @@ const EngineeringSection = () => {
     };
 
     const handleLoadedData = () => {
-      const ctx = canvasEl.getContext("2d");
+      const ctx = canvasEl.getContext("2d", { alpha: false });
       if (videoEl.videoWidth) {
         canvasEl.width = videoEl.videoWidth;
         canvasEl.height = videoEl.videoHeight;
@@ -68,55 +77,49 @@ const EngineeringSection = () => {
 
     return () => {
       cancelAnimationFrame(animationFrameId);
+      observer.disconnect();
       videoEl.removeEventListener("play", renderFrame);
       videoEl.removeEventListener("loadeddata", handleLoadedData);
     };
   }, []);
 
-  // GSAP ANIMATION LOGIC (UNCHANGED)
+  // GSAP ANIMATION LOGIC
   useEffect(() => {
     let ctx = gsap.context(() => {
-      // SplitText cleanup and initialization
       if (splitTextRef.current) {
-        splitTextRef.current.revert();
+        splitTextRef.current.top?.revert();
+        splitTextRef.current.bottom?.revert();
         splitTextRef.current = null;
       }
       
-      // SplitText for "ENGINEERED FROM"
       const splitTextTop = new SplitText(textTopRef.current, {
         type: "words",
-        wordsClass: "word-item-top",
+        wordsClass: "word-item-top transform-gpu will-change-transform", // Hardware acceleration
       });
 
-      // SplitText for "THE INSIDE"
       const splitTextBottom = new SplitText(textBottomRef.current, {
         type: "words",
-        wordsClass: "word-item-bottom",
+        wordsClass: "word-item-bottom transform-gpu will-change-transform", // Hardware acceleration
       });
 
-      // Store for cleanup
       splitTextRef.current = { 
         top: splitTextTop, 
         bottom: splitTextBottom 
       };
 
-      // Get all word elements
       const wordsTop = gsap.utils.toArray(".word-item-top");
       const wordsBottom = gsap.utils.toArray(".word-item-bottom");
       
-      // Set initial state for top text
       gsap.set(wordsTop, { color: "#666", opacity: 0.7 });
-      gsap.set(partRefs.current, { opacity: 0, y: 20 });
-      
-      // Set initial state for bottom text
+      gsap.set(partRefs.current, { opacity: 0, y: 20, willChange: "transform, opacity" });
       gsap.set(wordsBottom, { color: "#666", opacity: 0.7 });
 
-      // Animate "ENGINEERED FROM" words
       wordsTop.forEach((word, i) => {
         gsap.to(word, {
           color: "#fff",
           opacity: 1,
           ease: "power2.out",
+          force3D: true, // Optimization
           scrollTrigger: {
             trigger: textTopRef.current,
             start: `top+=${i * 250} 65%`,
@@ -126,12 +129,12 @@ const EngineeringSection = () => {
         });
       });
 
-      // Animate "THE INSIDE" words
       wordsBottom.forEach((word, i) => {
         gsap.to(word, {
           color: "#eb0a1e",
           opacity: 1,
           ease: "power2.out",
+          force3D: true, // Optimization
           scrollTrigger: {
             trigger: textBottomRef.current,
             start: `top+=${i * 50} 75%`,
@@ -145,12 +148,13 @@ const EngineeringSection = () => {
         scrollTrigger: {
           trigger: containerRef.current,
           start: "top top",
-          end: "+=400%", // Scroll length kitni lambi ho
+          end: "+=400%", 
           toggleActions: "play none none reverse",
-          pin: true,     // Screen ko rok ke rakhay ga
+          pin: true,     
           markers: false
         }
       });
+      
       const tll = gsap.timeline({
         scrollTrigger: {
           trigger: containerRef.current,
@@ -160,23 +164,25 @@ const EngineeringSection = () => {
           scrub: 1,
         }
       });
+
       partRefs.current.forEach((label, i) => {
         tll.to(label, {
           opacity: 1,
           y: 0,
           duration: 0.8,
-          ease: "power2.out"
+          ease: "power2.out",
+          force3D: true // Optimization
         }, `label-${i}`);
       });
 
       // 1. Image ko fade out karna aur Canvas/Video ko animate karna
-      tl.to(imageRef.current, { opacity: 0, scale: 0.8, duration: 1 }, 0)
-        // Yahan 'videoRef' ki bajaye 'canvasRef' ko animate kar rahy hain kyonk display canvas pe hogi
+      tl.to(imageRef.current, { opacity: 0, scale: 0.8, duration: 1, force3D: true }, 0)
         .to(canvasRef.current, { 
           opacity: 1, 
           scale: 1, 
           duration: 1,
-          onStart: () => videoRef.current.play() // Play real hidden video
+          force3D: true,
+          onStart: () => videoRef.current.play().catch(()=>{}) // Added catch to prevent errors
         }, 0)
 
       // 2. Texts ko move karna aur "Gap" khatam karna
@@ -185,7 +191,8 @@ const EngineeringSection = () => {
         x: -230,
         opacity: 0,
         duration: 1.5,
-        color: "#ffffff"
+        color: "#ffffff",
+        force3D: true
       }, 0)
 
       tl.to(textBottomRef.current, {
@@ -193,23 +200,20 @@ const EngineeringSection = () => {
         x: 20, 
         scale: 0.6,
         duration: 1.5,
-        color: "#eb0a1e"
+        color: "#eb0a1e",
+        force3D: true
       }, 0)
 
-      // 3. Paragraph (Milk-yellow) ko show karna
+      // 3. Paragraph ko show karna
       tl.fromTo(paragraphRef.current, 
         { opacity: 0, y: 50 }, 
-        { opacity: 1, y: 0, duration: 0.5 }, 
+        { opacity: 1, y: 0, duration: 0.5, force3D: true }, 
         1 
       );
 
     }, containerRef);
 
     return () => {
-      if (splitTextRef.current) {
-        if (splitTextRef.current.top) splitTextRef.current.top.revert();
-        if (splitTextRef.current.bottom) splitTextRef.current.bottom.revert();
-      }
       ctx.revert();
     };
   }, []);
@@ -234,33 +238,31 @@ const EngineeringSection = () => {
       {/* Top Text */}
       <h1 
         ref={textTopRef} 
-        className="text-white text-[10rem] font-extrabold tracking-[1.1rem] first-message"
+        className="text-white text-[10rem] font-extrabold tracking-[1.1rem] first-message transform-gpu will-change-transform"
       >
         ENGINEERED FROM
       </h1>
 
       {/* Media Wrapper */}
       <div className="media-wrapper">
-        {/* Your PNG Image */}
         <img 
           ref={imageRef}
-          src="/images//Parts.png" 
+          src="/images/Parts.png" 
           alt="Toyota Chassis" 
-          className="main-png scale-110 z-100 "
+          className="main-png scale-110 z-100 transform-gpu will-change-[transform,opacity]"
         />
 
-        {/* VISIBLE CANVAS: Yeh 3D video ki jagah nazar ayega (IDM bypass ho gaya) */}
         <canvas 
           ref={canvasRef}
-          className="main-video"
+          className="main-video transform-gpu will-change-[transform,opacity]"
           style={{ opacity: 0, pointerEvents: "none" }}
         />
 
-        {/* HIDDEN ACTUAL VIDEO: Yeh sirf GSAP k background me play hone k liye hai */}
         <video 
           ref={videoRef}
           muted 
           playsInline
+          preload="metadata" // Save bandwidth on initial load
           style={{ position: "absolute", width: "1px", height: "1px", opacity: 0, pointerEvents: "none" }}
         >
           <source src="/videos/Parts11.mp4" type="video/mp4" />
@@ -271,7 +273,7 @@ const EngineeringSection = () => {
             <div 
               key={index}
               ref={addToRefs}
-              className="part-label"
+              className="part-label transform-gpu"
               style={{ top: part.top, left: part.left }}
             >
               <div className="label-line"></div>
@@ -286,13 +288,13 @@ const EngineeringSection = () => {
       {/* Bottom Text */}
       <h1 
         ref={textBottomRef} 
-        className="text-toyota-red top-[65%] text-[10rem] font-extrabold tracking-[0.7rem] first-message"
+        className="text-toyota-red top-[65%] text-[10rem] font-extrabold tracking-[0.7rem] first-message transform-gpu will-change-transform"
       >
         THE INSIDE
       </h1>
 
       {/* Paragraph Description */}
-      <div ref={paragraphRef} className="desc-container font-paragraph">
+      <div ref={paragraphRef} className="desc-container font-paragraph transform-gpu will-change-[transform,opacity]">
         <p>
            A seamless integration of 
           power, stability, and futuristic design, crafted from the core to the surface.
@@ -330,9 +332,9 @@ const EngineeringSection = () => {
           max-width: 1100px;
           object-fit: contain;
           position: absolute;
-          transform: scale(1.2); /* Video scale effect */
+          transform: scale(1.2); 
         }
-           /* Callouts Styling */
+
         .callouts-overlay {
           position: absolute;
           width: 100%;
@@ -376,13 +378,12 @@ const EngineeringSection = () => {
         }
 
         .desc-container p {
-          color: #fff8e1; /* Milk Yellow */
+          color: #fff8e1; 
           font-size: 0.8rem;
           line-height: 1.6;
           opacity: 0.8;
         }
 
-        /* Word animation classes */
         .word-item-top, .word-item-bottom {
           display: inline-block;
           position: relative;

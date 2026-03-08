@@ -1,14 +1,14 @@
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, memo } from "react";
 
-export default function CarCards({ title, type, image, video , Scale , Videoscale }) {
+const CarCards = memo(function CarCards({ title, type, image, video , Scale , Videoscale }) {
   const videoRef = useRef(null);
   const cardRef = useRef(null);
 
-  // Desktop hover (unchanged)
+  // Desktop hover
   const enter = () => {
     if (!videoRef.current) return;
     videoRef.current.currentTime = 0;
-    videoRef.current.play();
+    videoRef.current.play().catch(() => {});
   };
 
   const leave = () => {
@@ -50,9 +50,9 @@ export default function CarCards({ title, type, image, video , Scale , Videoscal
       <img
         src={image}
         alt={title}
-        className={` ${Scale}
+        className={` ${Scale || ""}
           absolute inset-0 w-full h-full object-contain
-          transition-opacity duration-500
+          transition-opacity duration-500 will-change-opacity transform-gpu backface-hidden
           md:group-hover:opacity-0
         `}
       />
@@ -64,9 +64,9 @@ export default function CarCards({ title, type, image, video , Scale , Videoscal
         muted
         playsInline
         preload="metadata"
-        className={` ${Videoscale}
+        className={` ${Videoscale || ""}
           absolute inset-0 w-full h-full object-contain
-          opacity-100 md:opacity-0
+          opacity-100 md:opacity-0 will-change-opacity transform-gpu backface-hidden
           md:group-hover:opacity-100
           transition-opacity duration-500
         `}
@@ -87,4 +87,6 @@ export default function CarCards({ title, type, image, video , Scale , Videoscal
       />
     </div>
   );
-}
+});
+
+export default CarCards;

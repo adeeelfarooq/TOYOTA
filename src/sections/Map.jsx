@@ -10,8 +10,7 @@ const GlobalMap = () => {
   const sectionRef = useRef(null);
   const mapRef = useRef(null);
   const pinsRef = useRef([]);
-  const headingsRef = useRef(null); // Ref for the new headings container
-  const subheadingRef = useRef(null); // Ref for the subheading
+  const headingsRef = useRef(null);
   const [hoveredCountry, setHoveredCountry] = useState(null);
 
   useGSAP(() => {
@@ -20,13 +19,14 @@ const GlobalMap = () => {
     gsap.set(pinsRef.current, {
       scale: 0,
       opacity: 0,
-      transformOrigin: "center center"
+      transformOrigin: "center center",
+      willChange: "transform, opacity"
     });
 
-    // New: Initial setup for headings
     gsap.set([headingsRef.current], {
-      y: 50, // Start slightly below
+      y: 50,
       opacity: 0,
+      willChange: "transform, opacity"
     });
 
     // 🗺️ MAP FADE IN
@@ -35,6 +35,7 @@ const GlobalMap = () => {
       opacity: 0,
       duration: 2,
       ease: "power2.out",
+      force3D: true, 
       scrollTrigger: {
         trigger: sectionRef.current,
         start: "top 80%",
@@ -50,6 +51,7 @@ const GlobalMap = () => {
       duration: 1,
       stagger: 0.15,
       ease: "back.out(2)",
+      force3D: true, 
       scrollTrigger: {
         trigger: sectionRef.current,
         start: "top 40%",
@@ -58,20 +60,19 @@ const GlobalMap = () => {
       }
     });
 
-    // New: Headings animation
+    // Headings animation
     gsap.to(headingsRef.current, {
-        y: 0, // Animate to original position
+        y: 0, 
         opacity: 1,
         duration: 1.2,
         ease: "power2.out",
+        force3D: true, 
         scrollTrigger: {
             trigger: sectionRef.current,
-            start: "top 70%", // Trigger slightly before map fade in
+            start: "top 70%", 
             toggleActions: "play none none reverse",
         }
     });
-    
-
 
   }, []);
 
@@ -80,9 +81,6 @@ const GlobalMap = () => {
     { name: "USA", top: "38%", left: "22%", branches: 12, cities: ["New York", "Los Angeles", "Chicago", "Houston"], info: "North American Headquarters" },
     { name: "Canada", top: "30%", left: "20%", branches: 8, cities: ["Toronto", "Vancouver", "Montreal"], info: "Expanding EV Market" },
     { name: "Mexico", top: "48%", left: "23%", branches: 6, cities: ["Mexico City", "Monterrey"], info: "Manufacturing Hub" },
-    
-
-    
     
     // South America
     { name: "Brazil", top: "65%", left: "30%", branches: 10, cities: ["São Paulo", "Rio de Janeiro", "Brasília"], info: "Largest Market in SA" },
@@ -102,7 +100,7 @@ const GlobalMap = () => {
     { name: "Poland", top: "36%", left: "54%", branches: 6, cities: ["Warsaw", "Krakow"], info: "Eastern European Hub" },
     { name: "Ukraine", top: "33%", left: "58%", branches: 3, cities: ["Kyiv"], info: "Growing Market" },
     
-    // Eastern Europe / Caucasus (New Countries - Ukraine ke right side)
+    // Eastern Europe / Caucasus
     { name: "Romania", top: "32%", left: "80%", branches: 4, cities: ["Bucharest"], info: "Emerging European Market" },
     { name: "Bulgaria", top: "28%", left: "62%", branches: 3, cities: ["Sofia"], info: "Balkan Presence" },
     { name: "Greece", top: "44%", left: "71%", branches: 5, cities: ["Athens", "Thessaloniki"], info: "Mediterranean Hub" },
@@ -133,7 +131,6 @@ const GlobalMap = () => {
     { name: "Iran", top: "41%", left: "64%", branches: 4, cities: ["Tehran"], info: "Regional Presence" },
     { name: "Iraq", top: "42%", left: "60%", branches: 3, cities: ["Baghdad"], info: "Emerging Market" },
     
-    
     // Africa
     { name: "Egypt", top: "47%", left: "57%", branches: 4, cities: ["Cairo", "Alexandria"], info: "North African Hub" },
     { name: "Nigeria", top: "53%", left: "51%", branches: 3, cities: ["Lagos", "Abuja"], info: "West African Market" },
@@ -151,84 +148,74 @@ const GlobalMap = () => {
   return (
     <section ref={sectionRef} className="relative w-full h-dvh bg-black flex items-center justify-center overflow-hidden">
 
-      {/* NEW: Headings Section */}
-      {/* 🟥 STACKED HEADING */}
-{/* 🟥 HEADING + GLOBE ROW */}
-<div
-  ref={headingsRef}
-  className="absolute top-[5%] left-1/2 -translate-x-1/2 z-20 w-full max-w-7xl flex items-center justify-between "
->
+      {/* HEADINGS SECTION */}
+      <div
+        ref={headingsRef}
+        className="absolute top-[5%] left-1/2 -translate-x-1/2 z-20 w-full max-w-7xl flex items-center justify-between transform-gpu will-change-transform"
+      >
 
-  {/* LEFT SIDE STACKED TEXT */}
-  <div className="stacked-text flex flex-col uppercase font-bold text-[4rem] md:text-[4rem] leading-none text-white ml-70"
-    style={{ fontFamily: "'Google Sans Flex', sans-serif" }}
-  >
+        {/* LEFT SIDE STACKED TEXT */}
+        <div className="stacked-text flex flex-col uppercase font-bold text-[4rem] md:text-[4rem] leading-none text-white ml-70 transform-gpu"
+          style={{ fontFamily: "'Google Sans Flex', sans-serif" }}
+        >
+          <div className="overflow-hidden h-[0.9em] flex items-end">
+            <span className="block whitespace-nowrap">WE  <span className="text-toyota-red"> ARE EVERYWHERE</span></span>
+          </div>
 
-    <div className="overflow-hidden  h-[0.9em] flex items-end">
-      <span className="block whitespace-nowrap">WE  <span className="text-toyota-red"> ARE EVERYWHERE</span></span>
-    </div>
+          <div className="overflow-hidden h-[0.5em] flex items-end opacity-80 text-white">
+            <span className="block whitespace-nowrap">WE  <span className="text-toyota-red opacity-80"> ARE EVERYWHERE</span></span>
+          </div>
 
-    <div className="overflow-hidden h-[0.5em] flex items-end opacity-80 text-white">
-      <span className="block whitespace-nowrap">WE  <span className="text-toyota-red opacity-80"> ARE EVERYWHERE</span></span>
-    </div>
+          <div className="overflow-hidden h-[0.4em] flex items-end opacity-60 text-white">
+            <span className="block whitespace-nowrap">WE  <span className="text-toyota-red opacity-60"> ARE EVERYWHERE</span></span>
+          </div>
 
-    <div className="overflow-hidden h-[0.4em] flex items-end opacity-60 text-white">
-      <span className="block whitespace-nowrap">WE  <span className="text-toyota-red opacity-60"> ARE EVERYWHERE</span></span>
-    </div>
+          <div className="overflow-hidden h-[0.3em] flex items-end opacity-40 text-white">
+            <span className="block whitespace-nowrap">WE  <span className="text-toyota-red opacity-40"> ARE EVERYWHERE</span></span>
+          </div>
 
-    <div className="overflow-hidden h-[0.3em] flex items-end opacity-40 text-white">
-      <span className="block whitespace-nowrap">WE  <span className="text-toyota-red opacity-40"> ARE EVERYWHERE</span></span>
-    </div>
+          <div className="overflow-hidden h-[0.2em] flex items-end opacity-20 text-white">
+            <span className="block whitespace-nowrap">WE  <span className="text-toyota-red opacity-35"> ARE EVERYWHERE</span></span>
+          </div>
+        </div>
 
-    <div className="overflow-hidden h-[0.2em] flex items-end opacity-20 text-white">
-      <span className="block whitespace-nowrap">WE  <span className="text-toyota-red opacity-35"> ARE EVERYWHERE</span></span>
-    </div>
+        {/* 🌍 RIGHT SIDE GLOBE */}
+        <div className="relative w-[180px] h-[180px] md:w-[220px] md:h-[220px] flex items-center justify-center scale-80 -mt-7">
+          
+          {/* ROTATING TEXT (Fixed: Removed transform-gpu so animate-spin works perfectly) */}
+          <svg className="absolute w-full h-full animate-[spin_20s_linear_infinite]" viewBox="0 0 200 200">
+            <defs>
+              <path
+                id="circlePath"
+                d="M 100, 100
+                   m -80, 0
+                   a 80,80 0 1,1 160,0
+                   a 80,80 0 1,1 -160,0"
+              />
+            </defs>
 
-  </div>
+            <text fill="#eb0a1e" fontSize="10" fontWeight="bold" letterSpacing="2">
+              <textPath href="#circlePath" startOffset="0%">
+                OVER IN 170+ COUNTRIES • OVER IN 170+ COUNTRIES • OVER IN 170+ COUNTRIES •
+              </textPath>
+            </text>
+          </svg>
 
-  {/* 🌍 RIGHT SIDE GLOBE */}
-  <div className="relative w-[180px] h-[180px] md:w-[220px] md:h-[220px] flex items-center justify-center scale-80 -mt-7 ">
-
-    {/* ROTATING TEXT */}
-    <svg className="absolute w-full h-full animate-[spin_20s_linear_infinite]" viewBox="0 0 200 200">
-      <defs>
-        <path
-          id="circlePath"
-          d="M 100, 100
-             m -80, 0
-             a 80,80 0 1,1 160,0
-             a 80,80 0 1,1 -160,0"
-        />
-      </defs>
-
-      <text fill="#eb0a1e" fontSize="10" fontWeight="bold" letterSpacing="2">
-        <textPath href="#circlePath" startOffset="0%">
-          OVER IN 170+ COUNTRIES • OVER IN 170+ COUNTRIES • OVER IN 170+ COUNTRIES •
-        </textPath>
-      </text>
-    </svg>
-
-    {/* GLOBE IMAGE */}
-    <img
-      src="/images/Globe.png"
-      className="w-[70%] h-[70%] object-contain "
-      alt="globe"
-      
-    />
-
-  </div>
-
-</div>
-
-
-
+          {/* GLOBE IMAGE */}
+          <img
+            src="/images/Globe.png"
+            className="w-[70%] h-[70%] object-contain"
+            alt="globe"
+          />
+        </div>
+      </div>
 
       {/* 🗺️ MAP IMAGE */}
-      <div className="relative w-[95%] md:w-[90%] lg:w-[85%] max-w-7xl mx-auto bottom-[-17%] scale-x-120 ">
+      <div className="relative w-[95%] md:w-[90%] lg:w-[85%] max-w-7xl mx-auto bottom-[-17%] scale-x-120 transform-gpu">
         <img
           ref={mapRef}
           src="/images/Worldmap.png"
-          className="w-full h-auto opacity-90 scale-y-70 bottom-0"
+          className="w-full h-auto opacity-90 scale-y-70 bottom-0 transform-gpu will-change-transform"
           alt="World Map"
         />
       </div>
@@ -238,11 +225,11 @@ const GlobalMap = () => {
         <div
           key={index}
           ref={el => pinsRef.current[index] = el}
-          className="absolute flex flex-col items-center cursor-pointer mt-25   "
+          className="absolute flex flex-col items-center cursor-pointer mt-25 transform-gpu will-change-transform"
           style={{
             top: country.top,
             left: country.left,
-            transform: 'translate(-50%, -50%)',
+            transform: 'translate(-50%, -50%)', 
             zIndex: hoveredCountry?.name === country.name ? 50 : 10
           }}
           onMouseEnter={() => setHoveredCountry(country)}
@@ -250,17 +237,17 @@ const GlobalMap = () => {
         >
           <img
             src="/images/Pin.png"
-            className="w-8 md:w-10 lg:w-12 mb-1 transition-transform duration-300 scale-130 hover:scale-155  "
+            className="w-8 md:w-10 lg:w-12 mb-1 transition-transform duration-300 scale-130 hover:scale-155 transform-gpu"
             alt="pin"
           />
-          <span className="text-white text-[10px] md:text-xs uppercase bg-black/60 px-2 py-0.5 rounded-full border border-red-500/50 whitespace-nowrap">
+          <span className="text-white text-[10px] md:text-xs uppercase bg-black/60 px-2 py-0.5 rounded-full border border-red-500/50 whitespace-nowrap transform-gpu">
             {country.name}
           </span>
 
           {/* Hover Info Card */}
           {hoveredCountry?.name === country.name && (
             <div
-              className="absolute bg-black/90 backdrop-blur-md rounded-xl border border-red-500/30 p-4 shadow-2xl z-50"
+              className="absolute bg-black/90 backdrop-blur-md rounded-xl border border-red-500/30 p-4 shadow-2xl z-50 transform-gpu"
               style={{
                 top: 'auto',
                 bottom: '120%',
@@ -271,7 +258,7 @@ const GlobalMap = () => {
             >
               {/* Card Header */}
               <div className="flex items-center gap-2 mb-2 pb-2 border-b border-red-500/30">
-                <div className="w-2 h-2 bg-red-500 rounded-full "></div>
+                <div className="w-2 h-2 bg-red-500 rounded-full"></div>
                 <h3 className="text-red-500 uppercase font-bold text-sm">{country.name}</h3>
               </div>
               

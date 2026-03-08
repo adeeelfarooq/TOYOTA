@@ -1,9 +1,8 @@
 import { useRef, useState, useEffect, useMemo } from "react";
 import gsap from "gsap";
 import { SplitText, ScrollTrigger } from "gsap/all";
-import CarCards from "../components/Carcards";
+import CarCards from "../components/Carcards"; // Ensure correct path
 import { useGSAP } from "@gsap/react";
-
 
 gsap.registerPlugin(SplitText, ScrollTrigger);
 
@@ -52,17 +51,18 @@ export default function Cars() {
     // SplitText for header
     splitTextRef.current = new SplitText(".first-message", {
       type: "words",
-      wordsClass: "word-item",
+      wordsClass: "word-item transform-gpu will-change-transform",
     });
 
     const words = gsap.utils.toArray(".first-message .word-item");
-    gsap.set(words, { color: "#666", opacity: 0.7 });
+    gsap.set(words, { color: "#666", opacity: 0.7, willChange: "color, opacity" });
 
     words.forEach((word, i) => {
       gsap.to(word, {
         color: "#fff",
         opacity: 1,
         ease: "power2.out",
+        force3D: true,
         scrollTrigger: {
           trigger: ".first-message",
           start: `top+=${i * 50} 65%`,
@@ -76,6 +76,7 @@ export default function Cars() {
     gsap.to(".journey-container", {
       clipPath: "polygon(0% 0%,100% 0%,100% 100%,0% 100%)",
       ease: "circ.inOut",
+      force3D: true,
       scrollTrigger: {
         trigger: ".journey-container",
         start: "top 50%",
@@ -89,6 +90,7 @@ export default function Cars() {
       gsap.to(row, {
         x: -scrollDistance,
         ease: "none",
+        force3D: true,
         scrollTrigger: {
           trigger: wrapper,
           start: "top top",
@@ -124,7 +126,7 @@ export default function Cars() {
         </h2>
 
         <div 
-          className="journey-container flex items-center -translate-y-4 -translate-x-210"
+          className="journey-container flex items-center -translate-y-4 -translate-x-210 transform-gpu"
           style={{ clipPath: "polygon(0% 0%, 0% 0%, 0% 100%, 0% 100%)" }}
         >
           <h2 className="journey font-sans text-gray-950 bg-toyota-red text-2xl flex items-center w-30">
@@ -156,7 +158,7 @@ export default function Cars() {
       <div ref={cardsWrapperRef} className="relative h-screen">
         <div
           ref={cardsRowRef}
-          className="absolute top-1/2 -translate-y-1/2 flex gap-28 w-max"
+          className="absolute top-1/2 -translate-y-1/2 flex gap-28 w-max transform-gpu will-change-transform"
         >
           {filteredCars.map(car => (
             <CarCards key={car.id} {...car}  />

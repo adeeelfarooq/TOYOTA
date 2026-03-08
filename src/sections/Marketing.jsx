@@ -29,7 +29,7 @@ const videoVariants = [
 
 // ⚠️ WebP frames setup (Aapke 150 frames yahan handle honge)
 const TOTAL_FRAMES = 150; 
-const getFramePath = (index) => `/frames/Tacoma/frame_${String(index).padStart(4, "0")}.webp`; // Agar path different ho to isko update karein
+const getFramePath = (index) => `/frames/Tacoma/frame_${String(index).padStart(4, "0")}.webp`; 
 
 export default function TerrainSection() {
   const sectionRef = useRef(null);
@@ -40,7 +40,7 @@ export default function TerrainSection() {
   const canvasRef = useRef(null);
   const imagesRef = useRef([]);
 
-  // 🖼️ Frames Preload Logic
+  // 🖼️ Frames Preload Logic (Optimized background loading)
   useEffect(() => {
     for (let i = 1; i <= TOTAL_FRAMES; i++) {
       const img = new Image();
@@ -51,9 +51,8 @@ export default function TerrainSection() {
     // Canvas par pehla frame lagana jab image load ho jaye
     imagesRef.current[0].onload = () => {
       const canvas = canvasRef.current;
-      const ctx = canvas?.getContext("2d");
+      const ctx = canvas?.getContext("2d"); // Alpha wapis default (true) kar dia hai ta k background transparent rahe
       if (ctx && canvas) {
-        // Truck video ka resolution (e.g., 1920x1080 ya jo bhi apka frame size ho)
         canvas.width = imagesRef.current[0].width || 1920; 
         canvas.height = imagesRef.current[0].height || 1080;
         ctx.drawImage(imagesRef.current[0], 0, 0);
@@ -65,39 +64,42 @@ export default function TerrainSection() {
     const firstF = SplitText.create(".first-text ", { type: "chars" });
     const thirdF = SplitText.create(".third ", { type: "chars" });
     
-  // 1️⃣ Designed to dominate
-  gsap.to(".designed-dominate", {
-    clipPath:"polygon(100% 0%, 0% 0%, 0% 100%, 100% 100%)",
-    ease: "circ.out",
-    duration: 8,
-    opacity:1,
-    scrollTrigger: {
-      trigger: sectionRef.current,
-      start: "290% bottom",   
-      end: "335% bottom",
-      scrub: 1.5,
-    }
-  });
+    // 1️⃣ Designed to dominate
+    gsap.to(".designed-dominate", {
+      clipPath:"polygon(100% 0%, 0% 0%, 0% 100%, 100% 100%)",
+      ease: "circ.out",
+      duration: 8,
+      opacity:1,
+      force3D: true, // Hardware acceleration
+      scrollTrigger: {
+        trigger: sectionRef.current,
+        start: "290% bottom",   
+        end: "335% bottom",
+        scrub: 1.5,
+      }
+    });
 
-  // 2️⃣ Streets | Forests | Pinnacle
-  gsap.to(".terrain-tags", {
-    clipPath:"polygon(100% 0%, 0% 0%, 0% 100%, 100% 100%)",
-    ease: "circ.out",
-    duration: 8,
-    opacity: 1,
-    scrollTrigger: {
-      trigger: sectionRef.current,
-      start: "295% bottom",   
-      end: "340% bottom",
-      scrub: 1.5,
-    }
-  });
+    // 2️⃣ Streets | Forests | Pinnacle
+    gsap.to(".terrain-tags", {
+      clipPath:"polygon(100% 0%, 0% 0%, 0% 100%, 100% 100%)",
+      ease: "circ.out",
+      duration: 8,
+      opacity: 1,
+      force3D: true, // Hardware acceleration
+      scrollTrigger: {
+        trigger: sectionRef.current,
+        start: "295% bottom",   
+        end: "340% bottom",
+        scrub: 1.5,
+      }
+    });
     
     // Text Animations
     gsap.from(firstF.chars, {
       yPercent: 200,
       stagger: 0.02,
       ease: "power1.inOut",
+      force3D: true,
       scrollTrigger: {
         trigger: ".terrain",
         start: "top 75%",
@@ -109,6 +111,7 @@ export default function TerrainSection() {
       yPercent: 200,
       stagger: 0.02,
       ease: "power1.inOut",
+      force3D: true,
       scrollTrigger: {
         trigger: ".terrain",
         start: "top 75%",
@@ -116,15 +119,16 @@ export default function TerrainSection() {
       }
     });
 
-    /* ===== FIXED TACO CANVAS LOGIC (Exactly same animation & triggers) ===== */
+    /* ===== FIXED TACO CANVAS LOGIC (Aapki Exact Original Logic) ===== */
     gsap.from(".taco", {
-      xPercent: -65, // Aapki original requirement
+      xPercent: -65, 
       ease: "none",
       stagger: 0.02,
+      force3D: true,
       scrollTrigger: {
         trigger: ".terrain",
         start: "top 75%",
-        scrub: 1, // Original scrub timing
+        scrub: 1, 
         onUpdate: (self) => {
           const scrollPos = self.progress;
           // Frames calculate karne ki logic (scroll based)
@@ -164,6 +168,7 @@ export default function TerrainSection() {
         yPercent: 150,
         stagger: 0.25,
         ease: "power1.out",
+        force3D: true,
       });
 
       cardsRef.current.forEach((card, i) => {
@@ -206,32 +211,30 @@ export default function TerrainSection() {
       ></div>
  
       <div className="text-center mb-14 -mt-5 relative z-10">
-        <h2 className="uppercase first-text text-5xl md:text-8xl font-bold max-w-lg text-white overflow-hidden translate-x-100 ">
+        <h2 className="uppercase first-text text-5xl md:text-8xl font-bold max-w-lg text-white overflow-hidden translate-x-100 transform-gpu will-change-transform">
           Master Every 
         </h2>
-        <h2 className="third z-1000 uppercase text-8xl font-bold max-w-xl overflow-hidden text-toyota-red rotate-180 translate-y-4 translate-x-88 tracking-[2.15rem] ">Terrain</h2>
+        <h2 className="third z-1000 uppercase text-8xl font-bold max-w-xl overflow-hidden text-toyota-red rotate-180 translate-y-4 translate-x-88 tracking-[2.15rem] transform-gpu will-change-transform">
+          Terrain
+        </h2>
         
-        {/* <video> ki jagah ab hum <canvas> use kar rahe hain, Classes bilkul same hain */}
         <canvas 
           ref={canvasRef}
-          className="taco absolute -ml-40 scale-50 -mt-49 rotate-x-180 overflow-hidden mix-blend-difference"
+          className="taco absolute -ml-40 scale-50 -mt-49 rotate-x-180 overflow-hidden mix-blend-difference transform-gpu will-change-transform"
         />
        
         <div className="top-[360%] left-[640px] absolute text-sm flex flex-col items-center -translate-y-1">
           <div 
-          style={{
-            clipPath:"polygon(50% 0, 50% 0, 50% 100%, 50% 100%)"
-          }}
-            className="designed-dominate text-toyota-red tracking-[1rem] scale-130 bg-white pl-45 -translate-x-90 pr-45 z-20 border-toyota-red uppercase flex items-center justify-center font-bold"
+            style={{ clipPath:"polygon(50% 0, 50% 0, 50% 100%, 50% 100%)" }}
+            className="designed-dominate text-toyota-red tracking-[1rem] scale-130 bg-white pl-45 -translate-x-90 pr-45 z-20 border-toyota-red uppercase flex items-center justify-center font-bold will-change-[clip-path,opacity] transform-gpu"
           >
             Designedtodominate
           </div>
 
           <div
-          style={{
-            clipPath:"polygon(50% 0, 50% 0, 50% 100%, 50% 100%)"
-          }}
-           className="terrain-tags bg-toyota-red -translate-x-94 -translate-y-1 flex items-center justify-center px-10 py-2 border-milk-yellow border-t-0 border-1 w-140">
+            style={{ clipPath:"polygon(50% 0, 50% 0, 50% 100%, 50% 100%)" }}
+            className="terrain-tags bg-toyota-red -translate-x-94 -translate-y-1 flex items-center justify-center px-10 py-2 border-milk-yellow border-t-0 border-1 w-140 will-change-[clip-path,opacity] transform-gpu"
+          >
             <div className="flex items-center gap-4 text-milk-yellow uppercase tracking-[0.5rem] font-medium">
               <span>streets</span>
               <span className="opacity-40 scale-150 text-white font-light">|</span>
@@ -248,7 +251,7 @@ export default function TerrainSection() {
           <div
             key={i}
             ref={el => (cardsRef.current[i] = el)}
-            className="absolute left-25 z-100 w-250 h-[320px] rounded-3xl overflow-hidden border border-gray-800 shadow-2xl"
+            className="absolute left-25 z-100 w-250 h-[320px] rounded-3xl overflow-hidden border border-gray-800 shadow-2xl transform-gpu will-change-transform"
             style={{
               top: `${i * 40}px`,
               zIndex: i + 1
@@ -260,7 +263,6 @@ export default function TerrainSection() {
               muted
               playsInline
               preload="none"
-              loading="lazy"
               className="absolute z-10 inset-0 w-full h-full object-cover"
             />
 
