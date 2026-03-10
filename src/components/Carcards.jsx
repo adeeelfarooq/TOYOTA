@@ -74,8 +74,8 @@ const CarCards = memo(function CarCards({ title, type, image, video , Scale , Vi
 
       {/* TEXT */}
       <div className="absolute -bottom-14 left-0">
-        <p className="text-xs tracking-widest text-gray-400">{type}</p>
-        <h3 className="text-xl font-light tracking-wide">{title}</h3>
+        <p className="text-xs tracking-widest text-milk-yellow">{type}</p>
+        <h3 className="text-xl font-light text-white uppercase tracking-wide">{title}</h3>
       </div>
 
       <span
