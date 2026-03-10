@@ -68,10 +68,10 @@ const Lastpage = () => {
 
       // INITIAL STATE FIX: Image ko exactly center mein aur neechay chupa diya hai
       if (personRef.current) {
-        gsap.set(personRef.current, { xPercent: -50, yPercent: 100 });
+        gsap.set(personRef.current, { xPercent: -50, yPercent: 100, willChange: "transform" });
       }
       if (personsRef.current) {
-        gsap.set(personsRef.current, { xPercent: -50, yPercent: 100 });
+        gsap.set(personsRef.current, { xPercent: -50, yPercent: 100, willChange: "transform" });
       }
 
       // 1. Video Scroll Animation
@@ -105,7 +105,8 @@ const Lastpage = () => {
             x: "0%",     // End position (Original right pos)
             duration: 25, 
             ease: "none", 
-            repeat: -1   // Infinite loop
+            repeat: -1,   // Infinite loop
+            force3D: true // Optimization: GPU acceleration for smooth infinite moving
           }
         );
 
@@ -178,18 +179,18 @@ const Lastpage = () => {
       >
         <div className="absolute inset-0 bg-black/70 z-0"></div>
 
-        {/* HELMET PERSON IMAGE FIXED */}
+        {/* HELMET PERSON IMAGE FIXED - Added transform-gpu and will-change for smooth scrolling */}
         <img 
           ref={personRef}
           src="images/footer1.png" 
           alt="Toyota Racing Driver"
-          className="absolute bottom-0 left-1/2 h-[60%] md:h-[80%] object-contain z-[100] pointer-events-none"
+          className="absolute bottom-0 left-1/2 h-[60%] md:h-[80%] object-contain z-[100] pointer-events-none transform-gpu will-change-transform"
         />
         <img 
           ref={personsRef}
           src="images/Spn.png" 
           alt="Toyota Driver"
-          className="absolute bottom-0 left-1/2 h-[60%] md:h-[80%] object-contain z-[100] pointer-events-none"
+          className="absolute bottom-0 left-1/2 h-[60%] md:h-[80%] object-contain z-[100] pointer-events-none transform-gpu will-change-transform"
         />
 
         {/* LEFT INSIDE TEXT (PAGES) */}
@@ -214,7 +215,7 @@ const Lastpage = () => {
         <div className="absolute bottom-6 md:bottom-10 w-full overflow-hidden z-20 flex">
           <div 
             ref={marqueeRef} 
-            className="flex items-center w-max cursor-pointer"
+            className="flex items-center w-max cursor-pointer transform-gpu will-change-transform"
           >
             {/* Logo Set 1 */}
             {sponsors.map((src, index) => {
@@ -227,7 +228,8 @@ const Lastpage = () => {
                   key={index} 
                   src={src} 
                   alt="Toyota Sponsor" 
-                  className={`h-5 md:h-8 mx-8 md:mx-14 object-contain opacity-60 hover:opacity-100 transition-opacity ${needsScaling ? 'scale-[3.0]' : ''} ${reduceScaling ? 'scale-y-[0.5]' : ''} ${oneScaling ? 'scale-[2.3]' : ''}`} 
+                  loading="lazy" // Optimization: Only loads when user scrolls to bottom
+                  className={`h-5 md:h-8 mx-8 md:mx-14 object-contain opacity-60 hover:opacity-100 transition-opacity transform-gpu ${needsScaling ? 'scale-[3.0]' : ''} ${reduceScaling ? 'scale-y-[0.5]' : ''} ${oneScaling ? 'scale-[2.3]' : ''}`} 
                   style={{ filter: "brightness(0) invert(16%) sepia(93%) saturate(5831%) hue-rotate(349deg) brightness(97%) contrast(110%)" }}
                 />
               );
@@ -243,7 +245,8 @@ const Lastpage = () => {
                   key={`dup-${index}`} 
                   src={src} 
                   alt="Toyota Sponsor" 
-                  className={`h-5 md:h-8 mx-8 md:mx-14 object-contain opacity-60 hover:opacity-100 transition-opacity ${needsScaling ? 'scale-[3.0]' : ''} ${reduceScaling ? 'scale-y-[0.5]' : ''} ${oneScaling ? 'scale-[2.3]' : ''}`} 
+                  loading="lazy" // Optimization: Only loads when user scrolls to bottom
+                  className={`h-5 md:h-8 mx-8 md:mx-14 object-contain opacity-60 hover:opacity-100 transition-opacity transform-gpu ${needsScaling ? 'scale-[3.0]' : ''} ${reduceScaling ? 'scale-y-[0.5]' : ''} ${oneScaling ? 'scale-[2.3]' : ''}`} 
                   style={{ filter: "brightness(0) invert(16%) sepia(93%) saturate(5831%) hue-rotate(349deg) brightness(97%) contrast(110%)" }}
                 />
               );
