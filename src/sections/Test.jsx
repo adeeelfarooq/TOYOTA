@@ -2,7 +2,7 @@ import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import React, { useRef } from 'react';
-import Videos from '../components/Cards';
+import Videos from '../components/Cards'; // Apni path check kr lena
 import { MotionPathPlugin } from "gsap/MotionPathPlugin";
 
 gsap.registerPlugin(ScrollTrigger, MotionPathPlugin);
@@ -24,7 +24,7 @@ const TestPage = () => {
   ];
 
   useGSAP(() => {
-    // Clean up only our container's triggers
+    // Clean up triggers
     ScrollTrigger.getAll().forEach(st => {
       if (st.trigger === containerRef.current || 
           st.vars.trigger === containerRef.current) {
@@ -32,7 +32,7 @@ const TestPage = () => {
       }
     });
 
-    // Initial states
+    // Initial states (Removed forced will-change to save GPU memory)
     gsap.set(".message", {
       rotateX: 60,
       rotateY: 1,
@@ -53,15 +53,14 @@ const TestPage = () => {
       scale: 0.9,
     });
     
-    // Master Timeline with reduced end value
+    // Master Timeline
     const tl = gsap.timeline({
       scrollTrigger: {
         trigger: containerRef.current,
         start: "top top",
-        end: "+=2000%", // Reduced from 2000% to 300%
-        scrub: 1.5, // Increased scrub for smoother animation
+        end: "+=2000%", 
+        scrub: 1.5, 
         pin: true,
-        
         id: "testPage-scrollTrigger",
         invalidateOnRefresh: true,
       }
@@ -78,6 +77,7 @@ const TestPage = () => {
         opacity: 1,
         ease: "power4.out",
         duration: 2, 
+        force3D: "auto", // Let GSAP decide efficiently
       }
     )
     .to(".message", {
@@ -85,10 +85,11 @@ const TestPage = () => {
       rotateY: 0,
       opacity: 1,
       transformPerspective: 1000,
-      duration: 1
+      duration: 1,
+      force3D: "auto",
     }, "-=1")
 
-    // STEP 2: Videos Entry
+    // STEP 2: Videos Entry (Motion Path)
     .to(".video-card", {
       motionPath: {
         path: [
@@ -104,16 +105,17 @@ const TestPage = () => {
       opacity: 1,    
       duration: 5,
       stagger: 0.5,  
-      ease: "power1.inOut" 
+      ease: "power1.inOut",
+      force3D: "auto", // Keeps memory usage normal
     }, "-=0.5")
 
-    // STEP 3: Text Fade Out (Simplified timing)
+    // STEP 3: Text Fade Out
     .to(textContainerRef.current, {
       opacity: 0,
       scale: 0.7,
       duration: 2.5,
-      ease: "power2.out"
-    }, "<+=2.75") // Start 1.5 seconds after video starts
+      ease: "power2.out",
+    }, "<+=2.75") 
 
     // STEP 4: Tags Fade In
     .to(".tag-item", {
@@ -123,23 +125,10 @@ const TestPage = () => {
         amount: 1.5,
         from: "random"
       },
-      duration: 2
-    }, "<+=1.2"); // Overlap with text fade out
+      duration: 2,
+    }, "<+=1.2");
 
-    // Force refresh
-    ScrollTrigger.refresh();
-
-    // Cleanup
-    return () => {
-      ScrollTrigger.getAll().forEach(st => {
-        if (st.trigger === containerRef.current || 
-            st.vars.trigger === containerRef.current) {
-          st.kill();
-        }
-      });
-    };
-
-  }, { scope: containerRef });
+  }, { scope: containerRef }); 
 
   return (
     <div 
