@@ -11,8 +11,13 @@ function Hero() {
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      const titleSplit = SplitText.create(".title1", { type: "chars" });
-      const tl = gsap.timeline();
+      // Hardware acceleration add ki hai text split mein
+      const titleSplit = SplitText.create(".title1", { 
+        type: "chars",
+        charsClass: "transform-gpu will-change-transform" 
+      });
+      
+      const tl = gsap.timeline({ defaults: { force3D: true } });
 
       gsap.set(videoRef.current, { opacity: 0 });
 
@@ -98,39 +103,43 @@ function Hero() {
       ref={sectionRef}
       className="relative h-screen w-screen overflow-hidden bg-toyota-red-soft"
     >
-      {/* 🔴 INTRO RED SCREEN */}
+      {/* 🔴 INTRO RED SCREEN 
+          FIX: 'fixed' ko 'absolute' kar diya aur z-[100] lagaya hai. 
+          ScrollSmoother k andar 'absolute' perfect center karta hai. 
+      */}
       <div
         ref={introRef}
-        className="fixed inset-0 z-50 bg-toyota-red-soft flex items-center justify-center"
+        className="absolute  inset-0 z-[100] bg-toyota-red-soft flex items-center justify-center transform-gpu will-change-transform"
       >
         <img
           ref={introLogoRef}
           src="/images/Toyota-logo.svg"
           alt="Toyota"
-          className="w-40 scale-300 -translate-y-50"
+          className="w-40 scale-300  transform-gpu"
           style={{ clipPath: "polygon(0 0, 0 0, 0 100%, 0 100%)" }}
         />
       </div>
 
-      {/* 🎥 VIDEO */}
+      {/* 🎥 VIDEO 
+          FIX: Removed 'loading="lazy"' & 'preload="none"' because Hero video should load fast
+      */}
       <video
         ref={videoRef}
         src="/videos/Toyota-Video_1.webm"
         muted
         playsInline
-        preload="none"
-        loading="lazy"
-        className="absolute inset-0 w-full h-full object-cover"
+        preload="auto"
+        className="absolute inset-0 w-full h-full object-cover transform-gpu will-change-opacity"
       />
 
-      <div className="absolute inset-0 bg-black/30" />
+      <div className="absolute inset-0 bg-black/30 pointer-events-none" />
 
       {/* 🔴 HEADER LOGO */}
       <img
         ref={logoRef}
         src="/images/Toyota-logo.svg"
         alt="Toyota"
-        className="absolute top-6 left-8 z-20 w-32"
+        className="absolute top-6 left-8 z-20 w-32 transform-gpu"
         style={{ clipPath: "polygon(0 0, 0 0, 0 100%, 0 100%)" }}
       />
 
@@ -140,7 +149,7 @@ function Hero() {
           Future of <span className="text-toyota-red">Mobility</span>
         </h1>
 
-        <p className="para -mt-2 ml-2 text-gray-200 text-lg font-paragraph">
+        <p className="para -mt-2 ml-2 text-gray-200 text-lg font-paragraph transform-gpu will-change-opacity">
           Experience Toyota’s next-generation performance,
           intelligence and design.
         </p>
@@ -161,6 +170,7 @@ function Hero() {
             hover:text-black
             hover:cursor-pointer
             z-10
+            transform-gpu will-change-opacity
           "
         >
           <span className="relative z-10">Discover the Drive</span>

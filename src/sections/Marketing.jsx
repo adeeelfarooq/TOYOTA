@@ -201,7 +201,7 @@ export default function TerrainSection() {
   }, []);
 
   return (
-    <section
+    <div
       ref={sectionRef}
       className="terrain bg-[radial-gradient(circle,_#800D16_0%,_#5E0910_40%,_#320409_100%)] py-12 px-12 overflow-hidden"
     >
@@ -278,6 +278,6 @@ export default function TerrainSection() {
           </div>
         ))}
       </div>
-    </section>
+    </div>
   );
 }

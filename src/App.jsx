@@ -10,6 +10,7 @@ import EngineeringSection from './sections/Engineering';
 import TestPage from './sections/Test';
 import GlobalMap from './sections/Map';
 import Lastpage from './sections/Last';
+import Hero from './sections/Hero';
 // import ModernTestimonialsSection from './sections/Testimonial';
 
 gsap.registerPlugin(ScrollTrigger , ScrollToPlugin ,  ScrollSmoother);
@@ -41,7 +42,7 @@ const App = () => {
       <div id="smooth-wrapper">   
         <div id="smooth-content">
              
-          {/* <Hero/> */}
+          <Hero/>
           <Cars/>
 
           <div>
