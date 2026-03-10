@@ -5,7 +5,6 @@ import gsap from "gsap";
 function Hero() {
   const sectionRef = useRef(null);
   const videoRef = useRef(null);
-  const logoRef = useRef(null);
   const introRef = useRef(null);
   const introLogoRef = useRef(null);
 
@@ -69,21 +68,7 @@ function Hero() {
         )
         .from(".para", { opacity: 0 })
         .to(".para", { opacity: 1, duration: 1 }, "+=0.8")
-        .to(
-          logoRef.current,
-          {
-            scale: 1,
-            x: 0,
-            y: 0,
-            xPercent: 0,
-            yPercent: 0,
-            clipPath: "polygon(0 0, 100% 0, 100% 100%, 0 100%)",
-            duration: 1.2,
-            ease: "power2.inOut",
-          },
-          "-=2.0"
-        )
-        .from(".btn", { opacity: 0 })
+        .from(".btn", { opacity: 0 }, "-=0.5") // Logo hatane k baad Button timing adjust
         .to(
           ".btn",
           {
@@ -91,7 +76,7 @@ function Hero() {
             duration: 1,
             ease: "power3.out",
           },
-          "-=2.0"
+          "-=0.5"
         );
     }, sectionRef);
 
@@ -103,26 +88,21 @@ function Hero() {
       ref={sectionRef}
       className="relative h-screen w-screen overflow-hidden bg-toyota-red-soft"
     >
-      {/* 🔴 INTRO RED SCREEN 
-          FIX: 'fixed' ko 'absolute' kar diya aur z-[100] lagaya hai. 
-          ScrollSmoother k andar 'absolute' perfect center karta hai. 
-      */}
+      {/* 🔴 INTRO RED SCREEN */}
       <div
         ref={introRef}
-        className="absolute  inset-0 z-[100] bg-toyota-red-soft flex items-center justify-center transform-gpu will-change-transform"
+        className="absolute inset-0 z-[100] bg-toyota-red-soft flex items-center justify-center transform-gpu will-change-transform"
       >
         <img
           ref={introLogoRef}
           src="/images/Toyota-logo.svg"
           alt="Toyota"
-          className="w-40 scale-300  transform-gpu"
+          className="w-40 scale-300 transform-gpu"
           style={{ clipPath: "polygon(0 0, 0 0, 0 100%, 0 100%)" }}
         />
       </div>
 
-      {/* 🎥 VIDEO 
-          FIX: Removed 'loading="lazy"' & 'preload="none"' because Hero video should load fast
-      */}
+      {/* 🎥 VIDEO */}
       <video
         ref={videoRef}
         src="/videos/Toyota-Video_1.webm"
@@ -133,15 +113,6 @@ function Hero() {
       />
 
       <div className="absolute inset-0 bg-black/30 pointer-events-none" />
-
-      {/* 🔴 HEADER LOGO */}
-      <img
-        ref={logoRef}
-        src="/images/Toyota-logo.svg"
-        alt="Toyota"
-        className="absolute top-6 left-8 z-20 w-32 transform-gpu"
-        style={{ clipPath: "polygon(0 0, 0 0, 0 100%, 0 100%)" }}
-      />
 
       {/* TEXT */}
       <div className="absolute top-[8%] left-[28%] z-10">
