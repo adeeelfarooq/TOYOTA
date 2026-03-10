@@ -40,7 +40,7 @@ const App = () => {
   
   return (
     <main>
-      
+      <Logo/>
       <div id="smooth-wrapper">   
         <div id="smooth-content">
              
