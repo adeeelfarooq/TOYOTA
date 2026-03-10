@@ -32,4 +32,16 @@ body::-webkit-scrollbar {
   
 }
 
+/* 🚀 MAGIC PERFORMANCE FIX */
+section {
+  /* Jo section screen par nahi hai, browser usko calculate nahi karega */
+  content-visibility: auto;
+  contain-intrinsic-size: 100vh;
+}
+
+canvas, video {
+  /* GPU acceleration for all heavy media */
+  will-change: transform;
+}
+
 

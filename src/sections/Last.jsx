@@ -121,7 +121,7 @@ const Lastpage = () => {
   }, []);
 
   return (
-    <div 
+    <section
       ref={containerRef} 
       className='h-[150dvh] max-w-dvw relative flex items-end justify-center pb-5 overflow-hidden'
       style={{
@@ -256,7 +256,7 @@ const Lastpage = () => {
         
       </div>
       
-    </div>
+    </section>
   )
 }
 

@@ -14,44 +14,50 @@ import Lastpage from './sections/Last';
 
 gsap.registerPlugin(ScrollTrigger , ScrollToPlugin ,  ScrollSmoother);
 
+// 🚀 GLOBAL GSAP OPTIMIZATIONS (Lag khatam karne ke liye)
+gsap.config({
+  nullTargetWarn: false,
+  force3D: true, // Har cheez ko GPU par force karega
+});
+
+ScrollTrigger.config({
+  ignoreMobileResize: true, // Mobile par scroll ko stuck nahi hone dega
+});
+
+// Heavy paints aur lag ko rokne ke liye
+ScrollTrigger.normalizeScroll(true);
+
 const App = () => {
   useGSAP(()=>{
-  ScrollSmoother.create({
-    smooth: 3,
-    effects: true,
-  } )
-}) 
-  
+    ScrollSmoother.create({
+      smooth: 2, // 🔥 3 bohot heavy tha, 1.2 heavy websites k liye perfect aur smooth hai
+      effects: true,
+      smoothTouch: 0.1, // Mobile par bhi smooth karega
+    })
+  }) 
   
   return (
     <main>
       <div id="smooth-wrapper">   
-      <div id="smooth-content">
-         
-{/* <Hero/> */}
-<Cars/>
+        <div id="smooth-content">
+             
+          {/* <Hero/> */}
+          <Cars/>
 
-<div>
-<Marketing/>
-<TechnologySection/>
-<EngineeringSection/>
-<GlobalMap/>
-<TestPage/>
-<Lastpage/>
-
-
-{/* <ModernTestimonialsSection/> */}
-
-</div>
-    
+          <div>
+            <Marketing/>
+            <TechnologySection/>
+            <EngineeringSection/>
+            <GlobalMap/>
+            <TestPage/>
+            <Lastpage/>
+            {/* <ModernTestimonialsSection/> */}
+          </div>
+        
         </div>
       </div>
     </main>
-   
   )
 }
 
 export default App
-
-
-

@@ -131,7 +131,7 @@ const TestPage = () => {
   }, { scope: containerRef }); 
 
   return (
-    <div 
+    <section 
       id='tests'
       ref={containerRef} 
       className="h-screen w-full bg-black relative flex flex-col items-center justify-center overflow-hidden"
@@ -172,7 +172,7 @@ const TestPage = () => {
       <div className="absolute top-0 right-0 left-10 w-full h-full z-20 pointer-events-none">
         <Videos />
       </div>
-    </div>
+    </section>
   );
 };
 
