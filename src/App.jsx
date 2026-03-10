@@ -3,7 +3,7 @@ import { ScrollSmoother, ScrollToPlugin , ScrollTrigger } from 'gsap/all';
 // import Hero from './sections/Hero'
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
-// import Cars from './sections/Cars';
+import Cars from './sections/Cars';
 import Marketing from './sections/Marketing';
 import TechnologySection from './sections/Technology';
 import EngineeringSection from './sections/Engineering';
@@ -29,7 +29,7 @@ const App = () => {
       <div id="smooth-content">
          
 {/* <Hero/> */}
-{/* <Cars/> */}
+<Cars/>
 
 <div>
 <Marketing/>
