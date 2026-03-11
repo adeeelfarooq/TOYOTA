@@ -140,7 +140,7 @@ function Hero() {
   return (
     <section
       ref={sectionRef}
-      className="relative h-screen w-screen overflow-hidden bg-toyota-red-soft"
+      className="relative h-screen w-screen overflow-hidden bg-black"
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
     >
