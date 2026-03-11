@@ -8,9 +8,12 @@ function Hero() {
   const introRef = useRef(null);
   const introLogoRef = useRef(null);
 
+  // Background aur Mask ke liye naye refs
+  const bgWrapperRef = useRef(null);
+  const maskContainerRef = useRef(null);
+
   useEffect(() => {
     const ctx = gsap.context(() => {
-      // Hardware acceleration add ki hai text split mein
       const titleSplit = SplitText.create(".title1", { 
         type: "chars",
         charsClass: "transform-gpu will-change-transform" 
@@ -18,7 +21,8 @@ function Hero() {
       
       const tl = gsap.timeline({ defaults: { force3D: true } });
 
-      gsap.set(videoRef.current, { opacity: 0 });
+      // Shuru mein background wrapper ko hide rakha hai
+      gsap.set(bgWrapperRef.current, { opacity: 0 });
 
       // 🔴 INTRO RED SCREEN + LOGO
       tl.set(introRef.current, { yPercent: 0 })
@@ -42,16 +46,12 @@ function Hero() {
           ease: "power4.inOut",
         })
         .to(
-          videoRef.current,
+          // Intro ke baad Background Images show hongi
+          bgWrapperRef.current,
           {
             opacity: 1,
             duration: 1.5,
             ease: "power4.out",
-            onStart: () => {
-              if (videoRef.current) {
-                videoRef.current.play().catch(() => {});
-              }
-            },
           },
           "-=0.7"
         )
@@ -68,7 +68,7 @@ function Hero() {
         )
         .from(".para", { opacity: 0 })
         .to(".para", { opacity: 1, duration: 1 }, "+=0.8")
-        .from(".btn", { opacity: 0 }, "-=0.5") // Logo hatane k baad Button timing adjust
+        .from(".btn", { opacity: 0 }, "-=0.5") 
         .to(
           ".btn",
           {
@@ -83,10 +83,56 @@ function Hero() {
     return () => ctx.revert();
   }, []);
 
+  // 🎯 Lando Norris Style: Mouse Tracking Logic
+  const handleMouseMove = (e) => {
+    const { clientX, clientY } = e;
+    
+    // Mouse move hone par mask ki X aur Y position smooth delay k sath update hogi
+    if (maskContainerRef.current) {
+      gsap.to(maskContainerRef.current, {
+        "--x": `${clientX}px`,
+        "--y": `${clientY}px`,
+        duration: 0.6, // Ye duration usay smooth trail (peechay aane wala) effect deta hai
+        ease: "power3.out",
+      });
+    }
+  };
+
+  const handleMouseEnter = (e) => {
+    const { clientX, clientY } = e;
+    if (maskContainerRef.current) {
+      // Shuru mein achanak se darmyan se na aaye, balkay jahan mouse enter ho wahan set ho
+      gsap.set(maskContainerRef.current, {
+        "--x": `${clientX}px`,
+        "--y": `${clientY}px`,
+      });
+      // Mask ko fade in karna
+      gsap.to(maskContainerRef.current, {
+        opacity: 1,
+        duration: 0.5,
+        ease: "power2.out",
+      });
+    }
+  };
+
+  const handleMouseLeave = () => {
+    if (maskContainerRef.current) {
+      // Hover hatne par mask wapis fade out ho jaye
+      gsap.to(maskContainerRef.current, {
+        opacity: 0,
+        duration: 0.5,
+        ease: "power2.in",
+      });
+    }
+  };
+
   return (
     <section
       ref={sectionRef}
       className="relative h-screen w-screen overflow-hidden bg-toyota-red-soft"
+      onMouseMove={handleMouseMove}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
     >
       {/* 🔴 INTRO RED SCREEN */}
       <div
@@ -102,20 +148,44 @@ function Hero() {
         />
       </div>
 
-      {/* 🎥 VIDEO */}
-      <video
-        ref={videoRef}
-        src="/videos/Toyota-Video_1.webm"
-        muted
-        playsInline
-        preload="auto"
-        className="absolute inset-0 w-full h-full object-cover transform-gpu will-change-opacity"
-      />
+      {/* 🖼️ Lando Norris Smooth Circular Hover Reveal Effect */}
+      <div 
+        ref={bgWrapperRef}
+        className="absolute inset-0 w-full h-full transform-gpu will-change-opacity"
+      >
+        {/* 1. Base Image (Bina Helmet ke) */}
+        <img 
+          src="/images/hero1.png" 
+          className="absolute inset-0 w-full h-full object-cover" 
+          alt="Toyota Base" 
+        />
+        
+        {/* 2. Top Image (Helmet k sath) - Soft Mask Overlay */}
+        <div 
+          ref={maskContainerRef}
+          className="absolute inset-0 z-10 w-full h-full pointer-events-none"
+          style={{
+            // CSS Variables GSAP se control ho rahi hain
+            "--x": "50%",
+            "--y": "50%",
+            // Ye radial gradient ek bada, naram edge wala circle banata hai jo mask ka kaam karta hai
+            WebkitMaskImage: "radial-gradient(circle 30vw at var(--x) var(--y), black 0%, rgba(0,0,0,0.8) 20%, transparent 60%)",
+            maskImage: "radial-gradient(circle 30vw at var(--x) var(--y), black 0%, rgba(0,0,0,0.8) 20%, transparent 60%)",
+            opacity: 0, // Shuru mein mask hidden hai
+          }}
+        >
+          <img 
+            src="/images/spn2.png" 
+            className="w-full h-full object-cover" 
+            alt="Toyota Helmet Hover" 
+          />
+        </div>
+      </div>
 
-      <div className="absolute inset-0 bg-black/30 pointer-events-none" />
+      <div className="absolute inset-0 bg-black/30 pointer-events-none z-10" />
 
       {/* TEXT */}
-      <div className="absolute top-[8%] left-[28%] z-10">
+      <div className="absolute top-[8%] left-[28%] z-20 pointer-events-none">
         <h1 className="title1 text-white text-5xl md:text-8xl font-bold uppercase tracking-[-.35vw]">
           Future of <span className="text-toyota-red">Mobility</span>
         </h1>
@@ -141,6 +211,7 @@ function Hero() {
             hover:text-black
             hover:cursor-pointer
             z-10
+            pointer-events-auto
             transform-gpu will-change-opacity
           "
         >
