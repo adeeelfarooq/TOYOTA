@@ -8,9 +8,11 @@ function Hero() {
   const introRef = useRef(null);
   const introLogoRef = useRef(null);
 
-  // Background aur Mask ke liye naye refs
+  // 🎯 Background, SVG Mask Circle, aur Bubbling ke Refs
   const bgWrapperRef = useRef(null);
-  const maskContainerRef = useRef(null);
+  const maskCircleRef = useRef(null); // Ab hum is circle ko animate karenge
+  const turbulenceRef = useRef(null);
+  const timerRef = useRef(null); // 1 second track karne ke liye
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -21,7 +23,6 @@ function Hero() {
       
       const tl = gsap.timeline({ defaults: { force3D: true } });
 
-      // Shuru mein background wrapper ko hide rakha hai
       gsap.set(bgWrapperRef.current, { opacity: 0 });
 
       // 🔴 INTRO RED SCREEN + LOGO
@@ -46,7 +47,6 @@ function Hero() {
           ease: "power4.inOut",
         })
         .to(
-          // Intro ke baad Background Images show hongi
           bgWrapperRef.current,
           {
             opacity: 1,
@@ -78,50 +78,61 @@ function Hero() {
           },
           "-=0.5"
         );
+
+      // 🌊 CONTINUOUS BUBBLING ANIMATION
+      // Ye sirf SVG Mask Shape ko hila raha hai, picture ko nahi
+      gsap.to(turbulenceRef.current, {
+        attr: { baseFrequency: "0.015 0.025" }, 
+        duration: 3,
+        repeat: -1,
+        yoyo: true,
+        ease: "sine.inOut"
+      });
+
     }, sectionRef);
 
-    return () => ctx.revert();
+    return () => {
+      ctx.revert();
+      if (timerRef.current) clearTimeout(timerRef.current);
+    };
   }, []);
 
-  // 🎯 Lando Norris Style: Mouse Tracking Logic
+  // 🎯 Lando Norris Style: Mouse Tracking
   const handleMouseMove = (e) => {
     const { clientX, clientY } = e;
-    
-    // Mouse move hone par mask ki X aur Y position smooth delay k sath update hogi
-    if (maskContainerRef.current) {
-      gsap.to(maskContainerRef.current, {
-        "--x": `${clientX}px`,
-        "--y": `${clientY}px`,
-        duration: 0.6, // Ye duration usay smooth trail (peechay aane wala) effect deta hai
+
+    if (maskCircleRef.current) {
+      // 25vw k hisab se dynamic radius calculate kiya
+      const targetRadius = window.innerWidth * 0.25; 
+
+      // 1. Mask Shape (Circle) ko mouse ki jagah par lana aur radius bara karna
+      gsap.to(maskCircleRef.current, {
+        attr: { cx: clientX, cy: clientY, r: targetRadius },
+        duration: 0.5,
         ease: "power3.out",
       });
-    }
-  };
 
-  const handleMouseEnter = (e) => {
-    const { clientX, clientY } = e;
-    if (maskContainerRef.current) {
-      // Shuru mein achanak se darmyan se na aaye, balkay jahan mouse enter ho wahan set ho
-      gsap.set(maskContainerRef.current, {
-        "--x": `${clientX}px`,
-        "--y": `${clientY}px`,
-      });
-      // Mask ko fade in karna
-      gsap.to(maskContainerRef.current, {
-        opacity: 1,
-        duration: 0.5,
-        ease: "power2.out",
-      });
+      // 2. Pehle wala timer cancel karo
+      if (timerRef.current) clearTimeout(timerRef.current);
+
+      // 3. 1 SECOND Timer: Mouse rokne k baad radius wapis 0 (gayab) ho jayega
+      timerRef.current = setTimeout(() => {
+        gsap.to(maskCircleRef.current, {
+          attr: { r: 0 }, // Wapis shrink ho k evaporation effect
+          duration: 1.2, 
+          ease: "power2.inOut",
+        });
+      }, 1000); 
     }
   };
 
   const handleMouseLeave = () => {
-    if (maskContainerRef.current) {
-      // Hover hatne par mask wapis fade out ho jaye
-      gsap.to(maskContainerRef.current, {
-        opacity: 0,
-        duration: 0.5,
-        ease: "power2.in",
+    if (timerRef.current) clearTimeout(timerRef.current);
+    if (maskCircleRef.current) {
+      gsap.to(maskCircleRef.current, {
+        attr: { r: 0 },
+        duration: 1.2,
+        ease: "power2.inOut",
       });
     }
   };
@@ -131,9 +142,49 @@ function Hero() {
       ref={sectionRef}
       className="relative h-screen w-screen overflow-hidden bg-toyota-red-soft"
       onMouseMove={handleMouseMove}
-      onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
+      {/* 🟢 PERFECT SVG MASK ENGINE */}
+      <svg className="absolute w-0 h-0">
+        <defs>
+          {/* Radial Gradient for Soft Edges (Brush jaisa naram edge) */}
+          <radialGradient id="soft-brush" cx="50%" cy="50%" r="50%">
+            <stop offset="50%" stopColor="white" />
+            <stop offset="100%" stopColor="black" />
+          </radialGradient>
+
+          {/* Bubbling Filter applied ONLY to the Mask, NOT the image */}
+          <filter id="blob-edge" x="-50%" y="-50%" width="200%" height="200%">
+            <feTurbulence 
+              ref={turbulenceRef} 
+              type="fractalNoise" 
+              baseFrequency="0.02" 
+              numOctaves="3" 
+              result="noise" 
+            />
+            <feDisplacementMap 
+              in="SourceGraphic" 
+              in2="noise" 
+              scale="60" /* Bubbling kinaray (edges) kitne rough honge */
+              xChannelSelector="R" 
+              yChannelSelector="B" 
+            />
+          </filter>
+
+          <mask id="liquid-mask">
+            {/* Ye wo circle hai jo mouse ko follow karega aur animate hoga */}
+            <circle 
+              ref={maskCircleRef}
+              cx="50%" 
+              cy="50%" 
+              r="0" /* Shuru mein radius 0 hai (hidden) */
+              fill="url(#soft-brush)" 
+              filter="url(#blob-edge)" 
+            />
+          </mask>
+        </defs>
+      </svg>
+
       {/* 🔴 INTRO RED SCREEN */}
       <div
         ref={introRef}
@@ -148,10 +199,10 @@ function Hero() {
         />
       </div>
 
-      {/* 🖼️ Lando Norris Smooth Circular Hover Reveal Effect */}
+      {/* 🖼️ BACKGROUND & PERFECT LIQUID REVEAL */}
       <div 
         ref={bgWrapperRef}
-        className="absolute inset-0 w-full h-full transform-gpu will-change-opacity"
+        className="absolute inset-0 w-full h-full"
       >
         {/* 1. Base Image (Bina Helmet ke) */}
         <img 
@@ -160,26 +211,18 @@ function Hero() {
           alt="Toyota Base" 
         />
         
-        {/* 2. Top Image (Helmet k sath) - Soft Mask Overlay */}
-        <div 
-          ref={maskContainerRef}
-          className="absolute inset-0 z-10 w-full h-full pointer-events-none"
+        {/* 2. Top Image (Helmet k sath) - ONLY SVG MASK APPLIED HERE */}
+        <img 
+          src="/images/spn2.png" 
+          className="absolute -translate-x-4 translate-y-3 scale-95 inset-0 w-full h-full object-cover pointer-events-none will-change-transform" 
+          alt="Toyota Helmet Hover" 
           style={{
-            // CSS Variables GSAP se control ho rahi hain
-            "--x": "50%",
-            "--y": "50%",
-            // Ye radial gradient ek bada, naram edge wala circle banata hai jo mask ka kaam karta hai
-            WebkitMaskImage: "radial-gradient(circle 30vw at var(--x) var(--y), black 0%, rgba(0,0,0,0.8) 20%, transparent 60%)",
-            maskImage: "radial-gradient(circle 30vw at var(--x) var(--y), black 0%, rgba(0,0,0,0.8) 20%, transparent 60%)",
-            opacity: 0, // Shuru mein mask hidden hai
+            // Yahan humne image par Mask apply kiya hai.
+            // Image HD rahegi, sirf mask edge par bubble hoga.
+            WebkitMaskImage: "url(#liquid-mask)",
+            maskImage: "url(#liquid-mask)",
           }}
-        >
-          <img 
-            src="/images/spn2.png" 
-            className="w-full h-full object-cover" 
-            alt="Toyota Helmet Hover" 
-          />
-        </div>
+        />
       </div>
 
       <div className="absolute inset-0 bg-black/30 pointer-events-none z-10" />
