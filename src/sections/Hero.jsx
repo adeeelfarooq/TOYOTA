@@ -8,14 +8,9 @@ function Hero() {
   const introRef = useRef(null);
   const introLogoRef = useRef(null);
 
-  // 🎯 Background, SVG Mask Circle, aur Bubbling ke Refs
-  const bgWrapperRef = useRef(null);
-  const maskCircleRef = useRef(null); // Ab hum is circle ko animate karenge
-  const turbulenceRef = useRef(null);
-  const timerRef = useRef(null); // 1 second track karne ke liye
-
   useEffect(() => {
     const ctx = gsap.context(() => {
+      // Hardware acceleration add ki hai text split mein
       const titleSplit = SplitText.create(".title1", { 
         type: "chars",
         charsClass: "transform-gpu will-change-transform" 
@@ -23,7 +18,7 @@ function Hero() {
       
       const tl = gsap.timeline({ defaults: { force3D: true } });
 
-      gsap.set(bgWrapperRef.current, { opacity: 0 });
+      gsap.set(videoRef.current, { opacity: 0 });
 
       // 🔴 INTRO RED SCREEN + LOGO
       tl.set(introRef.current, { yPercent: 0 })
@@ -47,11 +42,16 @@ function Hero() {
           ease: "power4.inOut",
         })
         .to(
-          bgWrapperRef.current,
+          videoRef.current,
           {
             opacity: 1,
             duration: 1.5,
             ease: "power4.out",
+            onStart: () => {
+              if (videoRef.current) {
+                videoRef.current.play().catch(() => {});
+              }
+            },
           },
           "-=0.7"
         )
@@ -68,7 +68,7 @@ function Hero() {
         )
         .from(".para", { opacity: 0 })
         .to(".para", { opacity: 1, duration: 1 }, "+=0.8")
-        .from(".btn", { opacity: 0 }, "-=0.5") 
+        .from(".btn", { opacity: 0 }, "-=0.5") // Logo hatane k baad Button timing adjust
         .to(
           ".btn",
           {
@@ -78,113 +78,16 @@ function Hero() {
           },
           "-=0.5"
         );
-
-      // 🌊 CONTINUOUS BUBBLING ANIMATION
-      // Ye sirf SVG Mask Shape ko hila raha hai, picture ko nahi
-      gsap.to(turbulenceRef.current, {
-        attr: { baseFrequency: "0.015 0.025" }, 
-        duration: 3,
-        repeat: -1,
-        yoyo: true,
-        ease: "sine.inOut"
-      });
-
     }, sectionRef);
 
-    return () => {
-      ctx.revert();
-      if (timerRef.current) clearTimeout(timerRef.current);
-    };
+    return () => ctx.revert();
   }, []);
-
-  // 🎯 Lando Norris Style: Mouse Tracking
-  const handleMouseMove = (e) => {
-    const { clientX, clientY } = e;
-
-    if (maskCircleRef.current) {
-      // 25vw k hisab se dynamic radius calculate kiya
-      const targetRadius = window.innerWidth * 0.25; 
-
-      // 1. Mask Shape (Circle) ko mouse ki jagah par lana aur radius bara karna
-      gsap.to(maskCircleRef.current, {
-        attr: { cx: clientX, cy: clientY, r: targetRadius },
-        duration: 0.5,
-        ease: "power3.out",
-      });
-
-      // 2. Pehle wala timer cancel karo
-      if (timerRef.current) clearTimeout(timerRef.current);
-
-      // 3. 1 SECOND Timer: Mouse rokne k baad radius wapis 0 (gayab) ho jayega
-      timerRef.current = setTimeout(() => {
-        gsap.to(maskCircleRef.current, {
-          attr: { r: 0 }, // Wapis shrink ho k evaporation effect
-          duration: 1.2, 
-          ease: "power2.inOut",
-        });
-      }, 1000); 
-    }
-  };
-
-  const handleMouseLeave = () => {
-    if (timerRef.current) clearTimeout(timerRef.current);
-    if (maskCircleRef.current) {
-      gsap.to(maskCircleRef.current, {
-        attr: { r: 0 },
-        duration: 1.2,
-        ease: "power2.inOut",
-      });
-    }
-  };
 
   return (
     <section
       ref={sectionRef}
-      className="relative h-screen w-screen overflow-hidden bg-black"
-      onMouseMove={handleMouseMove}
-      onMouseLeave={handleMouseLeave}
+      className="relative h-screen w-screen overflow-hidden bg-toyota-red-soft"
     >
-      {/* 🟢 PERFECT SVG MASK ENGINE */}
-      <svg className="absolute w-0 h-0">
-        <defs>
-          {/* Radial Gradient for Soft Edges (Brush jaisa naram edge) */}
-          <radialGradient id="soft-brush" cx="50%" cy="50%" r="50%">
-            <stop offset="50%" stopColor="white" />
-            <stop offset="100%" stopColor="black" />
-          </radialGradient>
-
-          {/* Bubbling Filter applied ONLY to the Mask, NOT the image */}
-          <filter id="blob-edge" x="-50%" y="-50%" width="200%" height="200%">
-            <feTurbulence 
-              ref={turbulenceRef} 
-              type="fractalNoise" 
-              baseFrequency="0.02" 
-              numOctaves="3" 
-              result="noise" 
-            />
-            <feDisplacementMap 
-              in="SourceGraphic" 
-              in2="noise" 
-              scale="60" /* Bubbling kinaray (edges) kitne rough honge */
-              xChannelSelector="R" 
-              yChannelSelector="B" 
-            />
-          </filter>
-
-          <mask id="liquid-mask">
-            {/* Ye wo circle hai jo mouse ko follow karega aur animate hoga */}
-            <circle 
-              ref={maskCircleRef}
-              cx="50%" 
-              cy="50%" 
-              r="0" /* Shuru mein radius 0 hai (hidden) */
-              fill="url(#soft-brush)" 
-              filter="url(#blob-edge)" 
-            />
-          </mask>
-        </defs>
-      </svg>
-
       {/* 🔴 INTRO RED SCREEN */}
       <div
         ref={introRef}
@@ -199,36 +102,20 @@ function Hero() {
         />
       </div>
 
-      {/* 🖼️ BACKGROUND & PERFECT LIQUID REVEAL */}
-      <div 
-        ref={bgWrapperRef}
-        className="absolute inset-0 w-full h-full"
-      >
-        {/* 1. Base Image (Bina Helmet ke) */}
-        <img 
-          src="/images/hero1.png" 
-          className="absolute inset-0 w-full h-full object-cover" 
-          alt="Toyota Base" 
-        />
-        
-        {/* 2. Top Image (Helmet k sath) - ONLY SVG MASK APPLIED HERE */}
-        <img 
-          src="/images/spn2.png" 
-          className="absolute -translate-x-4 translate-y-3 scale-95 inset-0 w-full h-full object-cover pointer-events-none will-change-transform" 
-          alt="Toyota Helmet Hover" 
-          style={{
-            // Yahan humne image par Mask apply kiya hai.
-            // Image HD rahegi, sirf mask edge par bubble hoga.
-            WebkitMaskImage: "url(#liquid-mask)",
-            maskImage: "url(#liquid-mask)",
-          }}
-        />
-      </div>
+      {/* 🎥 VIDEO */}
+      <video
+        ref={videoRef}
+        src="/videos/Toyota-Video_1.webm"
+        muted
+        playsInline
+        preload="auto"
+        className="absolute inset-0 w-full h-full object-cover transform-gpu will-change-opacity"
+      />
 
-      <div className="absolute inset-0 bg-black/30 pointer-events-none z-10" />
+      <div className="absolute inset-0 bg-black/30 pointer-events-none" />
 
       {/* TEXT */}
-      <div className="absolute top-[8%] left-[28%] z-20 pointer-events-none">
+      <div className="absolute top-[8%] left-[28%] z-10">
         <h1 className="title1 text-white text-5xl md:text-8xl font-bold uppercase tracking-[-.35vw]">
           Future of <span className="text-toyota-red">Mobility</span>
         </h1>
@@ -254,7 +141,6 @@ function Hero() {
             hover:text-black
             hover:cursor-pointer
             z-10
-            pointer-events-auto
             transform-gpu will-change-opacity
           "
         >

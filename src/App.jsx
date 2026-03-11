@@ -1,6 +1,6 @@
 import React from 'react'
 import { ScrollSmoother, ScrollToPlugin , ScrollTrigger } from 'gsap/all';
-// import Hero from './sections/Hero'
+
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
 import Cars from './sections/Cars';
@@ -10,8 +10,9 @@ import EngineeringSection from './sections/Engineering';
 import TestPage from './sections/Test';
 import GlobalMap from './sections/Map';
 import Lastpage from './sections/Last';
-import Hero from './sections/Hero';
 import Logo from './components/Logo';
+import Hero2 from './sections/Hero2';
+
 // import ModernTestimonialsSection from './sections/Testimonial';
 
 gsap.registerPlugin(ScrollTrigger , ScrollToPlugin ,  ScrollSmoother);
@@ -43,8 +44,8 @@ const App = () => {
       <Logo/>
       <div id="smooth-wrapper">   
         <div id="smooth-content">
-             
-          <Hero/>
+             <Hero2/>
+          
           <Cars/>
 
           <div>
