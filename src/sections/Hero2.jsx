@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import gsap from "gsap";
+import { cover } from "three/src/extras/TextureUtils.js";
 
 function Hero2() {
   const sectionRef = useRef(null);
@@ -104,10 +105,17 @@ function Hero2() {
 
   return (
     <section
+    style={{
+        backgroundImage: "url('/images/bg-1.png') ",
+        backgroundSize: "cover", // Quotes lazmi hain
+            backgroundPosition: "center",
+            
+    }}
       ref={sectionRef}
       className="relative h-screen w-screen overflow-hidden bg-black"
       onMouseMove={handleMouseMove}
     >
+        <div className="absolute inset-0 bg-black/50 z-0"></div>
       {/* 🟢 PERFECT SVG MASK TRAIL ENGINE */}
       <svg className="absolute w-0 h-0 pointer-events-none">
         <defs>
