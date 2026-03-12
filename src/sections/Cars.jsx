@@ -115,7 +115,7 @@ export default function Cars() {
   }, [filteredCars]);
 
   return (
-    <section className="bg-black text-white px-14 py-25 overflow-hidden carsmodels cars-section">
+    <section id="carsmodels" className="bg-black text-white px-14 py-25 overflow-hidden carsmodels cars-section">
       <div className="flex items-end justify-between -mb-16 msgs">
         <h1 className="text-7xl font-sans first-message origin-bottom-left">
           EXPLORE MODELS

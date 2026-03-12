@@ -55,21 +55,21 @@ function Hero2() {
   const handleMouseMove = (e) => {
     const { clientX, clientY } = e;
     
-    if (!sectionRef.current || !bgWrapperRef.current) return;
+    if (!sectionRef.current) return;
 
-    // 🖱️ Image move parallax
+    // 🖱️ Parallax logic - Targetting ONLY the images, not the wrapper
     const { left, top, width, height } = sectionRef.current.getBoundingClientRect();
     const x = (clientX - left) / width - 0.5;
     const y = (clientY - top) / height - 0.5;
     
-    gsap.to(bgWrapperRef.current, {
+    gsap.to(".parallax-target", {
       x: x * 30,
       y: y * 20,
       duration: 1,
       ease: "power2.out"
     });
 
-    // Brush trail logic (Relative to the main container)
+    // 🖌️ Brush trail logic
     const rect = bgWrapperRef.current.getBoundingClientRect();
     const localX = clientX - rect.left;
     const localY = clientY - rect.top;
@@ -92,24 +92,19 @@ function Hero2() {
     <section
       ref={sectionRef}
       className="relative h-screen w-screen overflow-hidden bg-black flex items-center justify-center p-4 lg:p-6"
-      
       onMouseMove={handleMouseMove}
     >
-      
-
-      {/* 🟢 SVG DEFS: Filters, Mask & Cutouts */}
+      {/* 🟢 SVG DEFS */}
       <svg className="absolute w-0 h-0 pointer-events-none">
         <defs>
           <radialGradient id="soft-brush">
             <stop offset="30%" stopColor="white" stopOpacity="1" />
             <stop offset="100%" stopColor="white" stopOpacity="0" />
           </radialGradient>
-
           <filter id="blob-edge" x="-50%" y="-50%" width="200%" height="200%">
             <feTurbulence ref={turbulenceRef} type="fractalNoise" baseFrequency="0.015" numOctaves="3" result="noise" />
             <feDisplacementMap in="SourceGraphic" in2="noise" scale="40" xChannelSelector="R" yChannelSelector="B" />
           </filter>
-
           <mask id="liquid-trail-mask">
             <rect width="100%" height="100%" fill="black" />
             <g filter="url(#blob-edge)">
@@ -118,29 +113,8 @@ function Hero2() {
               ))}
             </g>
           </mask>
-
-          {/* 🔥 FUTURISTIC UI FRAME CLIPPATH (Exactly as Reference image) */}
           <clipPath id="panel-clip" clipPathUnits="objectBoundingBox">
-            <path d="
-              M 0.04, 0 
-              L 0.70, 0 
-              C 0.72, 0 0.73, 0.02 0.73, 0.05 
-              L 0.73, 0.15 
-              C 0.73, 0.18 0.74, 0.20 0.77, 0.20 
-              L 0.98, 0.20 
-              C 0.99, 0.20 1.0, 0.22 1.0, 0.25 
-              L 1.0, 0.60 
-              C 1.0, 0.63 0.99, 0.65 0.96, 0.65 
-              L 0.77, 0.65 
-              C 0.74, 0.65 0.73, 0.67 0.73, 0.70 
-              L 0.73, 0.95 
-              C 0.73, 0.98 0.72, 1.0 0.70, 1.0 
-              L 0.04, 1.0 
-              C 0.02, 1.0 0, 0.98 0, 0.95 
-              L 0, 0.05 
-              C 0, 0.02 0.02, 0 0.04, 0 
-              Z
-            " />
+            <path d="M 0.04, 0 L 0.70, 0 C 0.72, 0 0.73, 0.02 0.73, 0.05 L 0.73, 0.15 C 0.73, 0.18 0.74, 0.20 0.77, 0.20 L 0.98, 0.20 C 0.99, 0.20 1.0, 0.22 1.0, 0.25 L 1.0, 0.60 C 1.0, 0.63 0.99, 0.65 0.96, 0.65 L 0.77, 0.65 C 0.74, 0.65 0.73, 0.67 0.73, 0.70 L 0.73, 0.95 C 0.73, 0.98 0.72, 1.0 0.70, 1.0 L 0.04, 1.0 C 0.02, 1.0 0, 0.98 0, 0.95 L 0, 0.05 C 0, 0.02 0.02, 0 0.04, 0 Z" />
           </clipPath>
         </defs>
       </svg>
@@ -163,8 +137,8 @@ function Hero2() {
             backgroundColor: "rgba(0,0,0,0.95)"
           }}
         >
-          {/* 🅱️ TOYOTA LAYERS (RESTORED) */}
-          <div ref={mainTextRef} className="absolute z-[-999] inset-0 flex items-center justify-center pointer-events-none z-0 mt-10">
+          {/* 🅱️ TOYOTA LAYERS */}
+          <div ref={mainTextRef} className="absolute z-0 inset-0 flex items-center justify-center pointer-events-none mt-10">
             <div className="stacked-text flex flex-col items-center uppercase font-black text-[6rem] md:text-[10rem] lg:text-[15rem] leading-none tracking-tighter" style={{ fontFamily: "'Google Sans Flex', sans-serif" }}>
               <div className="overflow-hidden h-[0.9em] flex items-start"><span className="block text-toyota-red opacity-40">TOYOTA</span></div>
               <div className="overflow-hidden h-[0.65em] flex items-start opacity-80 -mt-[0.05em]"><span className="block text-transparent" style={{ WebkitTextStroke: "2px white" }}>TOYOTA</span></div>
@@ -174,28 +148,22 @@ function Hero2() {
             </div>
           </div>
 
-          {/* CAR IMAGES (Base + Masked) */}
-          <img src="/images/hero1.png" className="absolute inset-0 w-full h-full object-cover z-1000 scale-70 opacity-90" alt="Base" />
-          <img 
-            src="/images/spn2.png" 
-            className="absolute z-1000 inset-0 w-full h-full object-cover scale-x-68 scale-70 pointer-events-none" 
-            style={{ WebkitMaskImage: "url(#liquid-trail-mask)", maskImage: "url(#liquid-trail-mask)" }} 
-            alt="Hover" 
-          />
+          {/* 🏎️ CAR IMAGES (Targeted with 'parallax-target') */}
+          <div className="absolute inset-0 w-full h-full parallax-target">
+            <img src="/images/hero1.png" className="absolute inset-0 w-full h-full object-cover scale-70 " alt="Base" />
+            <img 
+              src="/images/spn2.png" 
+              className="absolute inset-0 w-full h-full object-cover  scale-68 pointer-events-none mt-2 -ml-2" 
+              style={{ WebkitMaskImage: "url(#liquid-trail-mask)", maskImage: "url(#liquid-trail-mask)" }} 
+              alt="Hover" 
+            />
+          </div>
 
-          <div
-          style={{
-            
-    
-        backgroundImage: "url('/images/bg-1.png')",
-        backgroundSize: "cover",
-   
-          }}
-           className="absolute inset-0 z-[-1000] bg-gradient-to-t from-black via-transparent to-transparent pointer-events-none z-10" />
+          {/* Inner Background Backdrop */}
+         
         </div>
-        
 
-        {/* 2️⃣ TOP RIGHT MODULE (Menu / Search / Contact) */}
+        {/* 2️⃣ TOP RIGHT MODULE */}
         <div className="absolute top-0 right-0 w-[24%] h-[18%] flex flex-col items-end gap-3 pointer-events-none">
             <div className="flex gap-2 pointer-events-auto">
               <button className="w-12 h-12 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white flex items-center justify-center hover:bg-toyota-red transition-all cursor-pointer">
@@ -213,7 +181,7 @@ function Hero2() {
             </button>
         </div>
 
-        {/* 3️⃣ BOTTOM RIGHT MODULE (Sub-Card + Arrows) */}
+        {/* 3️⃣ BOTTOM RIGHT MODULE */}
         <div className="absolute bottom-0 right-0 w-[24%] h-[32%] flex flex-col justify-end gap-3 pointer-events-none">
             <div className="flex justify-end gap-2 pointer-events-auto">
                <button className="w-10 h-10 rounded-full border border-white/20 bg-white/5 text-white flex items-center justify-center text-xs hover:bg-white hover:text-black transition-all cursor-pointer">←</button>
@@ -234,7 +202,7 @@ function Hero2() {
         {/* EXPLORE MODELS CTA */}
         <div ref={uiElementsRef} className="absolute bottom-10 left-[5%] z-30 pointer-events-auto">
           <button
-            onClick={() => gsap.to(window, { duration: 2, scrollTo: "#msgg" })}
+            onClick={() => gsap.to(window, { duration: 2, scrollTo: "#footer" })}
             className="group flex items-center gap-6 px-10 py-5 bg-white/10 backdrop-blur-lg border border-white/20 rounded-full hover:bg-white hover:text-black transition-all duration-500"
           >
             <span className="text-xs font-black uppercase tracking-[0.3em] text-white group-hover:text-black">Explore Models</span>

@@ -122,6 +122,7 @@ const Lastpage = () => {
 
   return (
     <section
+    id='footer'
       ref={containerRef} 
       className='h-[150dvh] max-w-dvw relative flex items-end justify-center pb-5 overflow-hidden'
       style={{
