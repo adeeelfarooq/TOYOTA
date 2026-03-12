@@ -183,7 +183,7 @@ function Hero2() {
         >
           {/* Main Solid Text (Top) - Ab yeh mukammal red hai */}
           <div className="overflow-hidden h-[0.9em] flex items-start">
-            <span className="block whitespace-nowrap text-toyota-red">TOYOTA</span>
+            <span className="block whitespace-nowrap text-toyota-red opacity-40">TOYOTA</span>
           </div>
 
           {/* Layer 1 (Cut) */}
