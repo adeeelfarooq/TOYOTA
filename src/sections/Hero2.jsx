@@ -8,8 +8,8 @@ function Hero2() {
 
   const bgWrapperRef = useRef(null);
   const turbulenceRef = useRef(null);
-  const mainTextRef = useRef(null); // Text ki animation k liye
-  const uiElementsRef = useRef(null); // Modern UI elements k liye
+  const mainTextRef = useRef(null); 
+  const uiElementsRef = useRef(null); 
   
   // 🎯 Brush Trail Engine k Refs
   const circlesRef = useRef([]); 
@@ -58,7 +58,20 @@ function Hero2() {
   // 🎯 Liquid Brush Trail Logic
   const handleMouseMove = (e) => {
     const { clientX, clientY } = e;
+    
+    // 🖱️ Image move effect on hover - Yeh naya add kiya hai
+    const { left, top, width, height } = sectionRef.current.getBoundingClientRect();
+    const x = (clientX - left) / width - 0.5;
+    const y = (clientY - top) / height - 0.5;
+    
+    gsap.to(bgWrapperRef.current, {
+      x: x * 30,  // 30 pixels left/right movement
+      y: y * 20,  // 20 pixels up/down movement
+      duration: 1,
+      ease: "power2.out"
+    });
 
+    // Brush trail logic (yeh pehle se tha)
     for (let i = 0; i < 2; i++) {
       const circle = circlesRef.current[circleIndex.current];
       
@@ -92,8 +105,7 @@ function Hero2() {
   return (
     <section
       ref={sectionRef}
-      // Toyota Red aur Black ka premium radial gradient background
-      className="relative h-screen w-screen overflow-hidden bg-[radial-gradient(circle_at_center,_#3f0000_0%,_#050505_80%,_#000000_100%)]"
+      className="relative h-screen w-screen overflow-hidden bg-black"
       onMouseMove={handleMouseMove}
     >
       {/* 🟢 PERFECT SVG MASK TRAIL ENGINE */}
@@ -154,7 +166,6 @@ function Hero2() {
       </div>
 
       {/* 🅱️ BIG CASCADING TOYOTA TEXT (Background Me) */}
-      {/* 4 Layers jo neechay flow karti hui nazar aayengi */}
       <div 
         ref={mainTextRef}
         className="absolute inset-0 flex items-center justify-center pointer-events-none z-0 transform-gpu will-change-transform mt-10"
@@ -162,9 +173,9 @@ function Hero2() {
         <div className="stacked-text flex flex-col items-center uppercase font-black text-[6rem] md:text-[10rem] lg:text-[15rem] leading-none tracking-tighter"
           style={{ fontFamily: "'Google Sans Flex', sans-serif" }}
         >
-          {/* Main Solid Text (Top) */}
+          {/* Main Solid Text (Top) - Ab yeh mukammal red hai */}
           <div className="overflow-hidden h-[0.9em] flex items-start">
-            <span className="block whitespace-nowrap">TOY<span className="text-toyota-red">OTA</span></span>
+            <span className="block whitespace-nowrap text-toyota-red">TOYOTA</span>
           </div>
 
           {/* Layer 1 (Cut) */}
@@ -200,7 +211,7 @@ function Hero2() {
       {/* 🖼️ CAR IMAGES LAYER (Text k Upar hogi, Trail Mask k sath) */}
       <div 
         ref={bgWrapperRef}
-        className="absolute inset-0 w-full h-full z-10 pointer-events-none"
+        className="absolute inset-0 w-full h-full z-10 pointer-events-none will-change-transform"
       >
         {/* 1. Base Image (Bina Helmet/Car k) */}
         <img 
@@ -224,32 +235,7 @@ function Hero2() {
       {/* 💻 MODERN UI ELEMENTS (Overlays) */}
       <div ref={uiElementsRef} className="absolute inset-0 z-20 pointer-events-none">
         
-        {/* Top Left Tech Details */}
-        <div className="absolute top-10 left-10 flex flex-col gap-1 text-[10px] md:text-xs font-mono tracking-[0.2em] text-white/50 uppercase">
-          <p className="text-white">/// GAZOO RACING</p>
-          <p>Performance Division</p>
-          <p className="text-toyota-red">EST. 1937</p>
-        </div>
-
-        {/* Top Right Crosshair */}
-        <div className="absolute top-10 right-10 text-white/30 font-light text-2xl">
-          +
-        </div>
-
-        {/* Bottom Left Specs */}
-        <div className="absolute bottom-10 left-10 flex flex-col gap-2 border-l-2 border-toyota-red pl-4">
-          <div className="text-white/80 font-mono text-xs tracking-widest uppercase">
-            <span className="opacity-50">Engine // </span> Hybrid Synergy
-          </div>
-          <div className="text-white/80 font-mono text-xs tracking-widest uppercase">
-            <span className="opacity-50">Output // </span> 382 HP
-          </div>
-          <div className="text-white/80 font-mono text-xs tracking-widest uppercase">
-            <span className="opacity-50">0-60 MPH // </span> 3.8s
-          </div>
-        </div>
-
-        {/* Bottom Right CTA Button */}
+        {/* Bottom Right CTA Button (Baki sab remove kar diya) */}
         <div className="absolute bottom-10 right-10 pointer-events-auto">
           <button
             onClick={() => gsap.to(window, { duration: 2, scrollTo: "#msgg" })}
