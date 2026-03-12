@@ -4,15 +4,16 @@ import gsap from "gsap";
 
 function Hero2() {
   const sectionRef = useRef(null);
-  const videoRef = useRef(null);
   const introRef = useRef(null);
   const introLogoRef = useRef(null);
 
-  // 🎯 Background, SVG Mask Circle, aur Bubbling ke Refs
   const bgWrapperRef = useRef(null);
-  const maskCircleRef = useRef(null); // Ab hum is circle ko animate karenge
   const turbulenceRef = useRef(null);
-  const timerRef = useRef(null); // 1 second track karne ke liye
+  
+  // 🎯 Brush Trail Engine k Refs
+  const circlesRef = useRef([]); // Mouse k peechay banne wale circles ka array
+  const circleIndex = useRef(0); // Kaunsa circle abhi use karna hai
+  const NUM_CIRCLES = 50; // Total circles jo trail banayenge (Zyada = Smooth Brush)
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -29,60 +30,22 @@ function Hero2() {
       tl.set(introRef.current, { yPercent: 0 })
         .fromTo(
           introLogoRef.current,
-          {
-            opacity: 0,
-            clipPath: "polygon(0 0, 0 0, 0 100%, 0 100%)",
-          },
-          {
-            opacity: 1,
-            clipPath: "polygon(0 0, 100% 0, 100% 100%, 0 100%)",
-            duration: 2,
-            ease: "power3.out",
-          }
+          { opacity: 0, clipPath: "polygon(0 0, 0 0, 0 100%, 0 100%)" },
+          { opacity: 1, clipPath: "polygon(0 0, 100% 0, 100% 100%, 0 100%)", duration: 2, ease: "power3.out" }
         )
         .to({}, { duration: 1 })
-        .to(introRef.current, {
-          yPercent: -100,
-          duration: 1.4,
-          ease: "power4.inOut",
-        })
-        .to(
-          bgWrapperRef.current,
-          {
-            opacity: 1,
-            duration: 1.5,
-            ease: "power4.out",
-          },
-          "-=0.7"
-        )
+        .to(introRef.current, { yPercent: -100, duration: 1.4, ease: "power4.inOut" })
+        .to(bgWrapperRef.current, { opacity: 1, duration: 1.5, ease: "power4.out" }, "-=0.7")
         .from(titleSplit.chars, { opacity: 0 }, "+=2.6")
-        .to(
-          titleSplit.chars,
-          {
-            opacity: 1,
-            yPercent: -20,
-            stagger: 0.09,
-            ease: "power2.out",
-          },
-          "+=0.8"
-        )
+        .to(titleSplit.chars, { opacity: 1, yPercent: -20, stagger: 0.09, ease: "power2.out" }, "+=0.8")
         .from(".para", { opacity: 0 })
         .to(".para", { opacity: 1, duration: 1 }, "+=0.8")
         .from(".btn", { opacity: 0 }, "-=0.5") 
-        .to(
-          ".btn",
-          {
-            opacity: 1,
-            duration: 1,
-            ease: "power3.out",
-          },
-          "-=0.5"
-        );
+        .to(".btn", { opacity: 1, duration: 1, ease: "power3.out" }, "-=0.5");
 
-      // 🌊 CONTINUOUS BUBBLING ANIMATION
-      // Ye sirf SVG Mask Shape ko hila raha hai, picture ko nahi
+      // 🌊 CONTINUOUS BUBBLING ANIMATION FOR BRUSH EDGES
       gsap.to(turbulenceRef.current, {
-        attr: { baseFrequency: "0.015 0.025" }, 
+        attr: { baseFrequency: "0.01 0.02" }, 
         duration: 3,
         repeat: -1,
         yoyo: true,
@@ -91,49 +54,52 @@ function Hero2() {
 
     }, sectionRef);
 
-    return () => {
-      ctx.revert();
-      if (timerRef.current) clearTimeout(timerRef.current);
-    };
+    return () => ctx.revert();
   }, []);
 
-  // 🎯 Lando Norris Style: Mouse Tracking
+  // 🎯 Lando Norris / Framer Style Brush Trail Logic
   const handleMouseMove = (e) => {
     const { clientX, clientY } = e;
 
-    if (maskCircleRef.current) {
-      // 25vw k hisab se dynamic radius calculate kiya
-      const targetRadius = window.innerWidth * 0.25; 
+    // Brush ko ghana/thicker banane k liye hum ek move par 2 circles spawn karte hain
+    for (let i = 0; i < 2; i++) {
+      const circle = circlesRef.current[circleIndex.current];
+      
+      if (circle) {
+        // Liquid paint jaisa unsymmetrical feel dene k liye slight random offset
+        const offsetX = (Math.random() - 0.5) * 30;
+        const offsetY = (Math.random() - 0.5) * 30;
 
-      // 1. Mask Shape (Circle) ko mouse ki jagah par lana aur radius bara karna
-      gsap.to(maskCircleRef.current, {
-        attr: { cx: clientX, cy: clientY, r: targetRadius },
-        duration: 0.5,
-        ease: "power3.out",
-      });
+        // Pehli wali animations ko kill karein
+        gsap.killTweensOf(circle);
 
-      // 2. Pehle wala timer cancel karo
-      if (timerRef.current) clearTimeout(timerRef.current);
-
-      // 3. 1 SECOND Timer: Mouse rokne k baad radius wapis 0 (gayab) ho jayega
-      timerRef.current = setTimeout(() => {
-        gsap.to(maskCircleRef.current, {
-          attr: { r: 0 }, // Wapis shrink ho k evaporation effect
-          duration: 1.2, 
-          ease: "power2.inOut",
+        // Circle ko mouse ki jagah par lana
+        gsap.set(circle, {
+          attr: { cx: clientX + offsetX, cy: clientY + offsetY },
         });
-      }, 1000); 
-    }
-  };
 
-  const handleMouseLeave = () => {
-    if (timerRef.current) clearTimeout(timerRef.current);
-    if (maskCircleRef.current) {
-      gsap.to(maskCircleRef.current, {
-        attr: { r: 0 },
-        duration: 1.2,
-        ease: "power2.inOut",
-      });
+        // 1. Pop-in Animation (Brush lagna)
+        gsap.fromTo(circle, 
+          { attr: { r: 0 }, opacity: 1 },
+          { 
+            attr: { r: Math.random() * 30 + 80 }, // Radius 80 se 110 px tak random
+            duration: 0.2, 
+            ease: "power2.out" 
+          }
+        );
+
+        // 2. Auto-Fade Animation (1 Sec baad Evaporate hona)
+        gsap.to(circle, {
+          attr: { r: 0 }, // Wapis shrink hona
+          opacity: 0,
+          duration: 0.6, // Fade hone ki speed
+          delay: 0.8 + Math.random() * 0.4, // Lagbhag 1 second baad start hoga
+          ease: "power3.inOut"
+        });
+      }
+
+      // Next circle in the pool
+      circleIndex.current = (circleIndex.current + 1) % NUM_CIRCLES;
     }
   };
 
@@ -142,45 +108,52 @@ function Hero2() {
       ref={sectionRef}
       className="relative h-screen w-screen overflow-hidden bg-black"
       onMouseMove={handleMouseMove}
-      onMouseLeave={handleMouseLeave}
     >
-      {/* 🟢 PERFECT SVG MASK ENGINE */}
-      <svg className="absolute w-0 h-0">
+      {/* 🟢 PERFECT SVG MASK TRAIL ENGINE */}
+      <svg className="absolute w-0 h-0 pointer-events-none">
         <defs>
-          {/* Radial Gradient for Soft Edges (Brush jaisa naram edge) */}
-          <radialGradient id="soft-brush" cx="50%" cy="50%" r="50%">
-            <stop offset="50%" stopColor="white" />
-            <stop offset="100%" stopColor="black" />
+          {/* Radial Gradient: Mask ke kinaray naram (soft) karne k liye */}
+          <radialGradient id="soft-brush">
+            <stop offset="30%" stopColor="white" stopOpacity="1" />
+            <stop offset="100%" stopColor="white" stopOpacity="0" />
           </radialGradient>
 
-          {/* Bubbling Filter applied ONLY to the Mask, NOT the image */}
+          {/* Bubbling Filter: Sirf Mask ki shape par lagay ga, Image par NAHI */}
           <filter id="blob-edge" x="-50%" y="-50%" width="200%" height="200%">
             <feTurbulence 
               ref={turbulenceRef} 
               type="fractalNoise" 
-              baseFrequency="0.02" 
+              baseFrequency="0.015" 
               numOctaves="3" 
               result="noise" 
             />
             <feDisplacementMap 
               in="SourceGraphic" 
               in2="noise" 
-              scale="60" /* Bubbling kinaray (edges) kitne rough honge */
+              scale="40" // Bubbles ki intensity
               xChannelSelector="R" 
               yChannelSelector="B" 
             />
           </filter>
 
-          <mask id="liquid-mask">
-            {/* Ye wo circle hai jo mouse ko follow karega aur animate hoga */}
-            <circle 
-              ref={maskCircleRef}
-              cx="50%" 
-              cy="50%" 
-              r="0" /* Shuru mein radius 0 hai (hidden) */
-              fill="url(#soft-brush)" 
-              filter="url(#blob-edge)" 
-            />
+          <mask id="liquid-trail-mask">
+            {/* Background black = Hidden by default */}
+            <rect width="100%" height="100%" fill="black" />
+            
+            {/* Filter sirf is group par lagay ga jisme hamare brush strokes hain */}
+            <g filter="url(#blob-edge)">
+              {/* 50 circles jo trail banayenge */}
+              {Array.from({ length: NUM_CIRCLES }).map((_, i) => (
+                <circle
+                  key={i}
+                  ref={(el) => (circlesRef.current[i] = el)}
+                  cx="0"
+                  cy="0"
+                  r="0"
+                  fill="url(#soft-brush)"
+                />
+              ))}
+            </g>
           </mask>
         </defs>
       </svg>
@@ -199,7 +172,7 @@ function Hero2() {
         />
       </div>
 
-      {/* 🖼️ BACKGROUND & PERFECT LIQUID REVEAL */}
+      {/* 🖼️ BACKGROUND & PERFECT BRUSH REVEAL */}
       <div 
         ref={bgWrapperRef}
         className="absolute inset-0 w-full h-full"
@@ -211,16 +184,14 @@ function Hero2() {
           alt="Toyota Base" 
         />
         
-        {/* 2. Top Image (Helmet k sath) - ONLY SVG MASK APPLIED HERE */}
+        {/* 2. Top Image (Helmet k sath) - HD RAHAY GI, MASK TRAIL EFFECT K SATH */}
         <img 
           src="/images/spn2.png" 
-          className="absolute -translate-x-4 translate-y-3  scale-70 inset-0 w-full h-full object-cover pointer-events-none will-change-transform" 
+          className="absolute -translate-x-4 translate-y-3 scale-x-68 scale-70 inset-0 w-full h-full object-cover pointer-events-none will-change-transform" 
           alt="Toyota Helmet Hover" 
           style={{
-            // Yahan humne image par Mask apply kiya hai.
-            // Image HD rahegi, sirf mask edge par bubble hoga.
-            WebkitMaskImage: "url(#liquid-mask)",
-            maskImage: "url(#liquid-mask)",
+            WebkitMaskImage: "url(#liquid-trail-mask)",
+            maskImage: "url(#liquid-trail-mask)",
           }}
         />
       </div>
