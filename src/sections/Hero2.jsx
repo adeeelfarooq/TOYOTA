@@ -1,5 +1,4 @@
 import { useEffect, useRef } from "react";
-import { SplitText } from "gsap/all";
 import gsap from "gsap";
 
 function Hero2() {
@@ -9,6 +8,8 @@ function Hero2() {
 
   const bgWrapperRef = useRef(null);
   const turbulenceRef = useRef(null);
+  const mainTextRef = useRef(null); // Text ki animation k liye
+  const uiElementsRef = useRef(null); // Modern UI elements k liye
   
   // 🎯 Brush Trail Engine k Refs
   const circlesRef = useRef([]); 
@@ -17,14 +18,11 @@ function Hero2() {
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      const titleSplit = SplitText.create(".title1", { 
-        type: "chars",
-        charsClass: "transform-gpu will-change-transform" 
-      });
-      
       const tl = gsap.timeline({ defaults: { force3D: true } });
 
       gsap.set(bgWrapperRef.current, { opacity: 0 });
+      gsap.set(mainTextRef.current, { opacity: 0, y: 50 });
+      gsap.set(uiElementsRef.current, { opacity: 0 });
 
       // 🔴 INTRO RED SCREEN + LOGO
       tl.set(introRef.current, { yPercent: 0 })
@@ -35,17 +33,17 @@ function Hero2() {
         )
         .to({}, { duration: 1 })
         .to(introRef.current, { yPercent: -100, duration: 1.4, ease: "power4.inOut" })
+        
+        // Intro k baad Base background + Images show hongi
         .to(bgWrapperRef.current, { opacity: 1, duration: 1.5, ease: "power4.out" }, "-=0.7")
-        .from(titleSplit.chars, { opacity: 0 }, "+=2.6")
-        .to(titleSplit.chars, { opacity: 1, yPercent: -20, stagger: 0.09, ease: "power2.out" }, "+=0.8")
-        .from(".para", { opacity: 0 })
-        .to(".para", { opacity: 1, duration: 1 }, "+=0.8")
-        .from(".btn", { opacity: 0 }, "-=0.5") 
-        .to(".btn", { opacity: 1, duration: 1, ease: "power3.out" }, "-=0.5");
+        
+        // Modern UI aur Flowing Text ka entrance
+        .to(mainTextRef.current, { opacity: 1, y: 0, duration: 1.5, ease: "power3.out" }, "-=1.0")
+        .to(uiElementsRef.current, { opacity: 1, duration: 1.5, ease: "power2.out" }, "-=1.0");
 
       // 🌊 CONTINUOUS BUBBLING ANIMATION FOR BRUSH EDGES
       gsap.to(turbulenceRef.current, {
-        attr: { baseFrequency: "0.01 0.02" }, 
+        attr: { baseFrequency: "0.015 0.025" }, 
         duration: 3,
         repeat: -1,
         yoyo: true,
@@ -59,11 +57,7 @@ function Hero2() {
 
   // 🎯 Liquid Brush Trail Logic
   const handleMouseMove = (e) => {
-    if (!bgWrapperRef.current) return;
-    
-    const rect = bgWrapperRef.current.getBoundingClientRect();
-    const localX = e.clientX - rect.left;
-    const localY = e.clientY - rect.top;
+    const { clientX, clientY } = e;
 
     for (let i = 0; i < 2; i++) {
       const circle = circlesRef.current[circleIndex.current];
@@ -75,7 +69,7 @@ function Hero2() {
         gsap.killTweensOf(circle);
 
         gsap.set(circle, {
-          attr: { cx: localX + offsetX, cy: localY + offsetY },
+          attr: { cx: clientX + offsetX, cy: clientY + offsetY },
         });
 
         gsap.fromTo(circle, 
@@ -98,11 +92,11 @@ function Hero2() {
   return (
     <section
       ref={sectionRef}
-      // White padding remove kar di hai. Ab sirf main dark background hai.
-      className="relative h-screen w-screen bg-[#111111] flex items-center justify-center p-4 overflow-hidden"
+      // Toyota Red aur Black ka premium radial gradient background
+      className="relative h-screen w-screen overflow-hidden bg-[radial-gradient(circle_at_center,_#3f0000_0%,_#050505_80%,_#000000_100%)]"
       onMouseMove={handleMouseMove}
     >
-      {/* 🟢 SVG DEFS */}
+      {/* 🟢 PERFECT SVG MASK TRAIL ENGINE */}
       <svg className="absolute w-0 h-0 pointer-events-none">
         <defs>
           <radialGradient id="soft-brush">
@@ -111,52 +105,44 @@ function Hero2() {
           </radialGradient>
 
           <filter id="blob-edge" x="-50%" y="-50%" width="200%" height="200%">
-            <feTurbulence ref={turbulenceRef} type="fractalNoise" baseFrequency="0.015" numOctaves="3" result="noise" />
-            <feDisplacementMap in="SourceGraphic" in2="noise" scale="40" xChannelSelector="R" yChannelSelector="B" />
+            <feTurbulence 
+              ref={turbulenceRef} 
+              type="fractalNoise" 
+              baseFrequency="0.015" 
+              numOctaves="3" 
+              result="noise" 
+            />
+            <feDisplacementMap 
+              in="SourceGraphic" 
+              in2="noise" 
+              scale="40" 
+              xChannelSelector="R" 
+              yChannelSelector="B" 
+            />
           </filter>
 
           <mask id="liquid-trail-mask">
             <rect width="100%" height="100%" fill="black" />
             <g filter="url(#blob-edge)">
               {Array.from({ length: NUM_CIRCLES }).map((_, i) => (
-                <circle key={i} ref={(el) => (circlesRef.current[i] = el)} cx="-100" cy="-100" r="0" fill="url(#soft-brush)" />
+                <circle
+                  key={i}
+                  ref={(el) => (circlesRef.current[i] = el)}
+                  cx="0"
+                  cy="0"
+                  r="0"
+                  fill="url(#soft-brush)"
+                />
               ))}
             </g>
           </mask>
-
-          {/* 🔥 FIXED SVG PATH: 
-              - Left corners (Top aur Bottom) ab bilkul normal rounded hain.
-              - Right side cuts ab 75% width se start hongy (pehle 65% thay, isliye early the).
-          */}
-          <clipPath id="futuristic-cut" clipPathUnits="objectBoundingBox">
-            <path d="
-              M 0.03, 0 
-              L 0.72, 0 
-              C 0.74, 0 0.75, 0.02 0.75, 0.05 
-              L 0.75, 0.16 
-              C 0.75, 0.19 0.76, 0.20 0.78, 0.20 
-              L 0.97, 0.20 
-              C 0.99, 0.20 1.0, 0.22 1.0, 0.25 
-              L 1.0, 0.60 
-              C 1.0, 0.63 0.99, 0.65 0.97, 0.65 
-              L 0.78, 0.65 
-              C 0.76, 0.65 0.75, 0.67 0.75, 0.70 
-              L 0.75, 0.95 
-              C 0.75, 0.98 0.74, 1.0 0.72, 1.0 
-              L 0.03, 1.0 
-              C 0.01, 1.0 0, 0.98 0, 0.95 
-              L 0, 0.05 
-              C 0, 0.02 0.01, 0 0.03, 0 
-              Z
-            " />
-          </clipPath>
         </defs>
       </svg>
 
       {/* 🔴 INTRO RED SCREEN */}
       <div
         ref={introRef}
-        className="fixed inset-0 z-[100] bg-toyota-red-soft flex items-center justify-center transform-gpu will-change-transform"
+        className="absolute inset-0 z-[100] bg-toyota-red-soft flex items-center justify-center transform-gpu will-change-transform"
       >
         <img
           ref={introLogoRef}
@@ -167,95 +153,113 @@ function Hero2() {
         />
       </div>
 
-      {/* 🔲 NO WHITE BORDER: Main container now directly uses full space */}
-      <div className="relative w-full h-full max-w-[1600px] mx-auto">
-        
-        {/* 1️⃣ MAIN CLIPPED SECTION */}
-        <div 
-          ref={bgWrapperRef}
-          className="absolute inset-0 w-full h-full bg-black/90 pointer-events-auto shadow-2xl"
-          style={{
-        
-            clipPath: "url(#futuristic-cut)",
-            WebkitClipPath: "url(#futuristic-cut)"
-          }}
+      {/* 🅱️ BIG CASCADING TOYOTA TEXT (Background Me) */}
+      {/* 4 Layers jo neechay flow karti hui nazar aayengi */}
+      <div 
+        ref={mainTextRef}
+        className="absolute inset-0 flex items-center justify-center pointer-events-none z-0 transform-gpu will-change-transform mt-10"
+      >
+        <div className="stacked-text flex flex-col items-center uppercase font-black text-[6rem] md:text-[10rem] lg:text-[15rem] leading-none tracking-tighter"
+          style={{ fontFamily: "'Google Sans Flex', sans-serif" }}
         >
-          {/* Base Image */}
-          <img 
-            src="/images/hero1.png" 
-            className="absolute inset-0 w-full h-full object-cover opacity-80" 
-            alt="Toyota Base" 
-          />
-          
-          {/* Top Image (Liquid Mask Trail) */}
-          <img 
-            src="/images/spn2.png" 
-            className="absolute -translate-x-4 translate-y-3 scale-x-68 scale-70 inset-0 w-full h-full object-cover pointer-events-none will-change-transform" 
-            alt="Toyota Helmet Hover" 
-            style={{
-              WebkitMaskImage: "url(#liquid-trail-mask)",
-              maskImage: "url(#liquid-trail-mask)",
-            }}
-          />
+          {/* Main Solid Text (Top) */}
+          <div className="overflow-hidden h-[0.9em] flex items-start">
+            <span className="block whitespace-nowrap">TOY<span className="text-toyota-red">OTA</span></span>
+          </div>
 
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/30 pointer-events-none z-10" />
+          {/* Layer 1 (Cut) */}
+          <div className="overflow-hidden h-[0.65em] flex items-start opacity-80 -mt-[0.05em]">
+            <span className="block whitespace-nowrap text-transparent" style={{ WebkitTextStroke: "2px white" }}>
+              TOY<span className="text-transparent" style={{ WebkitTextStroke: "2px #eb0a1e" }}>OTA</span>
+            </span>
+          </div>
 
-          {/* TEXT */}
-          <div className="absolute bottom-[5%] left-[5%] z-20 pointer-events-none">
-            <h1 className="title1 text-white text-5xl md:text-[5.5rem] leading-[0.9] font-bold uppercase tracking-[-.1vw]">
-              Future <br /> 
-              <span className="text-toyota-red">Mobility.</span>
-            </h1>
+          {/* Layer 2 (Cut) */}
+          <div className="overflow-hidden h-[0.45em] flex items-start opacity-50 -mt-[0.05em]">
+            <span className="block whitespace-nowrap text-transparent" style={{ WebkitTextStroke: "2px white" }}>
+              TOY<span className="text-transparent" style={{ WebkitTextStroke: "2px #eb0a1e" }}>OTA</span>
+            </span>
+          </div>
 
-            <p className="para mt-4 ml-1 text-gray-300 text-sm md:text-base font-medium max-w-[400px] transform-gpu will-change-opacity uppercase tracking-widest">
-              Experience Toyota’s next-generation performance, intelligence and design.
-            </p>
+          {/* Layer 3 (Cut) */}
+          <div className="overflow-hidden h-[0.3em] flex items-start opacity-30 -mt-[0.05em]">
+            <span className="block whitespace-nowrap text-transparent" style={{ WebkitTextStroke: "2px white" }}>
+              TOY<span className="text-transparent" style={{ WebkitTextStroke: "2px #eb0a1e" }}>OTA</span>
+            </span>
+          </div>
+
+          {/* Layer 4 (Cut) */}
+          <div className="overflow-hidden h-[0.15em] flex items-start opacity-10 -mt-[0.05em]">
+            <span className="block whitespace-nowrap text-transparent" style={{ WebkitTextStroke: "2px white" }}>
+              TOY<span className="text-transparent" style={{ WebkitTextStroke: "2px #eb0a1e" }}>OTA</span>
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {/* 🖼️ CAR IMAGES LAYER (Text k Upar hogi, Trail Mask k sath) */}
+      <div 
+        ref={bgWrapperRef}
+        className="absolute inset-0 w-full h-full z-10 pointer-events-none"
+      >
+        {/* 1. Base Image (Bina Helmet/Car k) */}
+        <img 
+          src="/images/hero1.png" 
+          className="absolute inset-0 w-full h-full object-cover scale-70 drop-shadow-[0_0_50px_rgba(0,0,0,0.8)]" 
+          alt="Toyota Base" 
+        />
+        
+        {/* 2. Top Image (Hover wali Car) - MASK TRAIL EFFECT K SATH */}
+        <img 
+          src="/images/spn2.png" 
+          className="absolute -translate-x-4 translate-y-3 scale-x-68 scale-70 inset-0 w-full h-full object-cover pointer-events-none will-change-transform" 
+          alt="Toyota Hover" 
+          style={{
+            WebkitMaskImage: "url(#liquid-trail-mask)",
+            maskImage: "url(#liquid-trail-mask)",
+          }}
+        />
+      </div>
+
+      {/* 💻 MODERN UI ELEMENTS (Overlays) */}
+      <div ref={uiElementsRef} className="absolute inset-0 z-20 pointer-events-none">
+        
+        {/* Top Left Tech Details */}
+        <div className="absolute top-10 left-10 flex flex-col gap-1 text-[10px] md:text-xs font-mono tracking-[0.2em] text-white/50 uppercase">
+          <p className="text-white">/// GAZOO RACING</p>
+          <p>Performance Division</p>
+          <p className="text-toyota-red">EST. 1937</p>
+        </div>
+
+        {/* Top Right Crosshair */}
+        <div className="absolute top-10 right-10 text-white/30 font-light text-2xl">
+          +
+        </div>
+
+        {/* Bottom Left Specs */}
+        <div className="absolute bottom-10 left-10 flex flex-col gap-2 border-l-2 border-toyota-red pl-4">
+          <div className="text-white/80 font-mono text-xs tracking-widest uppercase">
+            <span className="opacity-50">Engine // </span> Hybrid Synergy
+          </div>
+          <div className="text-white/80 font-mono text-xs tracking-widest uppercase">
+            <span className="opacity-50">Output // </span> 382 HP
+          </div>
+          <div className="text-white/80 font-mono text-xs tracking-widest uppercase">
+            <span className="opacity-50">0-60 MPH // </span> 3.8s
           </div>
         </div>
 
-        {/* 2️⃣ TOP RIGHT NOTCH MODULE */}
-        <div className="absolute top-0 right-0 w-[24%] h-[18%] flex flex-col justify-between items-end z-20">
-           <div className="flex gap-2 w-full justify-end">
-              <button className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-toyota-red transition-colors">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-              </button>
-              <button className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-toyota-red transition-colors">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
-              </button>
-              <button className="flex-1 h-12 rounded-full bg-white/10 flex items-center justify-center text-white px-4 hover:bg-toyota-red transition-colors uppercase text-xs font-bold tracking-widest">
-                Contact
-              </button>
-           </div>
-           <button className="w-full h-12 rounded-full bg-white flex items-center justify-center text-black font-bold uppercase tracking-widest hover:bg-toyota-red hover:text-white transition-colors mt-auto text-sm">
-              Shop Now
-           </button>
-        </div>
-
-        {/* 3️⃣ BOTTOM RIGHT NOTCH MODULE (Separate Arrows applied) */}
-        <div className="absolute bottom-0 right-0 w-[24%] h-[33%] flex flex-col z-20">
-           
-           {/* 🔥 FIXED ARROWS: Ab ye right side par hain aur ALAG ALAG buttons hain */}
-           <div className="w-full flex justify-end gap-2 mb-3">
-              <button className="w-10 h-10 rounded-full bg-black border border-gray-600 flex items-center justify-center text-white hover:border-toyota-red hover:text-toyota-red transition-colors cursor-pointer">
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7"></path></svg>
-              </button>
-              <button className="w-10 h-10 rounded-full bg-black border border-gray-600 flex items-center justify-center text-white hover:border-toyota-red hover:text-toyota-red transition-colors cursor-pointer">
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path></svg>
-              </button>
-           </div>
-
-           {/* Nested Card */}
-           <div className="w-full flex-1 bg-black rounded-3xl overflow-hidden flex flex-col p-3 border border-white/10 group cursor-pointer">
-             <div className="flex-1 relative rounded-xl overflow-hidden bg-zinc-900 flex items-center justify-center">
-                <span className="text-zinc-700 text-xs uppercase tracking-widest font-bold z-10">Image</span>
-                <img src="/images/hero1.png" className="absolute inset-0 w-full h-full object-cover opacity-50 group-hover:scale-110 transition-transform duration-700" alt="Sub card" />
-             </div>
-             <div className="mt-2 text-right">
-                <p className="text-white uppercase text-xs font-bold tracking-widest">Aero Kit</p>
-                <p className="text-toyota-red text-sm font-bold">$1,250</p>
-             </div>
-           </div>
-
+        {/* Bottom Right CTA Button */}
+        <div className="absolute bottom-10 right-10 pointer-events-auto">
+          <button
+            onClick={() => gsap.to(window, { duration: 2, scrollTo: "#msgg" })}
+            className="group flex items-center gap-4 px-6 py-3 border border-white/20 rounded-full hover:bg-white hover:text-black transition-all duration-500"
+          >
+            <span className="text-xs font-bold uppercase tracking-[0.2em]">Explore Models</span>
+            <div className="w-6 h-6 rounded-full bg-toyota-red flex items-center justify-center group-hover:bg-black transition-colors">
+              <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
+            </div>
+          </button>
         </div>
 
       </div>
