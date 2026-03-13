@@ -149,7 +149,7 @@ function Hero2() {
             <div className="stacked-text flex flex-col items-center uppercase font-black text-[6rem] md:text-[10rem] lg:text-[15rem] leading-none tracking-tighter" style={{ fontFamily: "'Google Sans Flex', sans-serif" }}>
               <div className="overflow-hidden h-[0.9em] flex items-start"><span className="block text-toyota-red opacity-40">TOYOTA</span></div>
               
-              <div className="overflow-hidden h-[0.65em] flex items-start opacity-80 -mt-[0.05em]">
+              <div className="overflow-hidden h-[0.65em] flex items-start opacity-55 -mt-[0.05em]">
                 <span className="block text-transparent" style={{ WebkitTextStroke: "2px white" }}>TOY</span>
                 <span className="block text-transparent" style={{ WebkitTextStroke: "2px #eb0a1e" }}>OTA</span>
               </div>
