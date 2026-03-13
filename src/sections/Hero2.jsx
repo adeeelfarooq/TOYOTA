@@ -16,6 +16,10 @@ function Hero2() {
   const circleIndex = useRef(0); 
   const NUM_CIRCLES = 50; 
 
+  // 🎯 Autonomous Ink Blob Refs
+  const autoInkMaskRef = useRef(null); 
+  const autoInkVisualRef = useRef(null); 
+
   useEffect(() => {
     const ctx = gsap.context(() => {
       const tl = gsap.timeline({ defaults: { force3D: true } });
@@ -37,14 +41,49 @@ function Hero2() {
         .to(mainTextRef.current, { opacity: 1, y: 0, duration: 1.5, ease: "power3.out" }, "-=1.0")
         .to(uiElementsRef.current, { opacity: 1, duration: 1.5, ease: "power2.out" }, "-=1.0");
 
-      // 🌊 CONTINUOUS BUBBLING ANIMATION
+      // 🌊 CONTINUOUS EXTREME BUBBLING ANIMATION (Makes it look like flowing ink, not a circle)
       gsap.to(turbulenceRef.current, {
-        attr: { baseFrequency: "0.015 0.025" }, 
-        duration: 3,
+        attr: { baseFrequency: "0.004 0.008" }, // Low frequency = large organic liquid stretches
+        duration: 4,
         repeat: -1,
         yoyo: true,
         ease: "sine.inOut"
       });
+
+      // 💧 FAST AUTONOMOUS VISIBLE RED INK LOGIC (Lando Norris Style)
+      if (autoInkMaskRef.current && autoInkVisualRef.current && window.innerWidth > 0) {
+        
+        const animateBlob = () => {
+          const w = window.innerWidth;
+          const h = window.innerHeight;
+          // Offset by a large margin so it completely leaves the screen
+          const newX = gsap.utils.random(-400, w + 400);
+          const newY = gsap.utils.random(-400, h + 400);
+          // FAST swift movement like a brush stroke
+          const speed = gsap.utils.random(0.8, 1.6); 
+
+          gsap.to([autoInkMaskRef.current, autoInkVisualRef.current], {
+            attr: { cx: newX, cy: newY },
+            duration: speed,
+            ease: "power2.inOut",
+            onComplete: animateBlob 
+          });
+        };
+
+        const breatheBlob = () => {
+          // Rapidly changing radius combined with displacement map creates the splashing effect
+          const newRadius = gsap.utils.random(180, 300);
+          gsap.to([autoInkMaskRef.current, autoInkVisualRef.current], {
+            attr: { r: newRadius }, 
+            duration: gsap.utils.random(0.5, 1.2), 
+            ease: "sine.inOut",
+            onComplete: breatheBlob 
+          });
+        };
+
+        animateBlob();
+        breatheBlob();
+      }
 
     }, sectionRef);
 
@@ -77,11 +116,11 @@ function Hero2() {
     for (let i = 0; i < 2; i++) {
       const circle = circlesRef.current[circleIndex.current];
       if (circle) {
-        const offsetX = (Math.random() - 0.5) * 30;
-        const offsetY = (Math.random() - 0.5) * 30;
+        const offsetX = (Math.random() - 0.5) * 40;
+        const offsetY = (Math.random() - 0.5) * 40;
         gsap.killTweensOf(circle);
         gsap.set(circle, { attr: { cx: localX + offsetX, cy: localY + offsetY } });
-        gsap.fromTo(circle, { attr: { r: 0 }, opacity: 1 }, { attr: { r: Math.random() * 30 + 80 }, duration: 0.2, ease: "power2.out" });
+        gsap.fromTo(circle, { attr: { r: 0 }, opacity: 1 }, { attr: { r: Math.random() * 40 + 90 }, duration: 0.2, ease: "power2.out" });
         gsap.to(circle, { attr: { r: 0 }, opacity: 0, duration: 0.6, delay: 0.8 + Math.random() * 0.4, ease: "power3.inOut" });
       }
       circleIndex.current = (circleIndex.current + 1) % NUM_CIRCLES;
@@ -93,33 +132,37 @@ function Hero2() {
       ref={sectionRef}
       className="relative h-screen w-screen overflow-hidden bg-black flex items-center justify-center p-4 lg:p-6"
       onMouseMove={handleMouseMove}
-    //   style={{
-    //     backgroundImage: "url('/images/bg-1.png')",
-    //     backgroundSize: "cover",
-    //     backgroundPosition: "center",
-    //   }}
     >
       <div className="absolute inset-0 bg-black/50 z-0"></div>
 
       {/* 🟢 SVG DEFS */}
       <svg className="absolute w-0 h-0 pointer-events-none">
         <defs>
+          {/* Soft brush edge for mouse trail */}
           <radialGradient id="soft-brush">
-            <stop offset="30%" stopColor="white" stopOpacity="1" />
+            <stop offset="20%" stopColor="white" stopOpacity="1" />
             <stop offset="100%" stopColor="white" stopOpacity="0" />
           </radialGradient>
-          <filter id="blob-edge" x="-50%" y="-50%" width="200%" height="200%">
-            <feTurbulence ref={turbulenceRef} type="fractalNoise" baseFrequency="0.015" numOctaves="3" result="noise" />
-            <feDisplacementMap in="SourceGraphic" in2="noise" scale="40" xChannelSelector="R" yChannelSelector="B" />
+
+          {/* 🔥 EXTREME DISPLACEMENT FILTER: This completely breaks the circle into liquid ink */}
+          <filter id="blob-edge" x="-100%" y="-100%" width="300%" height="300%">
+            <feTurbulence ref={turbulenceRef} type="fractalNoise" baseFrequency="0.005" numOctaves="4" result="noise" />
+            <feDisplacementMap in="SourceGraphic" in2="noise" scale="250" xChannelSelector="R" yChannelSelector="G" />
           </filter>
+          
           <mask id="liquid-trail-mask">
             <rect width="100%" height="100%" fill="black" />
             <g filter="url(#blob-edge)">
+              {/* HIDDEN MASK INK BLOB (Reveals the car/helmet) */}
+              <circle ref={autoInkMaskRef} cx="-500" cy="-500" r="200" fill="url(#soft-brush)" />
+              
+              {/* Mouse trail circles */}
               {Array.from({ length: NUM_CIRCLES }).map((_, i) => (
                 <circle key={i} ref={(el) => (circlesRef.current[i] = el)} cx="-100" cy="-100" r="0" fill="url(#soft-brush)" />
               ))}
             </g>
           </mask>
+          
           <clipPath id="panel-clip" clipPathUnits="objectBoundingBox">
             <path d="M 0.04, 0 L 0.70, 0 C 0.72, 0 0.73, 0.02 0.73, 0.05 L 0.73, 0.15 C 0.73, 0.18 0.74, 0.20 0.77, 0.20 L 0.98, 0.20 C 0.99, 0.20 1.0, 0.22 1.0, 0.25 L 1.0, 0.60 C 1.0, 0.63 0.99, 0.65 0.96, 0.65 L 0.77, 0.65 C 0.74, 0.65 0.73, 0.67 0.73, 0.70 L 0.73, 0.95 C 0.73, 0.98 0.72, 1.0 0.70, 1.0 L 0.04, 1.0 C 0.02, 1.0 0, 0.98 0, 0.95 L 0, 0.05 C 0, 0.02 0.02, 0 0.04, 0 Z" />
           </clipPath>
@@ -144,7 +187,21 @@ function Hero2() {
             backgroundColor: "rgba(0,0,0,0.95)"
           }}
         >
-          {/* 🅱️ TOYOTA LAYERS (First Layer Red, Reflection TOY White, OTA Red) */}
+          {/* 🩸 VISIBLE RED INK BLOB (Now fully unsymmetrical with solid low Toyota Red) */}
+          <svg className="absolute inset-0 w-full h-full z-0 pointer-events-none mix-blend-screen">
+             <g filter="url(#blob-edge)">
+               <circle 
+                  ref={autoInkVisualRef} 
+                  cx="-500" 
+                  cy="-500" 
+                  r="200" 
+                  fill="grey" /* Solid Toyota Red */
+                  opacity="0.6" /* Low opacity as requested */
+               />
+             </g>
+          </svg>
+
+          {/* 🅱️ TOYOTA LAYERS */}
           <div ref={mainTextRef} className="absolute z-[-999] inset-0 flex items-center justify-center pointer-events-none mt-10">
             <div className="stacked-text flex flex-col items-center uppercase font-black text-[6rem] md:text-[10rem] lg:text-[15rem] leading-none tracking-tighter" style={{ fontFamily: "'Google Sans Flex', sans-serif" }}>
               <div className="overflow-hidden h-[0.9em] flex items-start"><span className="block text-toyota-red opacity-40">TOYOTA</span></div>
@@ -171,7 +228,7 @@ function Hero2() {
             </div>
           </div>
 
-          {/* 🏎️ CAR IMAGES (Targeted with 'parallax-target') */}
+          {/* 🏎️ CAR IMAGES */}
           <div className="absolute inset-0 w-full h-full parallax-target">
             
             {/* ✨ REFLECTION LAYER ✨ */}
@@ -201,18 +258,9 @@ function Hero2() {
             />
 
           </div>
-
-          {/* Inner Background Backdrop Commented As Requested */}
-          {/* <div
-            style={{
-              backgroundImage: "url('/images/bg-1.png')",
-              backgroundSize: "cover",
-            }}
-            className="absolute inset-0 z-[-1000] bg-gradient-to-t from-black via-transparent to-transparent pointer-events-none" 
-          /> */}
         </div>
 
-        {/* 2️⃣ TOP RIGHT MODULE (Replaced SHOP NOW with EXPLORE MODELS) */}
+        {/* 2️⃣ TOP RIGHT MODULE */}
         <div className="absolute top-0 right-0 w-[24%] h-[18%] flex flex-col items-end gap-3 pointer-events-none">
             <div className="flex gap-2 pointer-events-auto">
               <button className="w-12 h-12 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white flex items-center justify-center hover:bg-toyota-red transition-all cursor-pointer">
@@ -225,7 +273,6 @@ function Hero2() {
                  CONTACT
               </button>
             </div>
-            {/* Button text changed to EXPLORE MODELS, no arrow icon, same tracking */}
             <button 
               onClick={() => gsap.to(window, { duration: 2, scrollTo: "#footer" })}
               className="w-full h-12 rounded-full border border-white/20 text-white font-black text-xs tracking-[0.2em] hover:bg-white hover:text-black transition-all cursor-pointer pointer-events-auto"
