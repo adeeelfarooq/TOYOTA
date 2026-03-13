@@ -11,14 +11,20 @@ function Hero2() {
   const mainTextRef = useRef(null); 
   const uiElementsRef = useRef(null); 
   
-  // 🎯 Brush Trail Engine k Refs
+  // 🎯 Brush Trail Engine k Refs (Mouse k liye)
   const circlesRef = useRef([]); 
   const circleIndex = useRef(0); 
   const NUM_CIRCLES = 50; 
 
-  // 🎯 Autonomous Ink Blob Refs
+  // 🎯 Autonomous Ink Blob Refs (Khud chalne wali ink)
   const autoInkMaskRef = useRef(null); 
   const autoInkVisualRef = useRef(null); 
+  
+  // 💧 Ink Droplets (Particles) k Refs
+  const autoPartsMaskRef = useRef([]);
+  const autoPartsVisRef = useRef([]);
+  const autoPartIndex = useRef(0);
+  const NUM_AUTO_PARTS = 30; // Ink apne peechay 30 drops chhoregi
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -41,40 +47,112 @@ function Hero2() {
         .to(mainTextRef.current, { opacity: 1, y: 0, duration: 1.5, ease: "power3.out" }, "-=1.0")
         .to(uiElementsRef.current, { opacity: 1, duration: 1.5, ease: "power2.out" }, "-=1.0");
 
-      // 🌊 CONTINUOUS EXTREME BUBBLING ANIMATION (Makes it look like flowing ink, not a circle)
+      // 🌊 CONTINUOUS BUBBLING ANIMATION
       gsap.to(turbulenceRef.current, {
-        attr: { baseFrequency: "0.004 0.008" }, // Low frequency = large organic liquid stretches
+        attr: { baseFrequency: "0.005 0.008" }, // Perfect for liquid stretch
         duration: 4,
         repeat: -1,
         yoyo: true,
         ease: "sine.inOut"
       });
 
-      // 💧 FAST AUTONOMOUS VISIBLE RED INK LOGIC (Lando Norris Style)
+      // 💧 ADVANCED AUTONOMOUS INK LOGIC (Shape, Drops & Center Dashes)
       if (autoInkMaskRef.current && autoInkVisualRef.current && window.innerWidth > 0) {
-        
+        let isCenterDash = false; // State to track phase
+
+        // Function: Ink jahan se guzray gi, wahan qatray (drops) chhoregi
+        function dropParticle() {
+          // Optimization: Har frame me nahi, random gap se drop kare
+          if (Math.random() > 0.4) return; 
+
+          const cx = parseFloat(this.targets()[0].getAttribute("cx"));
+          const cy = parseFloat(this.targets()[0].getAttribute("cy"));
+          
+          const idx = autoPartIndex.current;
+          const maskPart = autoPartsMaskRef.current[idx];
+          const visPart = autoPartsVisRef.current[idx];
+          
+          if (maskPart && visPart) {
+            const offsetX = gsap.utils.random(-80, 80); // Droplet ka phailao
+            const offsetY = gsap.utils.random(-50, 50);
+            const size = gsap.utils.random(20, 60);
+
+            gsap.killTweensOf([maskPart, visPart]);
+            
+            // Drop paida hua
+            gsap.set([maskPart, visPart], { 
+              attr: { cx: cx + offsetX, cy: cy + offsetY, r: size }, 
+              opacity: gsap.utils.random(0.6, 1) 
+            });
+            
+            // Drop shrink ho kar evaporate hoga
+            gsap.to([maskPart, visPart], { 
+              attr: { r: 0 }, 
+              opacity: 0, 
+              duration: gsap.utils.random(0.8, 1.5), 
+              ease: "power2.out" 
+            });
+          }
+          autoPartIndex.current = (idx + 1) % NUM_AUTO_PARTS;
+        }
+
         const animateBlob = () => {
           const w = window.innerWidth;
           const h = window.innerHeight;
-          // Offset by a large margin so it completely leaves the screen
-          const newX = gsap.utils.random(-400, w + 400);
-          const newY = gsap.utils.random(-400, h + 400);
-          // FAST swift movement like a brush stroke
-          const speed = gsap.utils.random(0.8, 1.6); 
+          
+          if (!isCenterDash) {
+            // PHASE 1: WANDERING (2 se 3 seconds normal move)
+            const newX = gsap.utils.random(-200, w + 200);
+            const newY = gsap.utils.random(-200, h + 200);
+            const speed = gsap.utils.random(2, 3); // 2-3 sec
+            
+            gsap.to([autoInkMaskRef.current, autoInkVisualRef.current], {
+              attr: { cx: newX, cy: newY },
+              duration: speed,
+              ease: "power1.inOut",
+              onUpdate: dropParticle, // Moving k waqt particles chhorna
+              onComplete: () => {
+                isCenterDash = true; // Agla phase dash hoga
+                animateBlob(); 
+              }
+            });
+          } else {
+            // PHASE 2: CENTER DASHES (1 sec me 2 ya 3 bar mid se guzarna)
+            const dashes = Math.floor(gsap.utils.random(2, 4)); // Randomly 2 or 3
+            const dashDuration = 1.0 / dashes; // Total 1 second time divided by dashes
+            
+            const dashTl = gsap.timeline({
+              onComplete: () => {
+                isCenterDash = false; // Wapis normal wandering
+                animateBlob();
+              }
+            });
 
-          gsap.to([autoInkMaskRef.current, autoInkVisualRef.current], {
-            attr: { cx: newX, cy: newY },
-            duration: speed,
-            ease: "power2.inOut",
-            onComplete: animateBlob 
-          });
+            let currentSide = Math.random() > 0.5 ? 1 : -1; // Random start side
+
+            for (let i = 0; i < dashes; i++) {
+              const targetX = currentSide === 1 ? w + 300 : -300;
+              // Mid 20% area calculation (40% se 60% height k darmyan)
+              const targetY = gsap.utils.random(h * 0.4, h * 0.6);
+
+              dashTl.to([autoInkMaskRef.current, autoInkVisualRef.current], {
+                attr: { cx: targetX, cy: targetY },
+                duration: dashDuration,
+                ease: "power1.inOut",
+                onUpdate: dropParticle // Dash me bhi particles nikalenge
+              });
+              currentSide *= -1; // Agli dash mukhalif simt (opposite) se
+            }
+          }
         };
 
         const breatheBlob = () => {
-          // Rapidly changing radius combined with displacement map creates the splashing effect
-          const newRadius = gsap.utils.random(180, 300);
+          // Ellipse ki shape ko maintain rakhte hue sans lena
+          // Rx (width) lambi hai, Ry (height) kam hai
+          const newRx = gsap.utils.random(250, 400);
+          const newRy = gsap.utils.random(50, 100); 
           gsap.to([autoInkMaskRef.current, autoInkVisualRef.current], {
-            attr: { r: newRadius }, 
+            attr: { rx: newRx, ry: newRy }, 
             duration: gsap.utils.random(0.5, 1.2), 
             ease: "sine.inOut",
             onComplete: breatheBlob 
@@ -96,7 +174,6 @@ function Hero2() {
     
     if (!sectionRef.current || !bgWrapperRef.current) return;
 
-    // 🖱️ Parallax logic - Targetting ONLY the images, not the wrapper
     const { left, top, width, height } = sectionRef.current.getBoundingClientRect();
     const x = (clientX - left) / width - 0.5;
     const y = (clientY - top) / height - 0.5;
@@ -108,7 +185,6 @@ function Hero2() {
       ease: "power2.out"
     });
 
-    // 🖌️ Brush trail logic
     const rect = bgWrapperRef.current.getBoundingClientRect();
     const localX = clientX - rect.left;
     const localY = clientY - rect.top;
@@ -116,11 +192,11 @@ function Hero2() {
     for (let i = 0; i < 2; i++) {
       const circle = circlesRef.current[circleIndex.current];
       if (circle) {
-        const offsetX = (Math.random() - 0.5) * 40;
-        const offsetY = (Math.random() - 0.5) * 40;
+        const offsetX = (Math.random() - 0.5) * 30;
+        const offsetY = (Math.random() - 0.5) * 30;
         gsap.killTweensOf(circle);
         gsap.set(circle, { attr: { cx: localX + offsetX, cy: localY + offsetY } });
-        gsap.fromTo(circle, { attr: { r: 0 }, opacity: 1 }, { attr: { r: Math.random() * 40 + 90 }, duration: 0.2, ease: "power2.out" });
+        gsap.fromTo(circle, { attr: { r: 0 }, opacity: 1 }, { attr: { r: Math.random() * 30 + 80 }, duration: 0.2, ease: "power2.out" });
         gsap.to(circle, { attr: { r: 0 }, opacity: 0, duration: 0.6, delay: 0.8 + Math.random() * 0.4, ease: "power3.inOut" });
       }
       circleIndex.current = (circleIndex.current + 1) % NUM_CIRCLES;
@@ -138,13 +214,17 @@ function Hero2() {
       {/* 🟢 SVG DEFS */}
       <svg className="absolute w-0 h-0 pointer-events-none">
         <defs>
-          {/* Soft brush edge for mouse trail */}
           <radialGradient id="soft-brush">
             <stop offset="20%" stopColor="white" stopOpacity="1" />
             <stop offset="100%" stopColor="white" stopOpacity="0" />
           </radialGradient>
+          
+          <radialGradient id="neon-ink-glow">
+            <stop offset="10%" stopColor="#ff1e1e" stopOpacity="0.8" />
+            <stop offset="40%" stopColor="#eb0a1e" stopOpacity="0.5" />
+            <stop offset="100%" stopColor="#eb0a1e" stopOpacity="0" />
+          </radialGradient>
 
-          {/* 🔥 EXTREME DISPLACEMENT FILTER: This completely breaks the circle into liquid ink */}
           <filter id="blob-edge" x="-100%" y="-100%" width="300%" height="300%">
             <feTurbulence ref={turbulenceRef} type="fractalNoise" baseFrequency="0.005" numOctaves="4" result="noise" />
             <feDisplacementMap in="SourceGraphic" in2="noise" scale="250" xChannelSelector="R" yChannelSelector="G" />
@@ -153,10 +233,14 @@ function Hero2() {
           <mask id="liquid-trail-mask">
             <rect width="100%" height="100%" fill="black" />
             <g filter="url(#blob-edge)">
-              {/* HIDDEN MASK INK BLOB (Reveals the car/helmet) */}
-              <circle ref={autoInkMaskRef} cx="-500" cy="-500" r="200" fill="url(#soft-brush)" />
+              {/* SHAPE FIXED: Ellipse ban gaya taake lamba (brush) lagay */}
+              <ellipse ref={autoInkMaskRef} cx="-500" cy="-500" rx="300" ry="80" fill="url(#soft-brush)" />
               
-              {/* Mouse trail circles */}
+              {/* Droplets / Particles for Auto Ink Mask */}
+              {Array.from({ length: NUM_AUTO_PARTS }).map((_, i) => (
+                <circle key={`auto-m-${i}`} ref={(el) => (autoPartsMaskRef.current[i] = el)} cx="-100" cy="-100" r="0" fill="url(#soft-brush)" />
+              ))}
+
               {Array.from({ length: NUM_CIRCLES }).map((_, i) => (
                 <circle key={i} ref={(el) => (circlesRef.current[i] = el)} cx="-100" cy="-100" r="0" fill="url(#soft-brush)" />
               ))}
@@ -187,17 +271,16 @@ function Hero2() {
             backgroundColor: "rgba(0,0,0,0.95)"
           }}
         >
-          {/* 🩸 VISIBLE RED INK BLOB (Now fully unsymmetrical with solid low Toyota Red) */}
+          {/* 🩸 VISIBLE RED INK BLOB & DROPLETS */}
           <svg className="absolute inset-0 w-full h-full z-0 pointer-events-none mix-blend-screen">
              <g filter="url(#blob-edge)">
-               <circle 
-                  ref={autoInkVisualRef} 
-                  cx="-500" 
-                  cy="-500" 
-                  r="200" 
-                  fill="grey" /* Solid Toyota Red */
-                  opacity="0.6" /* Low opacity as requested */
-               />
+               {/* Ellipse for sleek fast ink shape */}
+               <ellipse ref={autoInkVisualRef} cx="-500" opacity={0.2} cy="-500" rx="300" ry="80" fill="url(#neon-ink-glow)" />
+               
+               {/* Visible Droplets */}
+               {Array.from({ length: NUM_AUTO_PARTS }).map((_, i) => (
+                  <circle key={`auto-v-${i}`} ref={(el) => (autoPartsVisRef.current[i] = el)} cx="-100" cy="-100" r="0" fill="url(#neon-ink-glow)" />
+               ))}
              </g>
           </svg>
 
@@ -205,58 +288,25 @@ function Hero2() {
           <div ref={mainTextRef} className="absolute z-[-999] inset-0 flex items-center justify-center pointer-events-none mt-10">
             <div className="stacked-text flex flex-col items-center uppercase font-black text-[6rem] md:text-[10rem] lg:text-[15rem] leading-none tracking-tighter" style={{ fontFamily: "'Google Sans Flex', sans-serif" }}>
               <div className="overflow-hidden h-[0.9em] flex items-start"><span className="block text-toyota-red opacity-40">TOYOTA</span></div>
-              
-              <div className="overflow-hidden h-[0.65em] flex items-start opacity-55 -mt-[0.05em]">
-                <span className="block text-transparent" style={{ WebkitTextStroke: "2px white" }}>TOY</span>
-                <span className="block text-transparent" style={{ WebkitTextStroke: "2px #eb0a1e" }}>OTA</span>
-              </div>
-              
-              <div className="overflow-hidden h-[0.45em] flex items-start opacity-50 -mt-[0.05em]">
-                <span className="block text-transparent" style={{ WebkitTextStroke: "2px white" }}>TOY</span>
-                <span className="block text-transparent" style={{ WebkitTextStroke: "2px #eb0a1e" }}>OTA</span>
-              </div>
-              
-              <div className="overflow-hidden h-[0.3em] flex items-start opacity-30 -mt-[0.05em]">
-                <span className="block text-transparent" style={{ WebkitTextStroke: "2px white" }}>TOY</span>
-                <span className="block text-transparent" style={{ WebkitTextStroke: "2px #eb0a1e" }}>OTA</span>
-              </div>
-              
-              <div className="overflow-hidden h-[0.15em] flex items-start opacity-10 -mt-[0.05em]">
-                <span className="block text-transparent" style={{ WebkitTextStroke: "2px white" }}>TOY</span>
-                <span className="block text-transparent" style={{ WebkitTextStroke: "2px #eb0a1e" }}>OTA</span>
-              </div>
+              <div className="overflow-hidden h-[0.65em] flex items-start opacity-55 -mt-[0.05em]"><span className="block text-transparent" style={{ WebkitTextStroke: "2px white" }}>TOY</span><span className="block text-transparent" style={{ WebkitTextStroke: "2px #eb0a1e" }}>OTA</span></div>
+              <div className="overflow-hidden h-[0.45em] flex items-start opacity-50 -mt-[0.05em]"><span className="block text-transparent" style={{ WebkitTextStroke: "2px white" }}>TOY</span><span className="block text-transparent" style={{ WebkitTextStroke: "2px #eb0a1e" }}>OTA</span></div>
+              <div className="overflow-hidden h-[0.3em] flex items-start opacity-30 -mt-[0.05em]"><span className="block text-transparent" style={{ WebkitTextStroke: "2px white" }}>TOY</span><span className="block text-transparent" style={{ WebkitTextStroke: "2px #eb0a1e" }}>OTA</span></div>
+              <div className="overflow-hidden h-[0.15em] flex items-start opacity-10 -mt-[0.05em]"><span className="block text-transparent" style={{ WebkitTextStroke: "2px white" }}>TOY</span><span className="block text-transparent" style={{ WebkitTextStroke: "2px #eb0a1e" }}>OTA</span></div>
             </div>
           </div>
 
           {/* 🏎️ CAR IMAGES */}
           <div className="absolute inset-0 w-full h-full parallax-target">
-            
-            {/* ✨ REFLECTION LAYER ✨ */}
             <div 
               className="absolute inset-0 w-full h-full opacity-40 pointer-events-none -scale-y-100 translate-y-[42%]"
-              style={{
-                WebkitMaskImage: "linear-gradient(to top, rgba(0,0,0,1) 20%, rgba(0,0,0,0) 65%)",
-                maskImage: "linear-gradient(to top, rgba(0,0,0,1) 20%, rgba(0,0,0,0) 65%)"
-              }}
+              style={{ WebkitMaskImage: "linear-gradient(to top, rgba(0,0,0,1) 20%, rgba(0,0,0,0) 65%)", maskImage: "linear-gradient(to top, rgba(0,0,0,1) 20%, rgba(0,0,0,0) 65%)" }}
             >
               <img src="/images/hero1.png" className="absolute inset-0 w-full h-full object-cover scale-70 " alt="Base Reflection" />
-              <img 
-                src="/images/spn2.png" 
-                className="absolute inset-0 w-full h-full object-cover scale-68 pointer-events-none mt-2 -ml-2" 
-                style={{ WebkitMaskImage: "url(#liquid-trail-mask)", maskImage: "url(#liquid-trail-mask)" }} 
-                alt="Hover Reflection" 
-              />
+              <img src="/images/spn2.png" className="absolute inset-0 w-full h-full object-cover scale-68 pointer-events-none mt-2 -ml-2" style={{ WebkitMaskImage: "url(#liquid-trail-mask)", maskImage: "url(#liquid-trail-mask)" }} alt="Hover Reflection" />
             </div>
 
-            {/* 🚗 MAIN CAR IMAGES */}
             <img src="/images/hero1.png" className="absolute inset-0 w-full h-full object-cover scale-70 " alt="Base" />
-            <img 
-              src="/images/spn2.png" 
-              className="absolute inset-0 w-full h-full object-cover scale-68 pointer-events-none mt-2 -ml-2" 
-              style={{ WebkitMaskImage: "url(#liquid-trail-mask)", maskImage: "url(#liquid-trail-mask)" }} 
-              alt="Hover" 
-            />
-
+            <img src="/images/spn2.png" className="absolute inset-0 w-full h-full object-cover scale-68 pointer-events-none mt-2 -ml-2" style={{ WebkitMaskImage: "url(#liquid-trail-mask)", maskImage: "url(#liquid-trail-mask)" }} alt="Hover" />
           </div>
         </div>
 
