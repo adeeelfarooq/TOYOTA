@@ -55,7 +55,7 @@ function Hero2() {
   const handleMouseMove = (e) => {
     const { clientX, clientY } = e;
     
-    if (!sectionRef.current) return;
+    if (!sectionRef.current || !bgWrapperRef.current) return;
 
     // 🖱️ Parallax logic - Targetting ONLY the images, not the wrapper
     const { left, top, width, height } = sectionRef.current.getBoundingClientRect();
@@ -93,7 +93,14 @@ function Hero2() {
       ref={sectionRef}
       className="relative h-screen w-screen overflow-hidden bg-black flex items-center justify-center p-4 lg:p-6"
       onMouseMove={handleMouseMove}
+    //   style={{
+    //     backgroundImage: "url('/images/bg-1.png')",
+    //     backgroundSize: "cover",
+    //     backgroundPosition: "center",
+    //   }}
     >
+      <div className="absolute inset-0 bg-black/50 z-0"></div>
+
       {/* 🟢 SVG DEFS */}
       <svg className="absolute w-0 h-0 pointer-events-none">
         <defs>
@@ -138,7 +145,7 @@ function Hero2() {
           }}
         >
           {/* 🅱️ TOYOTA LAYERS */}
-          <div ref={mainTextRef} className="absolute z-0 inset-0 flex items-center justify-center pointer-events-none mt-10">
+          <div ref={mainTextRef} className="absolute z-[-999] inset-0 flex items-center justify-center pointer-events-none mt-10">
             <div className="stacked-text flex flex-col items-center uppercase font-black text-[6rem] md:text-[10rem] lg:text-[15rem] leading-none tracking-tighter" style={{ fontFamily: "'Google Sans Flex', sans-serif" }}>
               <div className="overflow-hidden h-[0.9em] flex items-start"><span className="block text-toyota-red opacity-40">TOYOTA</span></div>
               <div className="overflow-hidden h-[0.65em] flex items-start opacity-80 -mt-[0.05em]"><span className="block text-transparent" style={{ WebkitTextStroke: "2px white" }}>TOYOTA</span></div>
@@ -150,17 +157,48 @@ function Hero2() {
 
           {/* 🏎️ CAR IMAGES (Targeted with 'parallax-target') */}
           <div className="absolute inset-0 w-full h-full parallax-target">
+            
+            {/* ✨ NEW: REFLECTION LAYER ✨ 
+                Is container ko ulta (scaleY -1) kiya gaya hai aur neeche (translateY 42%) shift kiya gaya hai taake exact reflection banay. 
+            */}
+            <div 
+              className="absolute inset-0 w-full h-full opacity-40 pointer-events-none -scale-y-100 translate-y-[42%]"
+              style={{
+                // Yeh gradient reflection ko neechay jatay hue gayab (fade) karta hai
+                WebkitMaskImage: "linear-gradient(to top, rgba(0,0,0,1) 20%, rgba(0,0,0,0) 65%)",
+                maskImage: "linear-gradient(to top, rgba(0,0,0,1) 20%, rgba(0,0,0,0) 65%)"
+              }}
+            >
+              {/* Reflection Base */}
+              <img src="/images/hero1.png" className="absolute inset-0 w-full h-full object-cover scale-70 " alt="Base Reflection" />
+              {/* Reflection Hover (Masked the exact same way) */}
+              <img 
+                src="/images/spn2.png" 
+                className="absolute inset-0 w-full h-full object-cover scale-68 pointer-events-none mt-2 -ml-2" 
+                style={{ WebkitMaskImage: "url(#liquid-trail-mask)", maskImage: "url(#liquid-trail-mask)" }} 
+                alt="Hover Reflection" 
+              />
+            </div>
+
+            {/* 🚗 MAIN CAR IMAGES */}
             <img src="/images/hero1.png" className="absolute inset-0 w-full h-full object-cover scale-70 " alt="Base" />
             <img 
               src="/images/spn2.png" 
-              className="absolute inset-0 w-full h-full object-cover  scale-68 pointer-events-none mt-2 -ml-2" 
+              className="absolute inset-0 w-full h-full object-cover scale-68 pointer-events-none mt-2 -ml-2" 
               style={{ WebkitMaskImage: "url(#liquid-trail-mask)", maskImage: "url(#liquid-trail-mask)" }} 
               alt="Hover" 
             />
+
           </div>
 
           {/* Inner Background Backdrop */}
-         
+          {/* <div
+            style={{
+              backgroundImage: "url('/images/bg-1.png')",
+              backgroundSize: "cover",
+            }}
+            className="absolute inset-0 z-[-1000] bg-gradient-to-t from-black via-transparent to-transparent pointer-events-none" 
+          /> */}
         </div>
 
         {/* 2️⃣ TOP RIGHT MODULE */}
