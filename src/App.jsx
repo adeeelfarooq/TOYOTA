@@ -11,6 +11,7 @@ import TestPage from './sections/Test';
 import GlobalMap from './sections/Map';
 import Lastpage from './sections/Last';
 import Hero2 from './sections/Hero2';
+import Logo from './components/Logo';
 // import ModernTestimonialsSection from './sections/Testimonial';
 
 gsap.registerPlugin(ScrollTrigger , ScrollToPlugin ,  ScrollSmoother);
@@ -26,9 +27,12 @@ const App = () => {
   
   return (
     <main>
+      <Logo/>
+      
       <div id="smooth-wrapper">   
       <div id="smooth-content">
          <Hero2/>
+         
 {/* <Hero/> */}
 <Cars/>
 

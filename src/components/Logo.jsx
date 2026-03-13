@@ -25,8 +25,8 @@ const Logo = () => {
       src="/images/Toyota-logo.svg"
       alt="Toyota"
       // fixed aur z-[999] isko hamesha screen par start se end tak aik jagah rakhe ga
-      className="fixed top-6 left-8 z-[999] w-32 pointer-events-none transform-gpu"
-      style={{ clipPath: "polygon(0 0, 0 0, 0 100%, 0 100%)" }}
+      className="fixed top-6 opacity-60 left-8 z-[999] w-32 pointer-events-none transform-gpu"
+      style={{ clipPath: "polygon(0 0, 0 0, 0 100%, 0 100%)" , filter: "brightness(0) invert(16%) sepia(93%) saturate(5831%) hue-rotate(349deg) brightness(97%) contrast(110%)" }}
     />
   );
 };
