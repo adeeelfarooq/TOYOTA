@@ -144,34 +144,45 @@ function Hero2() {
             backgroundColor: "rgba(0,0,0,0.95)"
           }}
         >
-          {/* 🅱️ TOYOTA LAYERS */}
+          {/* 🅱️ TOYOTA LAYERS (First Layer Red, Reflection TOY White, OTA Red) */}
           <div ref={mainTextRef} className="absolute z-[-999] inset-0 flex items-center justify-center pointer-events-none mt-10">
             <div className="stacked-text flex flex-col items-center uppercase font-black text-[6rem] md:text-[10rem] lg:text-[15rem] leading-none tracking-tighter" style={{ fontFamily: "'Google Sans Flex', sans-serif" }}>
               <div className="overflow-hidden h-[0.9em] flex items-start"><span className="block text-toyota-red opacity-40">TOYOTA</span></div>
-              <div className="overflow-hidden h-[0.65em] flex items-start opacity-80 -mt-[0.05em]"><span className="block text-transparent" style={{ WebkitTextStroke: "2px white" }}>TOYOTA</span></div>
-              <div className="overflow-hidden h-[0.45em] flex items-start opacity-50 -mt-[0.05em]"><span className="block text-transparent" style={{ WebkitTextStroke: "2px white" }}>TOYOTA</span></div>
-              <div className="overflow-hidden h-[0.3em] flex items-start opacity-30 -mt-[0.05em]"><span className="block text-transparent" style={{ WebkitTextStroke: "2px white" }}>TOYOTA</span></div>
-              <div className="overflow-hidden h-[0.15em] flex items-start opacity-10 -mt-[0.05em]"><span className="block text-transparent" style={{ WebkitTextStroke: "2px white" }}>TOYOTA</span></div>
+              
+              <div className="overflow-hidden h-[0.65em] flex items-start opacity-80 -mt-[0.05em]">
+                <span className="block text-transparent" style={{ WebkitTextStroke: "2px white" }}>TOY</span>
+                <span className="block text-transparent" style={{ WebkitTextStroke: "2px #eb0a1e" }}>OTA</span>
+              </div>
+              
+              <div className="overflow-hidden h-[0.45em] flex items-start opacity-50 -mt-[0.05em]">
+                <span className="block text-transparent" style={{ WebkitTextStroke: "2px white" }}>TOY</span>
+                <span className="block text-transparent" style={{ WebkitTextStroke: "2px #eb0a1e" }}>OTA</span>
+              </div>
+              
+              <div className="overflow-hidden h-[0.3em] flex items-start opacity-30 -mt-[0.05em]">
+                <span className="block text-transparent" style={{ WebkitTextStroke: "2px white" }}>TOY</span>
+                <span className="block text-transparent" style={{ WebkitTextStroke: "2px #eb0a1e" }}>OTA</span>
+              </div>
+              
+              <div className="overflow-hidden h-[0.15em] flex items-start opacity-10 -mt-[0.05em]">
+                <span className="block text-transparent" style={{ WebkitTextStroke: "2px white" }}>TOY</span>
+                <span className="block text-transparent" style={{ WebkitTextStroke: "2px #eb0a1e" }}>OTA</span>
+              </div>
             </div>
           </div>
 
           {/* 🏎️ CAR IMAGES (Targeted with 'parallax-target') */}
           <div className="absolute inset-0 w-full h-full parallax-target">
             
-            {/* ✨ NEW: REFLECTION LAYER ✨ 
-                Is container ko ulta (scaleY -1) kiya gaya hai aur neeche (translateY 42%) shift kiya gaya hai taake exact reflection banay. 
-            */}
+            {/* ✨ REFLECTION LAYER ✨ */}
             <div 
               className="absolute inset-0 w-full h-full opacity-40 pointer-events-none -scale-y-100 translate-y-[42%]"
               style={{
-                // Yeh gradient reflection ko neechay jatay hue gayab (fade) karta hai
                 WebkitMaskImage: "linear-gradient(to top, rgba(0,0,0,1) 20%, rgba(0,0,0,0) 65%)",
                 maskImage: "linear-gradient(to top, rgba(0,0,0,1) 20%, rgba(0,0,0,0) 65%)"
               }}
             >
-              {/* Reflection Base */}
               <img src="/images/hero1.png" className="absolute inset-0 w-full h-full object-cover scale-70 " alt="Base Reflection" />
-              {/* Reflection Hover (Masked the exact same way) */}
               <img 
                 src="/images/spn2.png" 
                 className="absolute inset-0 w-full h-full object-cover scale-68 pointer-events-none mt-2 -ml-2" 
@@ -191,7 +202,7 @@ function Hero2() {
 
           </div>
 
-          {/* Inner Background Backdrop */}
+          {/* Inner Background Backdrop Commented As Requested */}
           {/* <div
             style={{
               backgroundImage: "url('/images/bg-1.png')",
@@ -201,7 +212,7 @@ function Hero2() {
           /> */}
         </div>
 
-        {/* 2️⃣ TOP RIGHT MODULE */}
+        {/* 2️⃣ TOP RIGHT MODULE (Replaced SHOP NOW with EXPLORE MODELS) */}
         <div className="absolute top-0 right-0 w-[24%] h-[18%] flex flex-col items-end gap-3 pointer-events-none">
             <div className="flex gap-2 pointer-events-auto">
               <button className="w-12 h-12 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white flex items-center justify-center hover:bg-toyota-red transition-all cursor-pointer">
@@ -214,8 +225,12 @@ function Hero2() {
                  CONTACT
               </button>
             </div>
-            <button className="w-full h-12 rounded-full border border-white/20 text-white font-black text-xs tracking-[0.2em] hover:bg-white hover:text-black transition-all cursor-pointer pointer-events-auto">
-              SHOP NOW
+            {/* Button text changed to EXPLORE MODELS, no arrow icon, same tracking */}
+            <button 
+              onClick={() => gsap.to(window, { duration: 2, scrollTo: "#footer" })}
+              className="w-full h-12 rounded-full border border-white/20 text-white font-black text-xs tracking-[0.2em] hover:bg-white hover:text-black transition-all cursor-pointer pointer-events-auto"
+            >
+              EXPLORE MODELS
             </button>
         </div>
 
@@ -235,19 +250,6 @@ function Hero2() {
                   View Specs
                </div>
             </div>
-        </div>
-
-        {/* EXPLORE MODELS CTA */}
-        <div ref={uiElementsRef} className="absolute bottom-10 left-[5%] z-30 pointer-events-auto">
-          <button
-            onClick={() => gsap.to(window, { duration: 2, scrollTo: "#footer" })}
-            className="group flex items-center gap-6 px-10 py-5 bg-white/10 backdrop-blur-lg border border-white/20 rounded-full hover:bg-white hover:text-black transition-all duration-500"
-          >
-            <span className="text-xs font-black uppercase tracking-[0.3em] text-white group-hover:text-black">Explore Models</span>
-            <div className="w-6 h-6 rounded-full bg-toyota-red flex items-center justify-center group-hover:rotate-45 transition-transform duration-500 shadow-lg">
-              <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
-            </div>
-          </button>
         </div>
 
       </div>
