@@ -11,26 +11,31 @@ function Hero2() {
   const mainTextRef = useRef(null);
   const uiElementsRef = useRef(null);
 
-  // 🎯 Brush Trail Engine k Refs (Mouse k liye)
+  // 🎯 Brush Trail Engine k Refs (Main aur Mirrored)
   const circlesRef = useRef([]);
+  const reflectCirclesRef = useRef([]); // Reflection k circles
   const circleIndex = useRef(0);
   const NUM_CIRCLES = 30; 
 
-  // 🎯 Autonomous Ink Blob Refs (Khud chalne wali ink)
+  // 🎯 Autonomous Ink Blob Refs (Top + Bottom Reflection)
   const autoInkGroupMaskRef = useRef(null); 
   const autoInkGroupVisRef = useRef(null);  
   const autoInkMaskRef = useRef(null);
   const autoInkVisualRef = useRef(null);
+  const autoInkReflectMaskRef = useRef(null); // Reflected Ink
+  const autoInkReflectVisualRef = useRef(null); // Reflected Ink
 
-  // 💧 Ink Droplets (Particles) k Refs
+  // 💧 Ink Droplets (Particles) k Refs (Top + Bottom)
   const autoPartsMaskRef = useRef([]);
   const autoPartsVisRef = useRef([]);
+  const autoPartsReflectMaskRef = useRef([]);
+  const autoPartsReflectVisRef = useRef([]);
   const autoPartIndex = useRef(0);
   const NUM_AUTO_PARTS = 20;
 
   // 🚦 Tracking States
   const isHoveringCar = useRef(false);
-  const inkTimerRef = useRef(null); // Timer ink ko wapis lane k liye
+  const inkTimerRef = useRef(null); 
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -41,6 +46,7 @@ function Hero2() {
       gsap.set(uiElementsRef.current, { opacity: 0 });
 
       gsap.set([autoInkMaskRef.current, autoInkVisualRef.current], { x: -500, y: -500 });
+      gsap.set([autoInkReflectMaskRef.current, autoInkReflectVisualRef.current], { x: -500, y: -500 });
 
       // 🔴 INTRO RED SCREEN + LOGO
       tl.set(introRef.current, { yPercent: 0 })
@@ -55,7 +61,7 @@ function Hero2() {
         .to(mainTextRef.current, { opacity: 1, y: 0, duration: 1.5, ease: "power3.out" }, "-=1.0")
         .to(uiElementsRef.current, { opacity: 1, duration: 1.5, ease: "power2.out" }, "-=1.0");
 
-      // 💧 ADVANCED AUTONOMOUS INK LOGIC
+      // 💧 ADVANCED AUTONOMOUS INK LOGIC (MIRRORED)
       if (autoInkMaskRef.current && autoInkVisualRef.current && window.innerWidth > 0) {
         let isCenterDash = false;
 
@@ -69,26 +75,26 @@ function Hero2() {
           const idx = autoPartIndex.current;
           const maskPart = autoPartsMaskRef.current[idx];
           const visPart = autoPartsVisRef.current[idx];
+          const refMaskPart = autoPartsReflectMaskRef.current[idx];
+          const refVisPart = autoPartsReflectVisRef.current[idx];
           
-          if (maskPart && visPart) {
+          if (maskPart && visPart && refMaskPart && refVisPart) {
             const offsetX = gsap.utils.random(-80, 80);
             const offsetY = gsap.utils.random(-50, 50);
             const size = gsap.utils.random(20, 60);
 
-            gsap.killTweensOf([maskPart, visPart]);
+            const targetX = currX + offsetX;
+            const targetY = currY + offsetY;
+            // Perfect Reflection Math
+            const mirrorY = (window.innerHeight * 1.42) - targetY;
+
+            gsap.killTweensOf([maskPart, visPart, refMaskPart, refVisPart]);
             
-            gsap.set([maskPart, visPart], { 
-              x: currX + offsetX, 
-              y: currY + offsetY, 
-              scale: size,
-              opacity: gsap.utils.random(0.6, 1) 
-            });
+            gsap.set([maskPart, visPart], { x: targetX, y: targetY, scale: size, opacity: gsap.utils.random(0.6, 1) });
+            gsap.set([refMaskPart, refVisPart], { x: targetX, y: mirrorY, scale: size, opacity: gsap.utils.random(0.6, 1) });
             
-            gsap.to([maskPart, visPart], { 
-              scale: 0, 
-              opacity: 0, 
-              duration: gsap.utils.random(0.8, 1.5), 
-              ease: "power2.out" 
+            gsap.to([maskPart, visPart, refMaskPart, refVisPart], { 
+              scale: 0, opacity: 0, duration: gsap.utils.random(0.8, 1.5), ease: "power2.out" 
             });
           }
           autoPartIndex.current = (idx + 1) % NUM_AUTO_PARTS;
@@ -101,40 +107,34 @@ function Hero2() {
           if (!isCenterDash) {
             const newX = gsap.utils.random(-200, w + 200);
             const newY = gsap.utils.random(-200, h + 200);
+            const mirrorY = (h * 1.42) - newY;
             const speed = gsap.utils.random(2, 3);
             
             gsap.to([autoInkMaskRef.current, autoInkVisualRef.current], {
-              x: newX, y: newY, 
-              duration: speed,
-              ease: "power1.inOut",
-              onUpdate: dropParticle,
-              onComplete: () => {
-                isCenterDash = true;
-                animateBlob(); 
-              }
+              x: newX, y: newY, duration: speed, ease: "power1.inOut", onUpdate: dropParticle,
+              onComplete: () => { isCenterDash = true; animateBlob(); }
+            });
+            gsap.to([autoInkReflectMaskRef.current, autoInkReflectVisualRef.current], {
+              x: newX, y: mirrorY, duration: speed, ease: "power1.inOut"
             });
           } else {
             const dashes = Math.floor(gsap.utils.random(2, 4));
             const dashDuration = 1.0 / dashes;
-            
-            const dashTl = gsap.timeline({
-              onComplete: () => {
-                isCenterDash = false;
-                animateBlob();
-              }
-            });
+            const dashTl = gsap.timeline({ onComplete: () => { isCenterDash = false; animateBlob(); }});
+            const mirrorDashTl = gsap.timeline();
 
             let currentSide = Math.random() > 0.5 ? 1 : -1;
 
             for (let i = 0; i < dashes; i++) {
               const targetX = currentSide === 1 ? w + 300 : -300;
               const targetY = gsap.utils.random(h * 0.4, h * 0.6);
+              const mirrorY = (h * 1.42) - targetY;
 
               dashTl.to([autoInkMaskRef.current, autoInkVisualRef.current], {
-                x: targetX, y: targetY, 
-                duration: dashDuration,
-                ease: "power1.inOut",
-                onUpdate: dropParticle
+                x: targetX, y: targetY, duration: dashDuration, ease: "power1.inOut", onUpdate: dropParticle
+              });
+              mirrorDashTl.to([autoInkReflectMaskRef.current, autoInkReflectVisualRef.current], {
+                x: targetX, y: mirrorY, duration: dashDuration, ease: "power1.inOut"
               });
               currentSide *= -1;
             }
@@ -144,10 +144,11 @@ function Hero2() {
         const breatheBlob = () => {
           const newRx = gsap.utils.random(250, 400);
           const newRy = gsap.utils.random(50, 100); 
-          gsap.to([autoInkMaskRef.current, autoInkVisualRef.current], {
-            attr: { rx: newRx, ry: newRy }, 
-            duration: gsap.utils.random(0.5, 1.2), 
-            ease: "sine.inOut",
+          gsap.to([
+            autoInkMaskRef.current, autoInkVisualRef.current,
+            autoInkReflectMaskRef.current, autoInkReflectVisualRef.current
+          ], {
+            attr: { rx: newRx, ry: newRy }, duration: gsap.utils.random(0.5, 1.2), ease: "sine.inOut",
             onComplete: breatheBlob 
           });
         };
@@ -155,83 +156,108 @@ function Hero2() {
         animateBlob();
         breatheBlob();
       }
-
     }, sectionRef);
 
     return () => ctx.revert();
-
   }, []);
 
-  // 🎯 Liquid Brush Trail Logic
+  // 🎯 Liquid Brush Trail Logic (WITH EXACT MIRROR & OFFSET FIX)
   const handleMouseMove = (e) => {
     const { clientX, clientY } = e;
 
     if (!sectionRef.current || !bgWrapperRef.current) return;
 
-    // Parallax logic (always runs)
+    // 🏎️ Parallax logic
     const { left, top, width, height } = sectionRef.current.getBoundingClientRect();
     const x = (clientX - left) / width - 0.5;
     const y = (clientY - top) / height - 0.5;
 
-    gsap.to(".parallax-target", {
-      x: x * 30,
-      y: y * 20,
-      duration: 1,
-      ease: "power2.out",
-      overwrite: "auto"
-    });
+    gsap.to(".parallax-target", { x: x * 30, y: y * 20, duration: 1, ease: "power2.out", overwrite: "auto" });
 
-    // 🔴 ONLY RUN THIS IF MOUSE IS ACTUALLY ON CAR (Mask Reveal Logic)
-    if (isHoveringCar.current) {
-      const rect = bgWrapperRef.current.getBoundingClientRect();
-      const localX = clientX - rect.left;
-      const localY = clientY - rect.top;
+    // 🔴 Tracker for screen height & hover bound
+    const rect = bgWrapperRef.current.getBoundingClientRect();
+    const H = rect.height;
+    const screenLocalY = clientY - rect.top;
 
-      const circle = circlesRef.current[circleIndex.current];
-      if (circle) {
-        const offsetX = (Math.random() - 0.5) * 30;
-        const offsetY = (Math.random() - 0.5) * 30;
-        gsap.killTweensOf(circle);
-        gsap.set(circle, { x: localX + offsetX, y: localY + offsetY });
-        gsap.fromTo(circle, { scale: 0, opacity: 1 }, { scale: Math.random() * 30 + 80, duration: 0.2, ease: "power2.out" });
-        
-        // Note: Circle disappear hone me max ~1.4 sec lagte hain (0.8 delay + 0.6 duration)
-        gsap.to(circle, { scale: 0, opacity: 0, duration: 0.6, delay: 0.5 + Math.random() * 0.3, ease: "power3.inOut" });
+    // Fixed "Adhi adhi jagah pr" issue:
+    // Boundary increased to 0.65 so the full top car works perfectly without getting cut off.
+    if (screenLocalY > H * 0.65) {
+      if (isHoveringCar.current) {
+        isHoveringCar.current = false;
+        if (inkTimerRef.current) inkTimerRef.current.kill();
+        inkTimerRef.current = gsap.delayedCall(1.4, () => {
+          gsap.to([autoInkGroupMaskRef.current, autoInkGroupVisRef.current], {
+            opacity: 1, duration: 0.5, ease: "power2.inOut", overwrite: "auto"
+          });
+        });
       }
-      circleIndex.current = (circleIndex.current + 1) % NUM_CIRCLES;
+      return; 
+    }
 
-      // 🔥 LOGIC: Jab tak mask ban raha hai, Auto Ink Hide kardo
+    // 🟢 AGAR MOUSE UPAR WALI GARI PAR HAI
+    if (!isHoveringCar.current) {
+      isHoveringCar.current = true;
       gsap.to([autoInkGroupMaskRef.current, autoInkGroupVisRef.current], {
-        opacity: 0,
-        duration: 0.3,
-        ease: "power2.out",
-        overwrite: "auto"
+        opacity: 0, duration: 0.3, ease: "power2.out", overwrite: "auto"
       });
+    }
 
-      // 🔥 LOGIC: Agar pehle se timer chal raha hai to cancel kardo
-      if (inkTimerRef.current) {
-        inkTimerRef.current.kill();
-      }
+    // 🔥 FIX OFFSET: Get coordinates EXACTLY relative to the moving Parallax Container
+    const parallaxEl = bgWrapperRef.current.querySelector(".parallax-target");
+    let pLocalX = clientX - rect.left;
+    let pLocalY = clientY - rect.top;
 
-      // 🔥 LOGIC: 1.4 Seconds (jab mask bilkul khtam/disappear ho jaye) baad ink wapis le aao
+    if (parallaxEl) {
+      const pRect = parallaxEl.getBoundingClientRect();
+      pLocalX = clientX - pRect.left;
+      pLocalY = clientY - pRect.top;
+    }
+
+    const circle = circlesRef.current[circleIndex.current];
+    const reflectCircle = reflectCirclesRef.current[circleIndex.current];
+
+    if (circle && reflectCircle) {
+      const offsetX = (Math.random() - 0.5) * 30;
+      const offsetY = (Math.random() - 0.5) * 30;
+      
+      const targetX = pLocalX + offsetX;
+      const targetY = pLocalY + offsetY;
+      // Exact mirrored coordinate for reflection
+      const mirrorY = (H * 1.42) - targetY; 
+      
+      gsap.killTweensOf([circle, reflectCircle]);
+      
+      gsap.set(circle, { x: targetX, y: targetY });
+      gsap.set(reflectCircle, { x: targetX, y: mirrorY });
+      
+      gsap.fromTo([circle, reflectCircle], 
+        { scale: 0, opacity: 1 }, 
+        { scale: Math.random() * 30 + 80, duration: 0.2, ease: "power2.out" }
+      );
+      gsap.to([circle, reflectCircle], 
+        { scale: 0, opacity: 0, duration: 0.6, delay: 0.5 + Math.random() * 0.3, ease: "power3.inOut" }
+      );
+    }
+    circleIndex.current = (circleIndex.current + 1) % NUM_CIRCLES;
+
+    if (inkTimerRef.current) inkTimerRef.current.kill();
+    inkTimerRef.current = gsap.delayedCall(1.4, () => {
+      gsap.to([autoInkGroupMaskRef.current, autoInkGroupVisRef.current], {
+        opacity: 1, duration: 0.5, ease: "power2.inOut", overwrite: "auto"
+      });
+    });
+  };
+
+  const handleMouseLeaveSection = () => {
+    if (isHoveringCar.current) {
+      isHoveringCar.current = false;
+      if (inkTimerRef.current) inkTimerRef.current.kill();
       inkTimerRef.current = gsap.delayedCall(1.4, () => {
         gsap.to([autoInkGroupMaskRef.current, autoInkGroupVisRef.current], {
-          opacity: 1,
-          duration: 0.5,
-          ease: "power2.inOut",
-          overwrite: "auto"
+          opacity: 1, duration: 0.5, ease: "power2.inOut", overwrite: "auto"
         });
       });
     }
-  };
-
-  // Tracking mouse enter/leave just to enable/disable mask generation
-  const handleImageEnter = () => {
-    isHoveringCar.current = true;
-  };
-
-  const handleImageLeave = () => {
-    isHoveringCar.current = false;
   };
 
   return (
@@ -239,6 +265,7 @@ function Hero2() {
       ref={sectionRef}
       className="relative h-screen w-screen overflow-hidden bg-black flex items-center justify-center p-4 lg:p-6"
       onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeaveSection}
     >
       <div className="absolute inset-0 bg-black/50 z-0"></div>
 
@@ -250,14 +277,12 @@ function Hero2() {
             <stop offset="100%" stopColor="white" stopOpacity="0" />
           </radialGradient>
           
-          {/* ✅ LANDO NORRIS INSPIRED DEEP LIQUID BLACK INK */}
           <radialGradient id="lando-ink">
             <stop offset="10%" stopColor="#1e1e1e" stopOpacity="0.95" />
             <stop offset="60%" stopColor="#0a0a0a" stopOpacity="0.8" />
             <stop offset="100%" stopColor="#000000" stopOpacity="0" />
           </radialGradient>
 
-          {/* LAG FIX APPLIED FOR EXTREME PERFORMANCE */}
           <filter id="blob-edge" x="-20%" y="-20%" width="140%" height="140%" colorInterpolationFilters="sRGB">
             <feTurbulence ref={turbulenceRef} type="fractalNoise" baseFrequency="0.005" numOctaves="1" result="noise" />
             <feDisplacementMap in="SourceGraphic" in2="noise" scale="150" xChannelSelector="R" yChannelSelector="G" />
@@ -267,14 +292,26 @@ function Hero2() {
             <rect width="100%" height="100%" fill="black" />
             <g filter="url(#blob-edge)">
               <g ref={autoInkGroupMaskRef}>
+                {/* 🔴 TOP AUTO INK */}
                 <ellipse ref={autoInkMaskRef} cx="0" cy="0" rx="300" ry="80" fill="url(#soft-brush)" className="will-change-transform" />
+                {/* 🔴 REFLECTED AUTO INK */}
+                <ellipse ref={autoInkReflectMaskRef} cx="0" cy="0" rx="300" ry="80" fill="url(#soft-brush)" className="will-change-transform" />
+                
                 {Array.from({ length: NUM_AUTO_PARTS }).map((_, i) => (
                   <circle key={`auto-m-${i}`} ref={(el) => (autoPartsMaskRef.current[i] = el)} cx="0" cy="0" r="1" fill="url(#soft-brush)" className="will-change-transform" />
                 ))}
+                {Array.from({ length: NUM_AUTO_PARTS }).map((_, i) => (
+                  <circle key={`auto-ref-m-${i}`} ref={(el) => (autoPartsReflectMaskRef.current[i] = el)} cx="0" cy="0" r="1" fill="url(#soft-brush)" className="will-change-transform" />
+                ))}
               </g>
 
+              {/* 🔴 TOP MOUSE BRUSH TRAIL */}
               {Array.from({ length: NUM_CIRCLES }).map((_, i) => (
-                <circle key={i} ref={(el) => (circlesRef.current[i] = el)} cx="0" cy="0" r="1" fill="url(#soft-brush)" className="will-change-transform" />
+                <circle key={`c-${i}`} ref={(el) => (circlesRef.current[i] = el)} cx="0" cy="0" r="1" fill="url(#soft-brush)" className="will-change-transform" />
+              ))}
+              {/* 🔴 REFLECTED MOUSE BRUSH TRAIL */}
+              {Array.from({ length: NUM_CIRCLES }).map((_, i) => (
+                <circle key={`c-ref-${i}`} ref={(el) => (reflectCirclesRef.current[i] = el)} cx="0" cy="0" r="1" fill="url(#soft-brush)" className="will-change-transform" />
               ))}
             </g>
           </mask>
@@ -303,13 +340,18 @@ function Hero2() {
             backgroundColor: "rgba(0,0,0,0.95)"
           }}
         >
-          {/* ✅ VISIBLE LANDO NORRIS STYLE INK */}
+          {/* ✅ VISIBLE LANDO NORRIS STYLE INK (TOP & REFLECTED) */}
           <svg className="absolute inset-0 w-full h-full z-0 pointer-events-none">
              <g filter="url(#blob-edge)">
                <g ref={autoInkGroupVisRef}>
                  <ellipse ref={autoInkVisualRef} cx="0" cy="0" rx="300" ry="80" fill="url(#lando-ink)" className="will-change-transform" />
+                 <ellipse ref={autoInkReflectVisualRef} cx="0" cy="0" rx="300" ry="80" fill="url(#lando-ink)" className="will-change-transform" />
+                 
                  {Array.from({ length: NUM_AUTO_PARTS }).map((_, i) => (
                     <circle key={`auto-v-${i}`} ref={(el) => (autoPartsVisRef.current[i] = el)} cx="0" cy="0" r="1" fill="url(#lando-ink)" className="will-change-transform" />
+                 ))}
+                 {Array.from({ length: NUM_AUTO_PARTS }).map((_, i) => (
+                    <circle key={`auto-ref-v-${i}`} ref={(el) => (autoPartsReflectVisRef.current[i] = el)} cx="0" cy="0" r="1" fill="url(#lando-ink)" className="will-change-transform" />
                  ))}
                </g>
              </g>
@@ -318,26 +360,21 @@ function Hero2() {
           {/* 🅱️ TOYOTA LAYERS */}
           <div ref={mainTextRef} className="absolute z-[-999] inset-0 flex items-center justify-center pointer-events-none mt-10">
             <div className="stacked-text flex flex-col items-center uppercase font-black text-[6rem] md:text-[10rem] lg:text-[15rem] leading-none mt-5 tracking-[3rem]">
-              
               <div className="overflow-hidden h-[0.9em] flex items-start ">
                 <span className="block text-toyota-red opacity-40" style={{ WebkitTextStroke: "6px #eb0a1e" }}>TOYOTA</span>
               </div>
-              
               <div className="overflow-hidden h-[0.65em] flex items-start opacity-55 -mt-[0.05em] ">
                 <span className="block text-transparent opacity-30" style={{ WebkitTextStroke: "3px white" }} >TOY</span>
                 <span className="block text-transparent opacity-30" style={{ WebkitTextStroke: "3px #eb0a1e" }} >OTA</span>
               </div>
-              
               <div className="overflow-hidden h-[0.45em] flex items-start opacity-50 -mt-[0.05em]">
                 <span className="block text-transparent opacity-25" style={{ WebkitTextStroke: "3px white"  }}>TOY</span>
                 <span className="block text-transparent opacity-25" style={{ WebkitTextStroke: "3px #eb0a1e" }}>OTA</span>
               </div>
-              
               <div className="overflow-hidden h-[0.3em] flex items-start opacity-30 -mt-[0.05em]">
                 <span className="block text-transparent opacity-20" style={{ WebkitTextStroke: "3px white" }}>TOY</span>
                 <span className="block text-transparent opacity-20" style={{ WebkitTextStroke: "3px #eb0a1e" }}>OTA</span>
               </div>
-              
               <div className="overflow-hidden h-[0.15em] flex items-start opacity-10 -mt-[0.05em]">
                 <span className="block text-transparent" style={{ WebkitTextStroke: "3px #eb0a1e" }}>TOY</span>
                 <span className="block text-transparent" style={{ WebkitTextStroke: "3px #eb0a1e" }}>OTA</span>
@@ -345,38 +382,19 @@ function Hero2() {
             </div>
           </div>
 
-          {/* 🏎️ CAR IMAGES LAYER 1: Base Layer (Receives Hover Events & Moves with Parallax) */}
-          <div 
-            className="absolute inset-0 w-full h-full parallax-target pointer-events-auto transform-gpu"
-            onMouseEnter={handleImageEnter}
-            onMouseLeave={handleImageLeave}
-          >
+          {/* 🏎️ CAR IMAGES LAYER (HOVER EVENT REMOVED, CONTROLLED BY MOUSEMOVE LOGIC) */}
+          <div className="absolute inset-0 w-full h-full parallax-target pointer-events-auto transform-gpu">
             <div 
               className="absolute inset-0 w-full h-full opacity-40 pointer-events-none -scale-y-100 translate-y-[42%]"
               style={{ WebkitMaskImage: "linear-gradient(to top, rgba(0,0,0,1) 20%, rgba(0,0,0,0) 65%)", maskImage: "linear-gradient(to top, rgba(0,0,0,1) 20%, rgba(0,0,0,0) 65%)" }}
             >
               <img src="/images/hero1.png" className="absolute inset-0 w-full h-full object-cover scale-70 " alt="Base Reflection" />
+              <img src="/images/spn2.png" className="absolute inset-0 w-full h-full object-cover scale-68 pointer-events-none mt-2 -ml-2" style={{ WebkitMaskImage: "url(#liquid-trail-mask)", maskImage: "url(#liquid-trail-mask)" }} alt="Hover Reflection" />
             </div>
+
             <img src="/images/hero1.png" className="absolute inset-0 w-full h-full object-cover scale-70 " alt="Base" />
+            <img src="/images/spn2.png" className="absolute inset-0 w-full h-full object-cover scale-68 pointer-events-none mt-2 -ml-2" style={{ WebkitMaskImage: "url(#liquid-trail-mask)", maskImage: "url(#liquid-trail-mask)" }} alt="Hover" />
           </div>
-
-          {/* 🏎️ CAR IMAGES LAYER 2: Hover/Masked Layer (Mask is STATIONARY, Image inside moves with Parallax) */}
-          <div 
-            className="absolute inset-0 w-full h-full pointer-events-none" 
-            style={{ WebkitMaskImage: "url(#liquid-trail-mask)", maskImage: "url(#liquid-trail-mask)" }}
-          >
-             {/* Inner container exactly matches the Parallax movement of Layer 1 */}
-             <div className="absolute inset-0 w-full h-full parallax-target transform-gpu">
-                <div 
-                  className="absolute inset-0 w-full h-full opacity-40 pointer-events-none -scale-y-100 translate-y-[42%]"
-                  style={{ WebkitMaskImage: "linear-gradient(to top, rgba(0,0,0,1) 20%, rgba(0,0,0,0) 65%)", maskImage: "linear-gradient(to top, rgba(0,0,0,1) 20%, rgba(0,0,0,0) 65%)" }}
-                >
-                  <img src="/images/spn2.png" className="absolute inset-0 w-full h-full object-cover scale-68 mt-2 -ml-2" alt="Hover Reflection" />
-                </div>
-                <img src="/images/spn2.png" className="absolute inset-0 w-full h-full object-cover scale-68 mt-2 -ml-2" alt="Hover" />
-             </div>
-          </div>
-
         </div>
 
         {/* 2️⃣ TOP RIGHT MODULE */}
