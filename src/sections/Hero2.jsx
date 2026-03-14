@@ -8,23 +8,25 @@ function Hero2() {
 
   const bgWrapperRef = useRef(null);
   const turbulenceRef = useRef(null);
-  const mainTextRef = useRef(null); 
-  const uiElementsRef = useRef(null); 
-  
+  const mainTextRef = useRef(null);
+  const uiElementsRef = useRef(null);
+
   // 🎯 Brush Trail Engine k Refs (Mouse k liye)
-  const circlesRef = useRef([]); 
-  const circleIndex = useRef(0); 
-  const NUM_CIRCLES = 50; 
+  const circlesRef = useRef([]);
+  const circleIndex = useRef(0);
+  const NUM_CIRCLES = 35; // Thore kam kiye hain performance k liye
 
   // 🎯 Autonomous Ink Blob Refs (Khud chalne wali ink)
-  const autoInkMaskRef = useRef(null); 
-  const autoInkVisualRef = useRef(null); 
-  
+  const autoInkGroupMaskRef = useRef(null); // Hover pe hide karne k liye
+  const autoInkGroupVisRef = useRef(null);  // Hover pe hide karne k liye
+  const autoInkMaskRef = useRef(null);
+  const autoInkVisualRef = useRef(null);
+
   // 💧 Ink Droplets (Particles) k Refs
   const autoPartsMaskRef = useRef([]);
   const autoPartsVisRef = useRef([]);
   const autoPartIndex = useRef(0);
-  const NUM_AUTO_PARTS = 30; // Ink apne peechay 30 drops chhoregi
+  const NUM_AUTO_PARTS = 20; // Performance boost k liye 20
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -33,6 +35,9 @@ function Hero2() {
       gsap.set(bgWrapperRef.current, { opacity: 0 });
       gsap.set(mainTextRef.current, { opacity: 0, y: 50 });
       gsap.set(uiElementsRef.current, { opacity: 0 });
+
+      // Init positioning using CSS Transforms (Fast & Smooth)
+      gsap.set([autoInkMaskRef.current, autoInkVisualRef.current], { x: -500, y: -500 });
 
       // 🔴 INTRO RED SCREEN + LOGO
       tl.set(introRef.current, { yPercent: 0 })
@@ -49,45 +54,46 @@ function Hero2() {
 
       // 🌊 CONTINUOUS BUBBLING ANIMATION
       gsap.to(turbulenceRef.current, {
-        attr: { baseFrequency: "0.005 0.008" }, // Perfect for liquid stretch
+        attr: { baseFrequency: "0.005 0.008" },
         duration: 4,
         repeat: -1,
         yoyo: true,
         ease: "sine.inOut"
       });
 
-      // 💧 ADVANCED AUTONOMOUS INK LOGIC (Shape, Drops & Center Dashes)
+      // 💧 ADVANCED AUTONOMOUS INK LOGIC (High-Performance Transforms)
       if (autoInkMaskRef.current && autoInkVisualRef.current && window.innerWidth > 0) {
-        let isCenterDash = false; // State to track phase
+        let isCenterDash = false;
 
-        // Function: Ink jahan se guzray gi, wahan qatray (drops) chhoregi
         function dropParticle() {
-          // Optimization: Har frame me nahi, random gap se drop kare
           if (Math.random() > 0.4) return; 
 
-          const cx = parseFloat(this.targets()[0].getAttribute("cx"));
-          const cy = parseFloat(this.targets()[0].getAttribute("cy"));
+          // EXTREME OPTIMIZATION: Get current x/y instead of attr cx/cy
+          const target = this.targets()[0];
+          const currX = gsap.getProperty(target, "x");
+          const currY = gsap.getProperty(target, "y");
           
           const idx = autoPartIndex.current;
           const maskPart = autoPartsMaskRef.current[idx];
           const visPart = autoPartsVisRef.current[idx];
           
           if (maskPart && visPart) {
-            const offsetX = gsap.utils.random(-80, 80); // Droplet ka phailao
+            const offsetX = gsap.utils.random(-80, 80);
             const offsetY = gsap.utils.random(-50, 50);
             const size = gsap.utils.random(20, 60);
 
             gsap.killTweensOf([maskPart, visPart]);
             
-            // Drop paida hua
+            // Using X, Y, and Scale (100x faster than attr)
             gsap.set([maskPart, visPart], { 
-              attr: { cx: cx + offsetX, cy: cy + offsetY, r: size }, 
+              x: currX + offsetX, 
+              y: currY + offsetY, 
+              scale: size, // Scale use kia hai radius ki jaga
               opacity: gsap.utils.random(0.6, 1) 
             });
             
-            // Drop shrink ho kar evaporate hoga
             gsap.to([maskPart, visPart], { 
-              attr: { r: 0 }, 
+              scale: 0, 
               opacity: 0, 
               duration: gsap.utils.random(0.8, 1.5), 
               ease: "power2.out" 
@@ -101,54 +107,49 @@ function Hero2() {
           const h = window.innerHeight;
           
           if (!isCenterDash) {
-            // PHASE 1: WANDERING (2 se 3 seconds normal move)
             const newX = gsap.utils.random(-200, w + 200);
             const newY = gsap.utils.random(-200, h + 200);
-            const speed = gsap.utils.random(2, 3); // 2-3 sec
+            const speed = gsap.utils.random(2, 3);
             
             gsap.to([autoInkMaskRef.current, autoInkVisualRef.current], {
-              attr: { cx: newX, cy: newY },
+              x: newX, y: newY, // CSS Transform instead of attr
               duration: speed,
               ease: "power1.inOut",
-              onUpdate: dropParticle, // Moving k waqt particles chhorna
+              onUpdate: dropParticle,
               onComplete: () => {
-                isCenterDash = true; // Agla phase dash hoga
+                isCenterDash = true;
                 animateBlob(); 
               }
             });
           } else {
-            // PHASE 2: CENTER DASHES (1 sec me 2 ya 3 bar mid se guzarna)
-            const dashes = Math.floor(gsap.utils.random(2, 4)); // Randomly 2 or 3
-            const dashDuration = 1.0 / dashes; // Total 1 second time divided by dashes
+            const dashes = Math.floor(gsap.utils.random(2, 4));
+            const dashDuration = 1.0 / dashes;
             
             const dashTl = gsap.timeline({
               onComplete: () => {
-                isCenterDash = false; // Wapis normal wandering
+                isCenterDash = false;
                 animateBlob();
               }
             });
 
-            let currentSide = Math.random() > 0.5 ? 1 : -1; // Random start side
+            let currentSide = Math.random() > 0.5 ? 1 : -1;
 
             for (let i = 0; i < dashes; i++) {
               const targetX = currentSide === 1 ? w + 300 : -300;
-              // Mid 20% area calculation (40% se 60% height k darmyan)
               const targetY = gsap.utils.random(h * 0.4, h * 0.6);
 
               dashTl.to([autoInkMaskRef.current, autoInkVisualRef.current], {
-                attr: { cx: targetX, cy: targetY },
+                x: targetX, y: targetY, // CSS Transform
                 duration: dashDuration,
                 ease: "power1.inOut",
-                onUpdate: dropParticle // Dash me bhi particles nikalenge
+                onUpdate: dropParticle
               });
-              currentSide *= -1; // Agli dash mukhalif simt (opposite) se
+              currentSide *= -1;
             }
           }
         };
 
         const breatheBlob = () => {
-          // Ellipse ki shape ko maintain rakhte hue sans lena
-          // Rx (width) lambi hai, Ry (height) kam hai
           const newRx = gsap.utils.random(250, 400);
           const newRy = gsap.utils.random(50, 100); 
           gsap.to([autoInkMaskRef.current, autoInkVisualRef.current], {
@@ -166,41 +167,61 @@ function Hero2() {
     }, sectionRef);
 
     return () => ctx.revert();
+
   }, []);
 
   // 🎯 Liquid Brush Trail Logic
   const handleMouseMove = (e) => {
     const { clientX, clientY } = e;
-    
+
     if (!sectionRef.current || !bgWrapperRef.current) return;
 
     const { left, top, width, height } = sectionRef.current.getBoundingClientRect();
     const x = (clientX - left) / width - 0.5;
     const y = (clientY - top) / height - 0.5;
-    
+
     gsap.to(".parallax-target", {
       x: x * 30,
       y: y * 20,
       duration: 1,
-      ease: "power2.out"
+      ease: "power2.out",
+      overwrite: "auto"
     });
 
     const rect = bgWrapperRef.current.getBoundingClientRect();
     const localX = clientX - rect.left;
     const localY = clientY - rect.top;
 
-    for (let i = 0; i < 2; i++) {
-      const circle = circlesRef.current[circleIndex.current];
-      if (circle) {
-        const offsetX = (Math.random() - 0.5) * 30;
-        const offsetY = (Math.random() - 0.5) * 30;
-        gsap.killTweensOf(circle);
-        gsap.set(circle, { attr: { cx: localX + offsetX, cy: localY + offsetY } });
-        gsap.fromTo(circle, { attr: { r: 0 }, opacity: 1 }, { attr: { r: Math.random() * 30 + 80 }, duration: 0.2, ease: "power2.out" });
-        gsap.to(circle, { attr: { r: 0 }, opacity: 0, duration: 0.6, delay: 0.8 + Math.random() * 0.4, ease: "power3.inOut" });
-      }
-      circleIndex.current = (circleIndex.current + 1) % NUM_CIRCLES;
+    // Use CSS Transforms for Brush Engine to avoid lag
+    const circle = circlesRef.current[circleIndex.current];
+    if (circle) {
+      const offsetX = (Math.random() - 0.5) * 30;
+      const offsetY = (Math.random() - 0.5) * 30;
+      gsap.killTweensOf(circle);
+      gsap.set(circle, { x: localX + offsetX, y: localY + offsetY });
+      gsap.fromTo(circle, { scale: 0, opacity: 1 }, { scale: Math.random() * 30 + 80, duration: 0.2, ease: "power2.out" });
+      gsap.to(circle, { scale: 0, opacity: 0, duration: 0.6, delay: 0.8 + Math.random() * 0.4, ease: "power3.inOut" });
     }
+    circleIndex.current = (circleIndex.current + 1) % NUM_CIRCLES;
+  };
+
+  // 🎯 Hide Auto Ink On Hover (Sirf CAR Image k liye)
+  const handleImageEnter = () => {
+    gsap.to([autoInkGroupMaskRef.current, autoInkGroupVisRef.current], {
+      opacity: 0,
+      duration: 0.4,
+      ease: "power2.out",
+      overwrite: "auto"
+    });
+  };
+
+  const handleImageLeave = () => {
+    gsap.to([autoInkGroupMaskRef.current, autoInkGroupVisRef.current], {
+      opacity: 1,
+      duration: 0.4,
+      ease: "power2.out",
+      overwrite: "auto"
+    });
   };
 
   return (
@@ -225,24 +246,26 @@ function Hero2() {
             <stop offset="100%" stopColor="#eb0a1e" stopOpacity="0" />
           </radialGradient>
 
-          <filter id="blob-edge" x="-100%" y="-100%" width="300%" height="300%">
-            <feTurbulence ref={turbulenceRef} type="fractalNoise" baseFrequency="0.005" numOctaves="4" result="noise" />
+          {/* Filter bounds optimized for extreme performance */}
+          <filter id="blob-edge" x="-20%" y="-20%" width="140%" height="140%">
+            <feTurbulence ref={turbulenceRef} type="fractalNoise" baseFrequency="0.005" numOctaves="2" result="noise" />
             <feDisplacementMap in="SourceGraphic" in2="noise" scale="250" xChannelSelector="R" yChannelSelector="G" />
           </filter>
           
           <mask id="liquid-trail-mask">
             <rect width="100%" height="100%" fill="black" />
             <g filter="url(#blob-edge)">
-              {/* SHAPE FIXED: Ellipse ban gaya taake lamba (brush) lagay */}
-              <ellipse ref={autoInkMaskRef} cx="-500" cy="-500" rx="300" ry="80" fill="url(#soft-brush)" />
               
-              {/* Droplets / Particles for Auto Ink Mask */}
-              {Array.from({ length: NUM_AUTO_PARTS }).map((_, i) => (
-                <circle key={`auto-m-${i}`} ref={(el) => (autoPartsMaskRef.current[i] = el)} cx="-100" cy="-100" r="0" fill="url(#soft-brush)" />
-              ))}
+              {/* GROUP FOR HOVER HIDE */}
+              <g ref={autoInkGroupMaskRef}>
+                <ellipse ref={autoInkMaskRef} cx="0" cy="0" rx="300" ry="80" fill="url(#soft-brush)" className="will-change-transform" />
+                {Array.from({ length: NUM_AUTO_PARTS }).map((_, i) => (
+                  <circle key={`auto-m-${i}`} ref={(el) => (autoPartsMaskRef.current[i] = el)} cx="0" cy="0" r="1" fill="url(#soft-brush)" className="will-change-transform" />
+                ))}
+              </g>
 
               {Array.from({ length: NUM_CIRCLES }).map((_, i) => (
-                <circle key={i} ref={(el) => (circlesRef.current[i] = el)} cx="-100" cy="-100" r="0" fill="url(#soft-brush)" />
+                <circle key={i} ref={(el) => (circlesRef.current[i] = el)} cx="0" cy="0" r="1" fill="url(#soft-brush)" className="will-change-transform" />
               ))}
             </g>
           </mask>
@@ -274,29 +297,55 @@ function Hero2() {
           {/* 🩸 VISIBLE RED INK BLOB & DROPLETS */}
           <svg className="absolute inset-0 w-full h-full z-0 pointer-events-none mix-blend-screen">
              <g filter="url(#blob-edge)">
-               {/* Ellipse for sleek fast ink shape */}
-               <ellipse ref={autoInkVisualRef} cx="-500" opacity={0.2} cy="-500" rx="300" ry="80" fill="url(#neon-ink-glow)" />
-               
-               {/* Visible Droplets */}
-               {Array.from({ length: NUM_AUTO_PARTS }).map((_, i) => (
-                  <circle key={`auto-v-${i}`} ref={(el) => (autoPartsVisRef.current[i] = el)} cx="-100" cy="-100" r="0" fill="url(#neon-ink-glow)" />
-               ))}
+               {/* GROUP FOR HOVER HIDE */}
+               <g ref={autoInkGroupVisRef}>
+                 <ellipse ref={autoInkVisualRef} cx="0" cy="0" opacity={0.2} rx="300" ry="80" fill="url(#neon-ink-glow)" className="will-change-transform" />
+                 {Array.from({ length: NUM_AUTO_PARTS }).map((_, i) => (
+                    <circle key={`auto-v-${i}`} ref={(el) => (autoPartsVisRef.current[i] = el)} cx="0" cy="0" r="1" fill="url(#neon-ink-glow)" className="will-change-transform" />
+                 ))}
+               </g>
              </g>
           </svg>
 
-          {/* 🅱️ TOYOTA LAYERS */}
+          {/* 🅱️ TOYOTA LAYERS (FONT FAMILY REMOVED, DEFAULT PROXIMA NOVA USE HOGA) */}
           <div ref={mainTextRef} className="absolute z-[-999] inset-0 flex items-center justify-center pointer-events-none mt-10">
-            <div className="stacked-text flex flex-col items-center uppercase font-black text-[6rem] md:text-[10rem] lg:text-[15rem] leading-none tracking-tighter" style={{ fontFamily: "'Google Sans Flex', sans-serif" }}>
-              <div className="overflow-hidden h-[0.9em] flex items-start"><span className="block text-toyota-red opacity-40">TOYOTA</span></div>
-              <div className="overflow-hidden h-[0.65em] flex items-start opacity-55 -mt-[0.05em]"><span className="block text-transparent" style={{ WebkitTextStroke: "2px white" }}>TOY</span><span className="block text-transparent" style={{ WebkitTextStroke: "2px #eb0a1e" }}>OTA</span></div>
-              <div className="overflow-hidden h-[0.45em] flex items-start opacity-50 -mt-[0.05em]"><span className="block text-transparent" style={{ WebkitTextStroke: "2px white" }}>TOY</span><span className="block text-transparent" style={{ WebkitTextStroke: "2px #eb0a1e" }}>OTA</span></div>
-              <div className="overflow-hidden h-[0.3em] flex items-start opacity-30 -mt-[0.05em]"><span className="block text-transparent" style={{ WebkitTextStroke: "2px white" }}>TOY</span><span className="block text-transparent" style={{ WebkitTextStroke: "2px #eb0a1e" }}>OTA</span></div>
-              <div className="overflow-hidden h-[0.15em] flex items-start opacity-10 -mt-[0.05em]"><span className="block text-transparent" style={{ WebkitTextStroke: "2px white" }}>TOY</span><span className="block text-transparent" style={{ WebkitTextStroke: "2px #eb0a1e" }}>OTA</span></div>
+            <div className="stacked-text flex flex-col items-center uppercase font-black text-[6rem] md:text-[10rem] lg:text-[15rem] leading-none mt-5 tracking-[3rem]">
+              
+              {/* 1ST LAYER: Thick/Heavy look using 6px Stroke */}
+              <div className="overflow-hidden h-[0.9em] flex items-start ">
+                <span className="block text-toyota-red opacity-40" style={{ WebkitTextStroke: "6px #eb0a1e" }}>TOYOTA</span>
+              </div>
+              
+              {/* OTHER LAYERS: Stroke 3px for consistent thickness */}
+              <div className="overflow-hidden h-[0.65em] flex items-start opacity-55 -mt-[0.05em] ">
+                <span className="block text-transparent opacity-30" style={{ WebkitTextStroke: "3px white" }} >TOY</span>
+                <span className="block text-transparent opacity-30" style={{ WebkitTextStroke: "3px #eb0a1e" }} >OTA</span>
+              </div>
+              
+              <div className="overflow-hidden h-[0.45em] flex items-start opacity-50 -mt-[0.05em]">
+                <span className="block text-transparent opacity-25" style={{ WebkitTextStroke: "3px white"  }}>TOY</span>
+                <span className="block text-transparent opacity-25" style={{ WebkitTextStroke: "3px #eb0a1e" }}>OTA</span>
+                
+              </div>
+              
+              <div className="overflow-hidden h-[0.3em] flex items-start opacity-30 -mt-[0.05em]">
+                <span className="block text-transparent opacity-20" style={{ WebkitTextStroke: "3px white" }}>TOY</span>
+                <span className="block text-transparent  opacity-20" style={{ WebkitTextStroke: "3px #eb0a1e" }}>OTA</span>
+              </div>
+              
+              <div className="overflow-hidden h-[0.15em] flex items-start opacity-10 -mt-[0.05em]">
+                <span className="block text-transparent" style={{ WebkitTextStroke: "3px #eb0a1e" }}>TOY</span>
+                <span className="block text-transparent" style={{ WebkitTextStroke: "3px #eb0a1e" }}>OTA</span>
+              </div>
             </div>
           </div>
 
-          {/* 🏎️ CAR IMAGES */}
-          <div className="absolute inset-0 w-full h-full parallax-target">
+          {/* 🏎️ CAR IMAGES - HOVER LOGIC ATTACHED ONLY HERE */}
+          <div 
+            className="absolute inset-0 w-full h-full parallax-target pointer-events-auto transform-gpu"
+            onMouseEnter={handleImageEnter}
+            onMouseLeave={handleImageLeave}
+          >
             <div 
               className="absolute inset-0 w-full h-full opacity-40 pointer-events-none -scale-y-100 translate-y-[42%]"
               style={{ WebkitMaskImage: "linear-gradient(to top, rgba(0,0,0,1) 20%, rgba(0,0,0,0) 65%)", maskImage: "linear-gradient(to top, rgba(0,0,0,1) 20%, rgba(0,0,0,0) 65%)" }}
