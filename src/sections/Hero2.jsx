@@ -14,11 +14,11 @@ function Hero2() {
   // 🎯 Brush Trail Engine k Refs (Mouse k liye)
   const circlesRef = useRef([]);
   const circleIndex = useRef(0);
-  const NUM_CIRCLES = 35; // Thore kam kiye hain performance k liye
+  const NUM_CIRCLES = 30; // Further optimized for performance
 
   // 🎯 Autonomous Ink Blob Refs (Khud chalne wali ink)
-  const autoInkGroupMaskRef = useRef(null); // Hover pe hide karne k liye
-  const autoInkGroupVisRef = useRef(null);  // Hover pe hide karne k liye
+  const autoInkGroupMaskRef = useRef(null); 
+  const autoInkGroupVisRef = useRef(null);  
   const autoInkMaskRef = useRef(null);
   const autoInkVisualRef = useRef(null);
 
@@ -26,7 +26,10 @@ function Hero2() {
   const autoPartsMaskRef = useRef([]);
   const autoPartsVisRef = useRef([]);
   const autoPartIndex = useRef(0);
-  const NUM_AUTO_PARTS = 20; // Performance boost k liye 20
+  const NUM_AUTO_PARTS = 20;
+
+  // 🚦 Tracking State for Hover (Taa k mask bahar na reveal ho)
+  const isHoveringCar = useRef(false);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -36,7 +39,7 @@ function Hero2() {
       gsap.set(mainTextRef.current, { opacity: 0, y: 50 });
       gsap.set(uiElementsRef.current, { opacity: 0 });
 
-      // Init positioning using CSS Transforms (Fast & Smooth)
+      // Init positioning using CSS Transforms
       gsap.set([autoInkMaskRef.current, autoInkVisualRef.current], { x: -500, y: -500 });
 
       // 🔴 INTRO RED SCREEN + LOGO
@@ -52,23 +55,16 @@ function Hero2() {
         .to(mainTextRef.current, { opacity: 1, y: 0, duration: 1.5, ease: "power3.out" }, "-=1.0")
         .to(uiElementsRef.current, { opacity: 1, duration: 1.5, ease: "power2.out" }, "-=1.0");
 
-      // 🌊 CONTINUOUS BUBBLING ANIMATION
-      gsap.to(turbulenceRef.current, {
-        attr: { baseFrequency: "0.005 0.008" },
-        duration: 4,
-        repeat: -1,
-        yoyo: true,
-        ease: "sine.inOut"
-      });
+      // 🛑 LAG FIX: Removed continuous turbulence baseFrequency animation here. 
+      // Movement of shapes through static filter gives the liquid effect natively without lag.
 
-      // 💧 ADVANCED AUTONOMOUS INK LOGIC (High-Performance Transforms)
+      // 💧 ADVANCED AUTONOMOUS INK LOGIC
       if (autoInkMaskRef.current && autoInkVisualRef.current && window.innerWidth > 0) {
         let isCenterDash = false;
 
         function dropParticle() {
           if (Math.random() > 0.4) return; 
 
-          // EXTREME OPTIMIZATION: Get current x/y instead of attr cx/cy
           const target = this.targets()[0];
           const currX = gsap.getProperty(target, "x");
           const currY = gsap.getProperty(target, "y");
@@ -84,11 +80,10 @@ function Hero2() {
 
             gsap.killTweensOf([maskPart, visPart]);
             
-            // Using X, Y, and Scale (100x faster than attr)
             gsap.set([maskPart, visPart], { 
               x: currX + offsetX, 
               y: currY + offsetY, 
-              scale: size, // Scale use kia hai radius ki jaga
+              scale: size,
               opacity: gsap.utils.random(0.6, 1) 
             });
             
@@ -112,7 +107,7 @@ function Hero2() {
             const speed = gsap.utils.random(2, 3);
             
             gsap.to([autoInkMaskRef.current, autoInkVisualRef.current], {
-              x: newX, y: newY, // CSS Transform instead of attr
+              x: newX, y: newY, 
               duration: speed,
               ease: "power1.inOut",
               onUpdate: dropParticle,
@@ -139,7 +134,7 @@ function Hero2() {
               const targetY = gsap.utils.random(h * 0.4, h * 0.6);
 
               dashTl.to([autoInkMaskRef.current, autoInkVisualRef.current], {
-                x: targetX, y: targetY, // CSS Transform
+                x: targetX, y: targetY, 
                 duration: dashDuration,
                 ease: "power1.inOut",
                 onUpdate: dropParticle
@@ -176,6 +171,7 @@ function Hero2() {
 
     if (!sectionRef.current || !bgWrapperRef.current) return;
 
+    // 1. Always apply parallax to the car container
     const { left, top, width, height } = sectionRef.current.getBoundingClientRect();
     const x = (clientX - left) / width - 0.5;
     const y = (clientY - top) / height - 0.5;
@@ -188,38 +184,45 @@ function Hero2() {
       overwrite: "auto"
     });
 
-    const rect = bgWrapperRef.current.getBoundingClientRect();
-    const localX = clientX - rect.left;
-    const localY = clientY - rect.top;
+    // 2. ONLY draw brush trail if mouse is hovering over the car image
+    if (isHoveringCar.current) {
+      const rect = bgWrapperRef.current.getBoundingClientRect();
+      const localX = clientX - rect.left;
+      const localY = clientY - rect.top;
 
-    // Use CSS Transforms for Brush Engine to avoid lag
-    const circle = circlesRef.current[circleIndex.current];
-    if (circle) {
-      const offsetX = (Math.random() - 0.5) * 30;
-      const offsetY = (Math.random() - 0.5) * 30;
-      gsap.killTweensOf(circle);
-      gsap.set(circle, { x: localX + offsetX, y: localY + offsetY });
-      gsap.fromTo(circle, { scale: 0, opacity: 1 }, { scale: Math.random() * 30 + 80, duration: 0.2, ease: "power2.out" });
-      gsap.to(circle, { scale: 0, opacity: 0, duration: 0.6, delay: 0.8 + Math.random() * 0.4, ease: "power3.inOut" });
+      const circle = circlesRef.current[circleIndex.current];
+      if (circle) {
+        const offsetX = (Math.random() - 0.5) * 30;
+        const offsetY = (Math.random() - 0.5) * 30;
+        gsap.killTweensOf(circle);
+        gsap.set(circle, { x: localX + offsetX, y: localY + offsetY });
+        gsap.fromTo(circle, { scale: 0, opacity: 1 }, { scale: Math.random() * 30 + 80, duration: 0.2, ease: "power2.out" });
+        gsap.to(circle, { scale: 0, opacity: 0, duration: 0.6, delay: 0.5 + Math.random() * 0.3, ease: "power3.inOut" });
+      }
+      circleIndex.current = (circleIndex.current + 1) % NUM_CIRCLES;
     }
-    circleIndex.current = (circleIndex.current + 1) % NUM_CIRCLES;
   };
 
-  // 🎯 Hide Auto Ink On Hover (Sirf CAR Image k liye)
+  // 🎯 Hide/Show Logic
   const handleImageEnter = () => {
+    isHoveringCar.current = true; // Set flag to allow mask revealing
+    // Fauran ink hide karo
     gsap.to([autoInkGroupMaskRef.current, autoInkGroupVisRef.current], {
       opacity: 0,
-      duration: 0.4,
+      duration: 0.3,
       ease: "power2.out",
       overwrite: "auto"
     });
   };
 
   const handleImageLeave = () => {
+    isHoveringCar.current = false; // Stop mask revealing
+    // Mask reveal khatam hone ka wait karo (0.6s delay) phir ink active karo
     gsap.to([autoInkGroupMaskRef.current, autoInkGroupVisRef.current], {
       opacity: 1,
-      duration: 0.4,
-      ease: "power2.out",
+      duration: 0.5,
+      delay: 0.6, // Delay lagaya taa k trail khtam hone k baad active ho
+      ease: "power2.in",
       overwrite: "auto"
     });
   };
@@ -246,17 +249,15 @@ function Hero2() {
             <stop offset="100%" stopColor="#eb0a1e" stopOpacity="0" />
           </radialGradient>
 
-          {/* Filter bounds optimized for extreme performance */}
-          <filter id="blob-edge" x="-20%" y="-20%" width="140%" height="140%">
-            <feTurbulence ref={turbulenceRef} type="fractalNoise" baseFrequency="0.005" numOctaves="2" result="noise" />
-            <feDisplacementMap in="SourceGraphic" in2="noise" scale="250" xChannelSelector="R" yChannelSelector="G" />
+          {/* LAG FIX: numOctaves="1" aur colorInterpolationFilters="sRGB" lagaya for max performance */}
+          <filter id="blob-edge" x="-20%" y="-20%" width="140%" height="140%" colorInterpolationFilters="sRGB">
+            <feTurbulence ref={turbulenceRef} type="fractalNoise" baseFrequency="0.005" numOctaves="1" result="noise" />
+            <feDisplacementMap in="SourceGraphic" in2="noise" scale="150" xChannelSelector="R" yChannelSelector="G" />
           </filter>
           
           <mask id="liquid-trail-mask">
             <rect width="100%" height="100%" fill="black" />
             <g filter="url(#blob-edge)">
-              
-              {/* GROUP FOR HOVER HIDE */}
               <g ref={autoInkGroupMaskRef}>
                 <ellipse ref={autoInkMaskRef} cx="0" cy="0" rx="300" ry="80" fill="url(#soft-brush)" className="will-change-transform" />
                 {Array.from({ length: NUM_AUTO_PARTS }).map((_, i) => (
@@ -297,7 +298,6 @@ function Hero2() {
           {/* 🩸 VISIBLE RED INK BLOB & DROPLETS */}
           <svg className="absolute inset-0 w-full h-full z-0 pointer-events-none mix-blend-screen">
              <g filter="url(#blob-edge)">
-               {/* GROUP FOR HOVER HIDE */}
                <g ref={autoInkGroupVisRef}>
                  <ellipse ref={autoInkVisualRef} cx="0" cy="0" opacity={0.2} rx="300" ry="80" fill="url(#neon-ink-glow)" className="will-change-transform" />
                  {Array.from({ length: NUM_AUTO_PARTS }).map((_, i) => (
@@ -307,16 +307,14 @@ function Hero2() {
              </g>
           </svg>
 
-          {/* 🅱️ TOYOTA LAYERS (FONT FAMILY REMOVED, DEFAULT PROXIMA NOVA USE HOGA) */}
+          {/* 🅱️ TOYOTA LAYERS */}
           <div ref={mainTextRef} className="absolute z-[-999] inset-0 flex items-center justify-center pointer-events-none mt-10">
             <div className="stacked-text flex flex-col items-center uppercase font-black text-[6rem] md:text-[10rem] lg:text-[15rem] leading-none mt-5 tracking-[3rem]">
               
-              {/* 1ST LAYER: Thick/Heavy look using 6px Stroke */}
               <div className="overflow-hidden h-[0.9em] flex items-start ">
                 <span className="block text-toyota-red opacity-40" style={{ WebkitTextStroke: "6px #eb0a1e" }}>TOYOTA</span>
               </div>
               
-              {/* OTHER LAYERS: Stroke 3px for consistent thickness */}
               <div className="overflow-hidden h-[0.65em] flex items-start opacity-55 -mt-[0.05em] ">
                 <span className="block text-transparent opacity-30" style={{ WebkitTextStroke: "3px white" }} >TOY</span>
                 <span className="block text-transparent opacity-30" style={{ WebkitTextStroke: "3px #eb0a1e" }} >OTA</span>
@@ -325,12 +323,11 @@ function Hero2() {
               <div className="overflow-hidden h-[0.45em] flex items-start opacity-50 -mt-[0.05em]">
                 <span className="block text-transparent opacity-25" style={{ WebkitTextStroke: "3px white"  }}>TOY</span>
                 <span className="block text-transparent opacity-25" style={{ WebkitTextStroke: "3px #eb0a1e" }}>OTA</span>
-                
               </div>
               
               <div className="overflow-hidden h-[0.3em] flex items-start opacity-30 -mt-[0.05em]">
                 <span className="block text-transparent opacity-20" style={{ WebkitTextStroke: "3px white" }}>TOY</span>
-                <span className="block text-transparent  opacity-20" style={{ WebkitTextStroke: "3px #eb0a1e" }}>OTA</span>
+                <span className="block text-transparent opacity-20" style={{ WebkitTextStroke: "3px #eb0a1e" }}>OTA</span>
               </div>
               
               <div className="overflow-hidden h-[0.15em] flex items-start opacity-10 -mt-[0.05em]">
@@ -340,7 +337,7 @@ function Hero2() {
             </div>
           </div>
 
-          {/* 🏎️ CAR IMAGES - HOVER LOGIC ATTACHED ONLY HERE */}
+          {/* 🏎️ CAR IMAGES - HOVER LOGIC APPLIED HERE */}
           <div 
             className="absolute inset-0 w-full h-full parallax-target pointer-events-auto transform-gpu"
             onMouseEnter={handleImageEnter}
