@@ -14,7 +14,7 @@ function Hero2() {
   // 🎯 Brush Trail Engine k Refs (Mouse k liye)
   const circlesRef = useRef([]);
   const circleIndex = useRef(0);
-  const NUM_CIRCLES = 30; // Further optimized for performance
+  const NUM_CIRCLES = 30; 
 
   // 🎯 Autonomous Ink Blob Refs (Khud chalne wali ink)
   const autoInkGroupMaskRef = useRef(null); 
@@ -28,8 +28,9 @@ function Hero2() {
   const autoPartIndex = useRef(0);
   const NUM_AUTO_PARTS = 20;
 
-  // 🚦 Tracking State for Hover (Taa k mask bahar na reveal ho)
+  // 🚦 Tracking States
   const isHoveringCar = useRef(false);
+  const inkTimerRef = useRef(null); // Timer ink ko wapis lane k liye
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -39,7 +40,6 @@ function Hero2() {
       gsap.set(mainTextRef.current, { opacity: 0, y: 50 });
       gsap.set(uiElementsRef.current, { opacity: 0 });
 
-      // Init positioning using CSS Transforms
       gsap.set([autoInkMaskRef.current, autoInkVisualRef.current], { x: -500, y: -500 });
 
       // 🔴 INTRO RED SCREEN + LOGO
@@ -54,9 +54,6 @@ function Hero2() {
         .to(bgWrapperRef.current, { opacity: 1, duration: 1.5, ease: "power4.out" }, "-=0.7")
         .to(mainTextRef.current, { opacity: 1, y: 0, duration: 1.5, ease: "power3.out" }, "-=1.0")
         .to(uiElementsRef.current, { opacity: 1, duration: 1.5, ease: "power2.out" }, "-=1.0");
-
-      // 🛑 LAG FIX: Removed continuous turbulence baseFrequency animation here. 
-      // Movement of shapes through static filter gives the liquid effect natively without lag.
 
       // 💧 ADVANCED AUTONOMOUS INK LOGIC
       if (autoInkMaskRef.current && autoInkVisualRef.current && window.innerWidth > 0) {
@@ -171,7 +168,7 @@ function Hero2() {
 
     if (!sectionRef.current || !bgWrapperRef.current) return;
 
-    // 1. Always apply parallax to the car container
+    // Parallax logic (always runs)
     const { left, top, width, height } = sectionRef.current.getBoundingClientRect();
     const x = (clientX - left) / width - 0.5;
     const y = (clientY - top) / height - 0.5;
@@ -184,7 +181,7 @@ function Hero2() {
       overwrite: "auto"
     });
 
-    // 2. ONLY draw brush trail if mouse is hovering over the car image
+    // 🔴 ONLY RUN THIS IF MOUSE IS ACTUALLY ON CAR (Mask Reveal Logic)
     if (isHoveringCar.current) {
       const rect = bgWrapperRef.current.getBoundingClientRect();
       const localX = clientX - rect.left;
@@ -197,34 +194,44 @@ function Hero2() {
         gsap.killTweensOf(circle);
         gsap.set(circle, { x: localX + offsetX, y: localY + offsetY });
         gsap.fromTo(circle, { scale: 0, opacity: 1 }, { scale: Math.random() * 30 + 80, duration: 0.2, ease: "power2.out" });
+        
+        // Note: Circle disappear hone me max ~1.4 sec lagte hain (0.8 delay + 0.6 duration)
         gsap.to(circle, { scale: 0, opacity: 0, duration: 0.6, delay: 0.5 + Math.random() * 0.3, ease: "power3.inOut" });
       }
       circleIndex.current = (circleIndex.current + 1) % NUM_CIRCLES;
+
+      // 🔥 LOGIC: Jab tak mask ban raha hai, Auto Ink Hide kardo
+      gsap.to([autoInkGroupMaskRef.current, autoInkGroupVisRef.current], {
+        opacity: 0,
+        duration: 0.3,
+        ease: "power2.out",
+        overwrite: "auto"
+      });
+
+      // 🔥 LOGIC: Agar pehle se timer chal raha hai to cancel kardo
+      if (inkTimerRef.current) {
+        inkTimerRef.current.kill();
+      }
+
+      // 🔥 LOGIC: 1.4 Seconds (jab mask bilkul khtam/disappear ho jaye) baad ink wapis le aao
+      inkTimerRef.current = gsap.delayedCall(1.4, () => {
+        gsap.to([autoInkGroupMaskRef.current, autoInkGroupVisRef.current], {
+          opacity: 1,
+          duration: 0.5,
+          ease: "power2.inOut",
+          overwrite: "auto"
+        });
+      });
     }
   };
 
-  // 🎯 Hide/Show Logic
+  // Tracking mouse enter/leave just to enable/disable mask generation
   const handleImageEnter = () => {
-    isHoveringCar.current = true; // Set flag to allow mask revealing
-    // Fauran ink hide karo
-    gsap.to([autoInkGroupMaskRef.current, autoInkGroupVisRef.current], {
-      opacity: 0,
-      duration: 0.3,
-      ease: "power2.out",
-      overwrite: "auto"
-    });
+    isHoveringCar.current = true;
   };
 
   const handleImageLeave = () => {
-    isHoveringCar.current = false; // Stop mask revealing
-    // Mask reveal khatam hone ka wait karo (0.6s delay) phir ink active karo
-    gsap.to([autoInkGroupMaskRef.current, autoInkGroupVisRef.current], {
-      opacity: 1,
-      duration: 0.5,
-      delay: 0.6, // Delay lagaya taa k trail khtam hone k baad active ho
-      ease: "power2.in",
-      overwrite: "auto"
-    });
+    isHoveringCar.current = false;
   };
 
   return (
@@ -249,7 +256,7 @@ function Hero2() {
             <stop offset="100%" stopColor="#eb0a1e" stopOpacity="0" />
           </radialGradient>
 
-          {/* LAG FIX: numOctaves="1" aur colorInterpolationFilters="sRGB" lagaya for max performance */}
+          {/* LAG FIX APPLIED FOR EXTREME PERFORMANCE */}
           <filter id="blob-edge" x="-20%" y="-20%" width="140%" height="140%" colorInterpolationFilters="sRGB">
             <feTurbulence ref={turbulenceRef} type="fractalNoise" baseFrequency="0.005" numOctaves="1" result="noise" />
             <feDisplacementMap in="SourceGraphic" in2="noise" scale="150" xChannelSelector="R" yChannelSelector="G" />
@@ -337,7 +344,7 @@ function Hero2() {
             </div>
           </div>
 
-          {/* 🏎️ CAR IMAGES - HOVER LOGIC APPLIED HERE */}
+          {/* 🏎️ CAR IMAGES - HOVER EVENTS APPLIED HERE */}
           <div 
             className="absolute inset-0 w-full h-full parallax-target pointer-events-auto transform-gpu"
             onMouseEnter={handleImageEnter}
