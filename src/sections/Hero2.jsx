@@ -250,10 +250,11 @@ function Hero2() {
             <stop offset="100%" stopColor="white" stopOpacity="0" />
           </radialGradient>
           
-          <radialGradient id="neon-ink-glow">
-            <stop offset="10%" stopColor="#ff1e1e" stopOpacity="0.8" />
-            <stop offset="40%" stopColor="#eb0a1e" stopOpacity="0.5" />
-            <stop offset="100%" stopColor="#eb0a1e" stopOpacity="0" />
+          {/* ✅ DARK GREY INK GRADIENT (Black background par dikhne ke liye) */}
+          <radialGradient id="dark-grey-ink">
+            <stop offset="10%" stopColor="#777777" stopOpacity="0.8" />
+            <stop offset="50%" stopColor="#444444" stopOpacity="0.5" />
+            <stop offset="100%" stopColor="#222222" stopOpacity="0" />
           </radialGradient>
 
           {/* LAG FIX APPLIED FOR EXTREME PERFORMANCE */}
@@ -302,13 +303,14 @@ function Hero2() {
             backgroundColor: "rgba(0,0,0,0.95)"
           }}
         >
-          {/* 🩸 VISIBLE RED INK BLOB & DROPLETS */}
-          <svg className="absolute inset-0 w-full h-full z-0 pointer-events-none mix-blend-screen">
+          {/* ✅ VISIBLE DARK GREY INK BLOB & DROPLETS (Glow / mix-blend removed) */}
+          <svg className="absolute inset-0 w-full h-full z-0 pointer-events-none">
              <g filter="url(#blob-edge)">
                <g ref={autoInkGroupVisRef}>
-                 <ellipse ref={autoInkVisualRef} cx="0" cy="0" opacity={0.2} rx="300" ry="80" fill="url(#neon-ink-glow)" className="will-change-transform" />
+                 {/* ✅ Opacity removed so it's clearly visible, fill updated */}
+                 <ellipse ref={autoInkVisualRef} cx="0" cy="0" rx="300" ry="80" fill="url(#dark-grey-ink)" className="will-change-transform" />
                  {Array.from({ length: NUM_AUTO_PARTS }).map((_, i) => (
-                    <circle key={`auto-v-${i}`} ref={(el) => (autoPartsVisRef.current[i] = el)} cx="0" cy="0" r="1" fill="url(#neon-ink-glow)" className="will-change-transform" />
+                    <circle key={`auto-v-${i}`} ref={(el) => (autoPartsVisRef.current[i] = el)} cx="0" cy="0" r="1" fill="url(#dark-grey-ink)" className="will-change-transform" />
                  ))}
                </g>
              </g>
