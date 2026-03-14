@@ -345,7 +345,7 @@ function Hero2() {
             </div>
           </div>
 
-          {/* 🏎️ CAR IMAGES - HOVER EVENTS APPLIED HERE */}
+          {/* 🏎️ CAR IMAGES LAYER 1: Base Layer (Receives Hover Events & Moves with Parallax) */}
           <div 
             className="absolute inset-0 w-full h-full parallax-target pointer-events-auto transform-gpu"
             onMouseEnter={handleImageEnter}
@@ -356,12 +356,27 @@ function Hero2() {
               style={{ WebkitMaskImage: "linear-gradient(to top, rgba(0,0,0,1) 20%, rgba(0,0,0,0) 65%)", maskImage: "linear-gradient(to top, rgba(0,0,0,1) 20%, rgba(0,0,0,0) 65%)" }}
             >
               <img src="/images/hero1.png" className="absolute inset-0 w-full h-full object-cover scale-70 " alt="Base Reflection" />
-              <img src="/images/spn2.png" className="absolute inset-0 w-full h-full object-cover scale-68 pointer-events-none mt-2 -ml-2" style={{ WebkitMaskImage: "url(#liquid-trail-mask)", maskImage: "url(#liquid-trail-mask)" }} alt="Hover Reflection" />
             </div>
-
             <img src="/images/hero1.png" className="absolute inset-0 w-full h-full object-cover scale-70 " alt="Base" />
-            <img src="/images/spn2.png" className="absolute inset-0 w-full h-full object-cover scale-68 pointer-events-none mt-2 -ml-2" style={{ WebkitMaskImage: "url(#liquid-trail-mask)", maskImage: "url(#liquid-trail-mask)" }} alt="Hover" />
           </div>
+
+          {/* 🏎️ CAR IMAGES LAYER 2: Hover/Masked Layer (Mask is STATIONARY, Image inside moves with Parallax) */}
+          <div 
+            className="absolute inset-0 w-full h-full pointer-events-none" 
+            style={{ WebkitMaskImage: "url(#liquid-trail-mask)", maskImage: "url(#liquid-trail-mask)" }}
+          >
+             {/* Inner container exactly matches the Parallax movement of Layer 1 */}
+             <div className="absolute inset-0 w-full h-full parallax-target transform-gpu">
+                <div 
+                  className="absolute inset-0 w-full h-full opacity-40 pointer-events-none -scale-y-100 translate-y-[42%]"
+                  style={{ WebkitMaskImage: "linear-gradient(to top, rgba(0,0,0,1) 20%, rgba(0,0,0,0) 65%)", maskImage: "linear-gradient(to top, rgba(0,0,0,1) 20%, rgba(0,0,0,0) 65%)" }}
+                >
+                  <img src="/images/spn2.png" className="absolute inset-0 w-full h-full object-cover scale-68 mt-2 -ml-2" alt="Hover Reflection" />
+                </div>
+                <img src="/images/spn2.png" className="absolute inset-0 w-full h-full object-cover scale-68 mt-2 -ml-2" alt="Hover" />
+             </div>
+          </div>
+
         </div>
 
         {/* 2️⃣ TOP RIGHT MODULE */}
