@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import gsap from "gsap";
-// 🟢 EXTRACTED COMPONENTS IMPORTS
+
 import { useAutoInk, AutoInkMaskElements, AutoInkVisualElements } from "../components/Smoke"
 import { useCarMaskReveal, MouseTrailMaskElements, CarImagesLayer } from "../components/CarMaskReveal";
 
@@ -120,13 +120,13 @@ function Hero2() {
         </div>
 
         {/* 2️⃣ TOP RIGHT MODULE */}
-        <div className="absolute top-0 right-0 w-[24%] h-[18%] flex flex-col items-end gap-3 pointer-events-none">
+        <div className="absolute top-0  right-0 w-[24%] h-[18%] flex flex-col items-end gap-3 pointer-events-none">
             <div className="flex gap-2 pointer-events-auto">
               <button className="w-12 h-12 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white flex items-center justify-center hover:bg-toyota-red transition-all cursor-pointer"><svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg></button>
               <button className="w-12 h-12 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white flex items-center justify-center hover:bg-toyota-red transition-all cursor-pointer"><svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg></button>
               <button className="h-12 px-6 rounded-full bg-white text-black font-black text-xs tracking-widest hover:bg-toyota-red hover:text-white transition-all cursor-pointer">CONTACT</button>
             </div>
-            <button onClick={() => gsap.to(window, { duration: 2, scrollTo: "#footer" })} className="w-full h-12 rounded-full border border-white/20 text-white font-black text-xs tracking-[0.2em] hover:bg-white hover:text-black transition-all cursor-pointer pointer-events-auto">EXPLORE MODELS</button>
+            <button onClick={() => gsap.to(window, { duration: 2, scrollTo: "#footer" })} className="w-full h-12 rounded-full border border-white/20 text-white font-black text-xs tracking-[0.2em] hover:bg-white hover:text-black transition-all  cursor-pointer pointer-events-auto">EXPLORE MODELS</button>
         </div>
 
         {/* 3️⃣ BOTTOM RIGHT MODULE */}
